@@ -2,7 +2,7 @@ import { InteractionApplicationCommandCallbackData, InteractionComponentHandler,
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction } from './types/base'
 import CordoAPI from './api'
-import Cordo from './cordo'
+import Cordo from './index'
 
 
 export default class CordoReplies {
