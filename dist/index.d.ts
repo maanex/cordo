@@ -1,6 +1,15 @@
 import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
+export * from './api';
+export * from './replies';
+export * from './lib/default-logger';
+export * from './lib/permission-strings';
+export * from './types/base';
+export * from './types/component';
+export * from './types/const';
+export * from './types/custom';
+export * from './types/middleware';
 export default class Cordo {
     private static commandHandlers;
     private static componentHandlers;

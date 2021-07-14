@@ -21,9 +21,9 @@ export type CordoConfig = {
   }
 }
 
-export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: cordo.GuildData) => any
-export type GuildDataMiddleware = (guildid: string) => cordo.GuildData | Promise<cordo.GuildData>
-export type UserDataMiddleware = (userid: string) => cordo.UserData | Promise<cordo.UserData>
+export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: GuildData) => any
+export type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>
+export type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>
 
 export type CustomLogger = {
   log(content: any): any
@@ -34,7 +34,5 @@ export type CustomLogger = {
 }
 
 
-export namespace cordo {
-  export type GuildData = { }
-  export type UserData = { }
-}
+export interface GuildData { }
+export interface UserData { }

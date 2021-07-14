@@ -18,9 +18,9 @@ export declare type CordoConfig = {
         interaction_failed: string;
     };
 };
-export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: cordo.GuildData) => any;
-export declare type GuildDataMiddleware = (guildid: string) => cordo.GuildData | Promise<cordo.GuildData>;
-export declare type UserDataMiddleware = (userid: string) => cordo.UserData | Promise<cordo.UserData>;
+export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: GuildData) => any;
+export declare type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
+export declare type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
 export declare type CustomLogger = {
     log(content: any): any;
     warn(content: any): any;
@@ -28,7 +28,7 @@ export declare type CustomLogger = {
     info(content: any): any;
     debug(content: any): any;
 };
-export declare namespace cordo {
-    type GuildData = {};
-    type UserData = {};
+export interface GuildData {
+}
+export interface UserData {
 }

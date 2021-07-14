@@ -3,7 +3,7 @@
 
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
 import { ComponentType, InteractionComponentFlag, InteractionType } from './const'
-import { cordo } from './middleware'
+import { GuildData, UserData } from './middleware'
 
 
 export type InteractionUser = {
@@ -113,8 +113,8 @@ export type InteractionBase = {
   version: number
   user: InteractionUser
   application_id?: string
-  guildData?: cordo.GuildData
-  userData?: cordo.UserData
+  guildData?: GuildData
+  userData?: UserData
   _answered: boolean
 }
 

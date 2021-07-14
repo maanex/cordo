@@ -1,6 +1,6 @@
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
 import { ComponentType, InteractionComponentFlag, InteractionType } from './const';
-import { cordo } from './middleware';
+import { GuildData, UserData } from './middleware';
 export declare type InteractionUser = {
     id: string;
     username: string;
@@ -96,8 +96,8 @@ export declare type InteractionBase = {
     version: number;
     user: InteractionUser;
     application_id?: string;
-    guildData?: cordo.GuildData;
-    userData?: cordo.UserData;
+    guildData?: GuildData;
+    userData?: UserData;
     _answered: boolean;
 };
 export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent);
