@@ -9,6 +9,16 @@ import CordoReplies from './replies'
 import DefaultLogger from './lib/default-logger'
 import PermissionStrings from './lib/permission-strings'
 
+
+export * from './api'
+export * from './replies'
+export * from './lib/default-logger'
+export * from './lib/permission-strings'
+export * from './types/base'
+export * from './types/component'
+export * from './types/const'
+export * from './types/custom'
+export * from './types/middleware'
 export default class Cordo {
 
   private static commandHandlers: { [command: string]: InteractionCommandHandler } = {}
