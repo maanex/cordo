@@ -14,7 +14,20 @@ export default class Cordo {
   private static commandHandlers: { [command: string]: InteractionCommandHandler } = {}
   private static componentHandlers: { [command: string]: InteractionComponentHandler } = {}
   private static uiStates: { [name: string]: InteractionUIState } = {}
-  private static config: CordoConfig = null
+  private static config: CordoConfig = {
+    botId: null,
+    texts: {
+      interaction_not_owned_title: 'Nope!',
+      interaction_not_owned_description: 'You cannot interact with this widget as you did not create it. Run the command yourself to get a interactable widget.',
+      interaction_not_permitted_title: 'No permission!',
+      interaction_not_permitted_description_generic: 'You cannot do this.',
+      interaction_not_permitted_description_bot_admin: 'Only bot admins can do this.',
+      interaction_not_permitted_description_guild_admin: 'Only server admins.',
+      interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do this.',
+      interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can do this.',
+      interaction_failed: 'We are very sorry but an error occured while processing your command. Please try again.'
+    }
+  }
   
   private static logger: CustomLogger = new DefaultLogger()
   private static middlewares = {
@@ -185,7 +198,7 @@ export default class Cordo {
       Cordo.logger.warn(ex)
       try {
         CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, {
-          content: 'We are very sorry but an error occured while processing your command. Please try again.',
+          content: Cordo.config.texts.interaction_failed,
           flags: InteractionResponseFlags.EPHEMERAL
         })
       } catch (ex) {
@@ -199,7 +212,7 @@ export default class Cordo {
       return 'passed'
 
     if (i.data.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN))
-      return void Cordo.interactionNotPermitted(i, '=interaction_not_permitted_bot_admin')
+      return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin)
     if (!i.data.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE) && i.message.interaction?.user.id !== i.user.id)
       return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command', i.message.interaction?.user.username)
 
@@ -207,11 +220,11 @@ export default class Cordo {
       return 'passed'
 
     if (i.data.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(i.member.permissions))
-      return void Cordo.interactionNotPermitted(i, '=interaction_not_permitted_admin')
+      return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_guild_admin)
     if (i.data.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_SERVER) && !PermissionStrings.containsManageServer(i.member.permissions))
-      return void Cordo.interactionNotPermitted(i, '=interaction_not_permitted_manage_server')
+      return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_manage_server)
     if (i.data.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(i.member.permissions))
-      return void Cordo.interactionNotPermitted(i, '=interaction_not_permitted_manage_messages')
+      return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_manage_messages)
 
     return 'passed'
   }
@@ -247,16 +260,16 @@ export default class Cordo {
 
   private static interactionNotPermitted(i: GenericInteraction, text?: string): any {
     return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
-      title: '=interaction_not_permitted_1',
-      description: text || '=interaction_not_permitted_generic',
+      title: Cordo.config.texts.interaction_not_permitted_title,
+      description: text || Cordo.config.texts.interaction_not_permitted_description_generic,
       flags: InteractionResponseFlags.EPHEMERAL
     })
   }
 
   private static interactionNotOwned(i: GenericInteraction, command?: string, owner?: string): any {
     return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
-      title: '=interaction_not_owned_1',
-      description: '=interaction_not_owned_2',
+      title: this.config.texts.interaction_not_owned_title,
+      description: this.config.texts.interaction_not_owned_description,
       flags: InteractionResponseFlags.EPHEMERAL,
       _context: { command, owner }
     })
@@ -269,8 +282,6 @@ export default class Cordo {
       return Cordo.config.botAdmins(userid)
     else
       return Cordo.config.botAdmins.includes(userid)
-    
-    return false
   }
 
 }

@@ -7,7 +7,18 @@ export type CordoConfig = {
   componentHandlerPath?: string | string[]
   uiStatesPath?: string | string[]
   contextPath?: string | string[]
-  botAdmins: string[] | ((userid: string) => boolean)
+  botAdmins?: string[] | ((userid: string) => boolean)
+  texts: {
+    interaction_not_owned_title: string
+    interaction_not_owned_description: string
+    interaction_not_permitted_title: string
+    interaction_not_permitted_description_generic: string
+    interaction_not_permitted_description_bot_admin: string
+    interaction_not_permitted_description_guild_admin: string
+    interaction_not_permitted_description_manage_server: string
+    interaction_not_permitted_description_manage_messages: string
+    interaction_failed: string
+  }
 }
 
 export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: cordo.GuildData) => any
