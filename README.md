@@ -2,6 +2,10 @@
 
 Cordo is a custom api wrapper built for interactions first. It functions as an addon on top of discord.js. Full documentation is yet to be written
 
+Originally built for the FreeStuff Bot, this codebase could find various usecases so we decided to outsource it. Here's an [Example bot](https://github.com/Maanex/cordo-example-bot) written with it.
+
+Use `npm i cordo` or `yarn add cordo` to install.
+
 
 ## How it works (aka quick docs / tutorial)
 
