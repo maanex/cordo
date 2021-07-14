@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = require("./types/const");
 const api_1 = require("./api");
-const cordo_1 = require("./cordo");
+const index_1 = require("./index");
 class CordoReplies {
     //
     static findActiveInteractionReplyContext(id) {
@@ -38,11 +38,11 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.id;
-                if (!cordo_1.default._data.uiStates[state]) {
-                    cordo_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
+                if (!index_1.default._data.uiStates[state]) {
+                    index_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = cordo_1.default._data.uiStates[state](i, args);
+                let data = index_1.default._data.uiStates[state](i, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
@@ -87,11 +87,11 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.custom_id;
-                if (!cordo_1.default._data.uiStates[state]) {
-                    cordo_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
+                if (!index_1.default._data.uiStates[state]) {
+                    index_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = cordo_1.default._data.uiStates[state](i, args);
+                let data = index_1.default._data.uiStates[state](i, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
@@ -110,11 +110,11 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = context.interaction.id;
-                if (!cordo_1.default._data.uiStates[state]) {
-                    cordo_1.default._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
+                if (!index_1.default._data.uiStates[state]) {
+                    index_1.default._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = cordo_1.default._data.uiStates[state](context.interaction, args);
+                let data = index_1.default._data.uiStates[state](context.interaction, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
@@ -129,7 +129,7 @@ class CordoReplies {
             _context: context,
             withTimeout(timeout, resetOnInteraction, janitor) {
                 if (timeout > 15 * 60 * 1000) {
-                    cordo_1.default._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
+                    index_1.default._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
                     return {};
                 }
                 context.timeout = timeout;

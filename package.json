@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A discord.js addon for handling complex interactions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
     "dev": "tsc && node --trace-warnings ./build/index.js",
     "test": "echo \"Error: no tests specified\" && exit 0",
-    "publish": "npm run lint && npm run build && npm run test && npm pub"
+    "prepublish": "npm run lint && npm run build && npm run test && npm pub"
   },
   "repository": {
     "type": "git",
