@@ -1,10 +1,10 @@
 import axios from 'axios'
-import Cordo from './cordo'
 import PermissionStrings from './lib/permission-strings'
 import { InteractionApplicationCommandCallbackData } from './types/custom'
 import { GenericInteraction, InteractionLocationGuild } from './types/base'
 import { MessageComponent } from './types/component'
 import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
+import Cordo from './index'
 
 export default class CordoAPI {
 

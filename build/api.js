@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
-const cordo_1 = require("./cordo");
 const permission_strings_1 = require("./lib/permission-strings");
 const const_1 = require("./types/const");
+const index_1 = require("./index");
 class CordoAPI {
     static interactionCallback(i, type, data) {
         CordoAPI.normaliseData(data, i);
@@ -13,10 +13,10 @@ class CordoAPI {
                 .post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
                 .then((res) => {
                 if (res.status >= 300) {
-                    cordo_1.default._data.logger.warn('Interaction callback failed with error:');
-                    cordo_1.default._data.logger.warn(JSON.stringify(res.data, null, 2));
-                    cordo_1.default._data.logger.warn('Request payload:');
-                    cordo_1.default._data.logger.warn(JSON.stringify({ type, data }, null, 2));
+                    index_1.default._data.logger.warn('Interaction callback failed with error:');
+                    index_1.default._data.logger.warn(JSON.stringify(res.data, null, 2));
+                    index_1.default._data.logger.warn('Request payload:');
+                    index_1.default._data.logger.warn(JSON.stringify({ type, data }, null, 2));
                 }
             });
             return;
@@ -26,10 +26,10 @@ class CordoAPI {
             case const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break;
             case const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break;
             case const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE:
-                axios_1.default.post(`https://discord.com/api/v8/webhooks/${cordo_1.default._data.config.botId}/${i.token}`, data);
+                axios_1.default.post(`https://discord.com/api/v8/webhooks/${index_1.default._data.config.botId}/${i.token}`, data);
                 break;
             case const_1.InteractionCallbackType.UPDATE_MESSAGE:
-                axios_1.default.patch(`https://discord.com/api/v8/webhooks/${cordo_1.default._data.config.botId}/${i.token}/messages/@original`, data);
+                axios_1.default.patch(`https://discord.com/api/v8/webhooks/${index_1.default._data.config.botId}/${i.token}/messages/@original`, data);
                 break;
         }
     }
@@ -40,7 +40,7 @@ class CordoAPI {
         if (!data)
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
-        cordo_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData));
+        index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData));
         if (!data.content)
             data.content = '';
         if (data.description || data.title) {
@@ -82,7 +82,7 @@ class CordoAPI {
                             else
                                 comp.disabled = true;
                         }
-                        else if (comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN) && !cordo_1.default._data.isBotOwner(i.user.id)) {
+                        else if (comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN) && !index_1.default._data.isBotOwner(i.user.id)) {
                             if (comp.flags.includes(const_1.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                                 comp.type = null;
                             else
