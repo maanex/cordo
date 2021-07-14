@@ -111,8 +111,10 @@ export type InteractionBase = {
   id: string
   token: string
   version: number
+  user: InteractionUser
   application_id?: string
   guildData?: cordo.GuildData
+  userData?: cordo.UserData
   _answered: boolean
 }
 

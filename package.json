@@ -1,13 +1,13 @@
 {
   "name": "cordo",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "A discord.js addon for handling complex interactions",
-  "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint --ext .ts --ignore-path .gitignore .",
+    "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
     "dev": "tsc && node --trace-warnings ./build/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no tests specified\" && exit 0",
+    "publish": "npm run lint && npm run build && npm run test && npm publish"
   },
   "repository": {
     "type": "git",

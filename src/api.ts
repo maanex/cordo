@@ -31,10 +31,10 @@ export default class CordoAPI {
       case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
       case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
       case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE:
-        axios.post(`https://discord.com/api/v8/webhooks/${config.bot.clientid}/${i.token}`, data)
+        axios.post(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}`, data)
         break
       case InteractionCallbackType.UPDATE_MESSAGE:
-        axios.patch(`https://discord.com/api/v8/webhooks/${config.bot.clientid}/${i.token}/messages/@original`, data)
+        axios.patch(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data)
         break
     }
   }
@@ -80,7 +80,7 @@ export default class CordoAPI {
             } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(perms)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
               else comp.disabled = true
-            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !RemoteConfig.botAdmins.includes(i.user?.id || i.member.user.id)) {
+            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !Cordo._data.isBotOwner(i.user.id)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
               else comp.disabled = true
             }
