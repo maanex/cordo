@@ -62,3 +62,33 @@ Component and State names correct and incorrect examples:
 ## Best practices
 
 While theoretically the entire system could be built on soly using states, it is recomended to use interaction.reply and interaction.edit over states in non-interactive environments to save resources. States have a larger overhead than a simply interaction reply.
+
+
+## Custom Guild or User Data
+
+For typescript users, you can use custom types for those objects by creating a new types file with the content
+
+```ts
+declare module 'cordo' {
+  interface GuildData {
+    // your types here
+  }
+
+  interface UserData {
+    // or here. Both optional
+  }
+}
+```
+
+And adding this file to your tsconfig.json using
+
+```json
+{
+  "compilerOptions": {
+    "typeRoots": [
+      "node_modules/@types",
+      "./src/types" // <- with this being the folder your types file is in
+    ]
+  }
+}
+```

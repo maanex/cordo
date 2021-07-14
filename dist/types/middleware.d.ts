@@ -6,7 +6,7 @@ export declare type CordoConfig = {
     uiStatesPath?: string | string[];
     contextPath?: string | string[];
     botAdmins?: string[] | ((userid: string) => boolean);
-    texts: {
+    texts?: {
         interaction_not_owned_title: string;
         interaction_not_owned_description: string;
         interaction_not_permitted_title: string;

@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "A discord.js addon for handling complex interactions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,11 +21,9 @@
     "url": "https://github.com/Maanex/cordo/issues"
   },
   "homepage": "https://github.com/Maanex/cordo#readme",
-  "dependencies": {
-    "axios": "^0.21.1",
-    "discord.js": "^12.5.3"
-  },
   "devDependencies": {
+    "axios": "^0.21.1",
+    "discord.js": "^12.5.3",
     "@types/axios": "^0.14.0",
     "@types/node": "^16.3.2",
     "@typescript-eslint/eslint-plugin": "^4.28.3",

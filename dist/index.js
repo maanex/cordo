@@ -40,6 +40,8 @@ class Cordo {
     }
     //
     static init(config) {
+        if (!config.texts)
+            config.texts = this.config.texts;
         this.config = config;
         if (config.contextPath)
             Cordo.findContext(config.contextPath);

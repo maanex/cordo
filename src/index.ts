@@ -61,6 +61,7 @@ export default class Cordo {
   //
 
   public static init(config: CordoConfig) {
+    if (!config.texts) config.texts = this.config.texts
     this.config = config
 
     if (config.contextPath) Cordo.findContext(config.contextPath)
