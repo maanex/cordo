@@ -7,7 +7,7 @@
     "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
     "dev": "tsc && node --trace-warnings ./build/index.js",
     "test": "echo \"Error: no tests specified\" && exit 0",
-    "pub": "npm run lint && npm run build && npm run test && npm publish"
+    "publish": "npm run lint && npm run build && npm run test && npm pub"
   },
   "repository": {
     "type": "git",
