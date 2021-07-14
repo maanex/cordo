@@ -1,11 +1,11 @@
 {
   "name": "cordo",
   "version": "1.0.0",
-  "description": "fuck you git",
+  "description": "A discord.js addon for handling complex interactions",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "eslint --ext .ts --ignore-path .gitignore .",
     "dev": "tsc && node --trace-warnings ./build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,12 +20,17 @@
   },
   "homepage": "https://github.com/Maanex/cordo#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "discord.js": "^12.5.3"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/node": "^16.3.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
     "eslint": "^7.30.0",
     "reflect-metadata": "^0.1.13",
+    "eslint-config-maanex": "^1.1.2",
     "typescript": "^4.3.5"
   }
 }

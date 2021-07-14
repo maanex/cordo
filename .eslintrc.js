@@ -3,7 +3,5 @@ module.exports = {
   env: {
     node: true
   },
-  extends: [
-    'maanex'
-  ]
+  extends: 'maanex'
 }
