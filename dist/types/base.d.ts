@@ -54,7 +54,7 @@ export declare type InteractionEmoji = {
 };
 export declare type InteractionLocationGuild = {
     member: InteractionMember;
-    user?: undefined;
+    user?: InteractionUser;
     guild_id: string;
     channel_id: string;
 };
@@ -90,6 +90,9 @@ export declare type InteractionTypeComponent = {
         flags: InteractionComponentFlag[];
     };
 };
+export declare type InteractionTypeRichMessage = {
+    type: InteractionType.RICH_MESSAGE;
+};
 export declare type InteractionBase = {
     id: string;
     token: string;
@@ -100,9 +103,10 @@ export declare type InteractionBase = {
     userData?: UserData;
     _answered: boolean;
 };
-export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent);
+export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeRichMessage);
 export declare type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
 export declare type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent;
+export declare type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage;
 export declare type ReplyableCommandInteraction = CommandInteraction & {
     reply(data: InteractionApplicationCommandCallbackData): void;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;

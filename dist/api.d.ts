@@ -5,5 +5,5 @@ export default class CordoAPI {
     /**
      * Transforms the shorthand way of writing into proper discord api compatible objects
      */
-    private static normaliseData;
+    static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction): void;
 }

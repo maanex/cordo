@@ -9,10 +9,13 @@ export declare enum InteractionResponseFlags {
     EPHEMERAL = 64
 }
 export declare enum InteractionType {
+    /** negative number => custom */
+    RICH_MESSAGE = -5,
     COMMAND = 2,
     COMPONENT = 3
 }
 export declare enum ComponentType {
+    /** negative number => custom */
     LINE_BREAK = -5,
     ROW = 1,
     BUTTON = 2,

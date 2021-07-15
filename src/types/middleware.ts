@@ -1,8 +1,10 @@
+import { Client } from 'discord.js'
 import { InteractionApplicationCommandCallbackData } from './custom'
 
 
 export type CordoConfig = {
   botId: string
+  botClient?: Client
   commandHandlerPath?: string | string[]
   componentHandlerPath?: string | string[]
   uiStatesPath?: string | string[]

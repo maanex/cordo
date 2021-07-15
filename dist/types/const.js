@@ -15,11 +15,14 @@ var InteractionResponseFlags;
 })(InteractionResponseFlags = exports.InteractionResponseFlags || (exports.InteractionResponseFlags = {}));
 var InteractionType;
 (function (InteractionType) {
+    /** negative number => custom */
+    InteractionType[InteractionType["RICH_MESSAGE"] = -5] = "RICH_MESSAGE";
     InteractionType[InteractionType["COMMAND"] = 2] = "COMMAND";
     InteractionType[InteractionType["COMPONENT"] = 3] = "COMPONENT";
 })(InteractionType = exports.InteractionType || (exports.InteractionType = {}));
 var ComponentType;
 (function (ComponentType) {
+    /** negative number => custom */
     ComponentType[ComponentType["LINE_BREAK"] = -5] = "LINE_BREAK";
     ComponentType[ComponentType["ROW"] = 1] = "ROW";
     ComponentType[ComponentType["BUTTON"] = 2] = "BUTTON";

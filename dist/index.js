@@ -161,6 +161,42 @@ class Cordo {
         else
             Cordo.logger.warn(`Unknown interaction type ${i.type}`);
     }
+    //
+    static sendRichMessage(channel, member, data) {
+        const fakeInteraction = {
+            id: 'rich-message-' + Math.random().toString().substr(2),
+            token: null,
+            version: 0,
+            user: {
+                ...member.user,
+                public_flags: 0
+            },
+            application_id: null,
+            guildData: null,
+            userData: null,
+            _answered: false,
+            guild_id: channel.guild.id,
+            channel_id: channel.id,
+            member: {
+                user: {
+                    ...member.user,
+                    public_flags: 0
+                },
+                roles: member.roles.cache.map(r => r.id),
+                premium_since: null,
+                permissions: member.permissions.bitfield + '',
+                pending: false,
+                nick: member.nickname,
+                mute: false,
+                joined_at: member.joinedAt.toISOString(),
+                is_pending: false,
+                deaf: false
+            },
+            type: const_1.InteractionType.RICH_MESSAGE
+        };
+        api_1.default.normaliseData(data, fakeInteraction);
+        channel.client.api.channels(channel.id).messages.post({ data });
+    }
     /*
      * INTERNAL
      */

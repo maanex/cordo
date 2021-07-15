@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { GuildMember, TextChannel } from 'discord.js'
+import { GuildMember, Message, TextChannel } from 'discord.js'
 import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
@@ -189,7 +189,11 @@ export default class Cordo {
 
   //
 
-  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData) {
+  public static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData) {
+    this.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo)
+  }
+
+  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message) {
     const fakeInteraction: RichMessageInteraction = {
       id: 'rich-message-' + Math.random().toString().substr(2),
       token: null,
@@ -199,8 +203,8 @@ export default class Cordo {
         public_flags: 0
       },
       application_id: null,
-      guildData: null,
-      userData: null,
+      guildData: Cordo._data.middlewares.fetchGuildData?.(channel.guild.id),
+      userData: Cordo._data.middlewares.fetchUserData?.(member.id),
       _answered: false,
       guild_id: channel.guild.id,
       channel_id: channel.id,
@@ -221,8 +225,17 @@ export default class Cordo {
       },
       type: InteractionType.RICH_MESSAGE
     }
+
     CordoAPI.normaliseData(data, fakeInteraction)
-    ;(channel.client as any).api.channels(channel.id).messages.post({ data })
+    if (replyTo) {
+      (data as any).message_reference = {
+        message_id: replyTo.id,
+        guild_id: replyTo.guild.id,
+        fail_if_not_exists: false
+      }
+    }
+
+    (channel.client as any).api.channels(channel.id).messages.post({ data })
   }
 
 
@@ -263,8 +276,20 @@ export default class Cordo {
 
     if (i.data.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN))
       return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin)
-    if (!i.data.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE) && i.message.interaction?.user.id !== i.user.id)
-      return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command', i.message.interaction?.user.username)
+
+    let interactionOwner = i.message.interaction?.user
+    if (!interactionOwner && (i.message as any).message_reference && Cordo.config.botClient) {
+      const reference = (i.message as any).message_reference
+      const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id) as TextChannel
+      const message = await channel.messages.fetch(reference.message_id)
+      interactionOwner = {
+        ...message.author,
+        public_flags: 0
+      }
+    }
+
+    if (!i.data.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE) && interactionOwner?.id !== i.user.id)
+      return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner')
 
     if (!i.member)
       return 'passed'
