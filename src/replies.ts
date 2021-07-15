@@ -8,7 +8,7 @@ import Cordo from './index'
 export default class CordoReplies {
 
   /* TODO @metrics */
-  private static activeInteractionReplyContexts: InteractionReplyContext[] = []
+  public static readonly activeInteractionReplyContexts: InteractionReplyContext[] = []
 
   //
 
@@ -18,7 +18,7 @@ export default class CordoReplies {
 
   //
 
-  private static newInteractionReplyContext(i: GenericInteraction): InteractionReplyContext {
+  public static newInteractionReplyContext(i: GenericInteraction): InteractionReplyContext {
     return {
       id: i.id,
       interaction: i,
@@ -40,6 +40,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
       replyPrivately(data: InteractionApplicationCommandCallbackData) {
@@ -73,6 +74,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
       replyPrivately(data: InteractionApplicationCommandCallbackData) {
@@ -85,6 +87,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
       // disableComponents() { TODO
@@ -138,7 +141,7 @@ export default class CordoReplies {
   /**
    * Gets the object to .withTimeout(...) on
    */
-  private static getLevelTwoReplyState(context: InteractionReplyContext): InteractionReplyStateLevelTwo {
+   public static getLevelTwoReplyState(context: InteractionReplyContext): InteractionReplyStateLevelTwo {
     return {
       _context: context,
       withTimeout(timeout: number, resetOnInteraction: boolean, janitor: (edit: InteractionJanitor) => any) {
@@ -163,7 +166,7 @@ export default class CordoReplies {
   /**
    * Gets the object to .on(...) on
    */
-  private static getLevelThreeReplyState(context: InteractionReplyContext): InteractionReplyStateLevelThree {
+  public static getLevelThreeReplyState(context: InteractionReplyContext): InteractionReplyStateLevelThree {
     const state: InteractionReplyStateLevelThree = {
       _context: context,
       on(customId: string, handler: InteractionComponentHandler) {

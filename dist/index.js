@@ -41,8 +41,8 @@ class Cordo {
     //
     static init(config) {
         if (!config.texts)
-            config.texts = this.config.texts;
-        this.config = config;
+            config.texts = Cordo.config.texts;
+        Cordo.config = config;
         if (config.contextPath)
             Cordo.findContext(config.contextPath);
         if (config.commandHandlerPath)
@@ -125,9 +125,15 @@ class Cordo {
     static findContext(dir) {
         if (typeof dir === 'string')
             dir = [dir];
-        this.findCommandHandlers([...dir, 'commands']);
-        this.findComponentHandlers([...dir, 'components']);
-        this.findUiStates([...dir, 'states']);
+        Cordo.findCommandHandlers([...dir, 'commands']);
+        Cordo.findComponentHandlers([...dir, 'components']);
+        Cordo.findUiStates([...dir, 'states']);
+    }
+    static updateBotId(newId) {
+        Cordo.config.botId = newId;
+    }
+    static updateBotClient(newClient) {
+        Cordo.config.botClient = newClient;
     }
     //
     static addMiddlewareInteractionCallback(fun) {
@@ -163,7 +169,7 @@ class Cordo {
     }
     //
     static sendRichReply(replyTo, data, mentionUser = true) {
-        this.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
+        Cordo.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
     }
     static sendRichMessage(channel, member, data, replyTo, mentionUser = true) {
         const fakeInteraction = {
@@ -279,7 +285,7 @@ class Cordo {
             i.data.custom_id = id;
             i.data.flags = flags.split('-').join('').split('');
         }
-        if ((await this.componentPermissionCheck(i)) !== 'passed')
+        if ((await Cordo.componentPermissionCheck(i)) !== 'passed')
             return;
         const context = replies_1.default.findActiveInteractionReplyContext(i.message.interaction?.id);
         if (context?.resetTimeoutOnInteraction) {
@@ -309,8 +315,8 @@ class Cordo {
     }
     static interactionNotOwned(i, command, owner) {
         return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
-            title: this.config.texts.interaction_not_owned_title,
-            description: this.config.texts.interaction_not_owned_description,
+            title: Cordo.config.texts.interaction_not_owned_title,
+            description: Cordo.config.texts.interaction_not_owned_description,
             flags: const_1.InteractionResponseFlags.EPHEMERAL,
             _context: { command, owner }
         });
@@ -332,13 +338,13 @@ Cordo.config = {
     botId: null,
     texts: {
         interaction_not_owned_title: 'Nope!',
-        interaction_not_owned_description: 'You cannot interact with this widget as you did not create it. Run the command yourself to get a interactable widget.',
+        interaction_not_owned_description: 'You cannot interact with Cordo widget as you did not create it. Run the command yourself to get a interactable widget.',
         interaction_not_permitted_title: 'No permission!',
-        interaction_not_permitted_description_generic: 'You cannot do this.',
-        interaction_not_permitted_description_bot_admin: 'Only bot admins can do this.',
+        interaction_not_permitted_description_generic: 'You cannot do Cordo.',
+        interaction_not_permitted_description_bot_admin: 'Only bot admins can do Cordo.',
         interaction_not_permitted_description_guild_admin: 'Only server admins.',
-        interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do this.',
-        interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can do this.',
+        interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do Cordo.',
+        interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can do Cordo.',
         interaction_failed: 'We are very sorry but an error occured while processing your command. Please try again.'
     }
 };

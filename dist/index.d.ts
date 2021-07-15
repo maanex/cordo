@@ -1,4 +1,4 @@
-import { GuildMember, Message, TextChannel } from 'discord.js';
+import { Client, GuildMember, Message, TextChannel } from 'discord.js';
 import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
@@ -45,6 +45,8 @@ export default class Cordo {
     static findComponentHandlers(dir: string | string[], prefix?: string): void;
     static findUiStates(dir: string | string[], prefix?: string): void;
     static findContext(dir: string | string[]): void;
+    static updateBotId(newId: string): void;
+    static updateBotClient(newClient: Client): void;
     static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware): void;
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
