@@ -189,11 +189,11 @@ export default class Cordo {
 
   //
 
-  public static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData) {
-    this.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo)
+  public static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true) {
+    this.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
   }
 
-  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message) {
+  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true) {
     const fakeInteraction: RichMessageInteraction = {
       id: 'rich-message-' + Math.random().toString().substr(2),
       token: null,
@@ -233,6 +233,9 @@ export default class Cordo {
         guild_id: replyTo.guild.id,
         fail_if_not_exists: false
       }
+
+      if (!mentionUser && !data.allowed_mentions)
+        data.allowed_mentions = { parse: [] }
     }
 
     (channel.client as any).api.channels(channel.id).messages.post({ data })
@@ -278,10 +281,14 @@ export default class Cordo {
       return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin)
 
     let interactionOwner = i.message.interaction?.user
+    console.log(1, interactionOwner)
+    console.log(2, JSON.stringify(i.message,null,2))
+    console.log(3, Cordo.config.botClient)
     if (!interactionOwner && (i.message as any).message_reference && Cordo.config.botClient) {
       const reference = (i.message as any).message_reference
       const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id) as TextChannel
       const message = await channel.messages.fetch(reference.message_id)
+      console.log(4, message)
       interactionOwner = {
         ...message.author,
         public_flags: 0

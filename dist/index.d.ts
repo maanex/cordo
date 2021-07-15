@@ -1,4 +1,4 @@
-import { GuildMember, TextChannel } from 'discord.js';
+import { GuildMember, Message, TextChannel } from 'discord.js';
 import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
@@ -49,7 +49,8 @@ export default class Cordo {
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
-    static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData): void;
+    static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData): void;
+    static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message): void;
     private static onCommand;
     private static componentPermissionCheck;
     private static onComponent;

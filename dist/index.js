@@ -162,7 +162,10 @@ class Cordo {
             Cordo.logger.warn(`Unknown interaction type ${i.type}`);
     }
     //
-    static sendRichMessage(channel, member, data) {
+    static sendRichReply(replyTo, data) {
+        this.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo);
+    }
+    static sendRichMessage(channel, member, data, replyTo) {
         const fakeInteraction = {
             id: 'rich-message-' + Math.random().toString().substr(2),
             token: null,
@@ -172,8 +175,8 @@ class Cordo {
                 public_flags: 0
             },
             application_id: null,
-            guildData: null,
-            userData: null,
+            guildData: Cordo._data.middlewares.fetchGuildData?.(channel.guild.id),
+            userData: Cordo._data.middlewares.fetchUserData?.(member.id),
             _answered: false,
             guild_id: channel.guild.id,
             channel_id: channel.id,
@@ -195,6 +198,13 @@ class Cordo {
             type: const_1.InteractionType.RICH_MESSAGE
         };
         api_1.default.normaliseData(data, fakeInteraction);
+        if (replyTo) {
+            data.message_reference = {
+                message_id: replyTo.id,
+                guild_id: replyTo.guild.id,
+                fail_if_not_exists: false
+            };
+        }
         channel.client.api.channels(channel.id).messages.post({ data });
     }
     /*
@@ -233,8 +243,18 @@ class Cordo {
             return 'passed';
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN))
             return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin);
-        if (!i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE) && i.message.interaction?.user.id !== i.user.id)
-            return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command', i.message.interaction?.user.username);
+        let interactionOwner = i.message.interaction?.user;
+        if (!interactionOwner && i.message.message_reference && Cordo.config.botClient) {
+            const reference = i.message.message_reference;
+            const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id);
+            const message = await channel.messages.fetch(reference.message_id);
+            interactionOwner = {
+                ...message.author,
+                public_flags: 0
+            };
+        }
+        if (!i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE) && interactionOwner?.id !== i.user.id)
+            return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner');
         if (!i.member)
             return 'passed';
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(i.member.permissions))
