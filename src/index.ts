@@ -1,9 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
+import { GuildMember, TextChannel } from 'discord.js'
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
-import { CommandInteraction, ComponentInteraction, GenericInteraction } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'
 import CordoAPI from './api'
 import CordoReplies from './replies'
 import DefaultLogger from './lib/default-logger'
@@ -184,6 +185,44 @@ export default class Cordo {
       Cordo.onComponent(i)
     else
       Cordo.logger.warn(`Unknown interaction type ${(i as any).type}`)
+  }
+
+  //
+
+  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData) {
+    const fakeInteraction: RichMessageInteraction = {
+      id: 'rich-message-' + Math.random().toString().substr(2),
+      token: null,
+      version: 0,
+      user: {
+        ...member.user,
+        public_flags: 0
+      },
+      application_id: null,
+      guildData: null,
+      userData: null,
+      _answered: false,
+      guild_id: channel.guild.id,
+      channel_id: channel.id,
+      member: {
+        user: {
+          ...member.user,
+          public_flags: 0
+        },
+        roles: member.roles.cache.map(r => r.id),
+        premium_since: null,
+        permissions: member.permissions.bitfield + '',
+        pending: false,
+        nick: member.nickname,
+        mute: false,
+        joined_at: member.joinedAt.toISOString(),
+        is_pending: false,
+        deaf: false
+      },
+      type: InteractionType.RICH_MESSAGE
+    }
+    CordoAPI.normaliseData(data, fakeInteraction)
+    ;(channel.client as any).api.channels(channel.id).messages.post({ data })
   }
 
 

@@ -65,7 +65,7 @@ export type InteractionEmoji = {
 
 export type InteractionLocationGuild = {
   member: InteractionMember
-  user?: undefined
+  user?: InteractionUser
   guild_id: string
   channel_id: string
 }
@@ -105,6 +105,10 @@ export type InteractionTypeComponent = {
   }
 }
 
+export type InteractionTypeRichMessage = {
+  type: InteractionType.RICH_MESSAGE
+}
+
 //
 
 export type InteractionBase = {
@@ -120,9 +124,10 @@ export type InteractionBase = {
 
 //
 
-export type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent)
+export type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeRichMessage)
 export type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand
 export type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent
+export type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage
 
 export type ReplyableCommandInteraction = CommandInteraction & {
   reply(data: InteractionApplicationCommandCallbackData): void

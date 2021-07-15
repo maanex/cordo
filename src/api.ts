@@ -42,7 +42,7 @@ export default class CordoAPI {
   /**
    * Transforms the shorthand way of writing into proper discord api compatible objects
    */
-  private static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction) {
+  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction) {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
     Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData))

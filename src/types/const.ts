@@ -13,11 +13,14 @@ export enum InteractionResponseFlags {
 }
 
 export enum InteractionType {
+  /** negative number => custom */
+  RICH_MESSAGE = -5,
   COMMAND = 2,
   COMPONENT = 3
 }
 
 export enum ComponentType {
+  /** negative number => custom */
   LINE_BREAK = -5,
   ROW = 1,
   BUTTON = 2,
