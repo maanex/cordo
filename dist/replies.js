@@ -30,6 +30,7 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
@@ -62,6 +63,7 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
@@ -74,6 +76,7 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             // disableComponents() { TODO

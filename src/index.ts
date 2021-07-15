@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { Client, GuildMember, Message, TextChannel } from 'discord.js'
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionReplyStateLevelTwo, InteractionUIState } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'

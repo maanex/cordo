@@ -1,18 +1,18 @@
-import { InteractionReplyContext } from './types/custom';
-import { CommandInteraction, ComponentInteraction, ReplyableCommandInteraction, ReplyableComponentInteraction } from './types/base';
+import { InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo } from './types/custom';
+import { CommandInteraction, ComponentInteraction, GenericInteraction, ReplyableCommandInteraction, ReplyableComponentInteraction } from './types/base';
 export default class CordoReplies {
-    private static activeInteractionReplyContexts;
+    static readonly activeInteractionReplyContexts: InteractionReplyContext[];
     static findActiveInteractionReplyContext(id: string): InteractionReplyContext | undefined;
-    private static newInteractionReplyContext;
+    static newInteractionReplyContext(i: GenericInteraction): InteractionReplyContext;
     static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction;
     static buildReplyableComponentInteraction(i: ComponentInteraction): ReplyableComponentInteraction;
     private static getJanitor;
     /**
      * Gets the object to .withTimeout(...) on
      */
-    private static getLevelTwoReplyState;
+    static getLevelTwoReplyState(context: InteractionReplyContext): InteractionReplyStateLevelTwo;
     /**
      * Gets the object to .on(...) on
      */
-    private static getLevelThreeReplyState;
+    static getLevelThreeReplyState(context: InteractionReplyContext): InteractionReplyStateLevelThree;
 }
