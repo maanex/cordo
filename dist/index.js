@@ -162,10 +162,10 @@ class Cordo {
             Cordo.logger.warn(`Unknown interaction type ${i.type}`);
     }
     //
-    static sendRichReply(replyTo, data) {
-        this.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo);
+    static sendRichReply(replyTo, data, mentionUser = true) {
+        this.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
     }
-    static sendRichMessage(channel, member, data, replyTo) {
+    static sendRichMessage(channel, member, data, replyTo, mentionUser = true) {
         const fakeInteraction = {
             id: 'rich-message-' + Math.random().toString().substr(2),
             token: null,
@@ -204,6 +204,8 @@ class Cordo {
                 guild_id: replyTo.guild.id,
                 fail_if_not_exists: false
             };
+            if (!mentionUser && !data.allowed_mentions)
+                data.allowed_mentions = { parse: [] };
         }
         channel.client.api.channels(channel.id).messages.post({ data });
     }
@@ -244,10 +246,14 @@ class Cordo {
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN))
             return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin);
         let interactionOwner = i.message.interaction?.user;
+        console.log(1, interactionOwner);
+        console.log(2, JSON.stringify(i.message, null, 2));
+        console.log(3, Cordo.config.botClient);
         if (!interactionOwner && i.message.message_reference && Cordo.config.botClient) {
             const reference = i.message.message_reference;
             const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id);
             const message = await channel.messages.fetch(reference.message_id);
+            console.log(4, message);
             interactionOwner = {
                 ...message.author,
                 public_flags: 0

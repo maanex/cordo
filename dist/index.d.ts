@@ -49,8 +49,8 @@ export default class Cordo {
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
-    static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData): void;
-    static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message): void;
+    static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser?: boolean): void;
+    static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser?: boolean): void;
     private static onCommand;
     private static componentPermissionCheck;
     private static onComponent;

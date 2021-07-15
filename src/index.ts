@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { GuildMember, Message, TextChannel } from 'discord.js'
+import { Client, GuildMember, Message, TextChannel } from 'discord.js'
 import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
@@ -29,13 +29,13 @@ export default class Cordo {
     botId: null,
     texts: {
       interaction_not_owned_title: 'Nope!',
-      interaction_not_owned_description: 'You cannot interact with this widget as you did not create it. Run the command yourself to get a interactable widget.',
+      interaction_not_owned_description: 'You cannot interact with Cordo widget as you did not create it. Run the command yourself to get a interactable widget.',
       interaction_not_permitted_title: 'No permission!',
-      interaction_not_permitted_description_generic: 'You cannot do this.',
-      interaction_not_permitted_description_bot_admin: 'Only bot admins can do this.',
+      interaction_not_permitted_description_generic: 'You cannot do Cordo.',
+      interaction_not_permitted_description_bot_admin: 'Only bot admins can do Cordo.',
       interaction_not_permitted_description_guild_admin: 'Only server admins.',
-      interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do this.',
-      interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can do this.',
+      interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do Cordo.',
+      interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can do Cordo.',
       interaction_failed: 'We are very sorry but an error occured while processing your command. Please try again.'
     }
   }
@@ -62,8 +62,8 @@ export default class Cordo {
   //
 
   public static init(config: CordoConfig) {
-    if (!config.texts) config.texts = this.config.texts
-    this.config = config
+    if (!config.texts) config.texts = Cordo.config.texts
+    Cordo.config = config
 
     if (config.contextPath) Cordo.findContext(config.contextPath)
     if (config.commandHandlerPath) Cordo.findContext(config.commandHandlerPath)
@@ -142,9 +142,17 @@ export default class Cordo {
   public static findContext(dir: string | string[]) {
     if (typeof dir === 'string')
       dir = [ dir ]
-    this.findCommandHandlers([ ...dir, 'commands' ])
-    this.findComponentHandlers([ ...dir, 'components' ])
-    this.findUiStates([ ...dir, 'states' ])
+    Cordo.findCommandHandlers([ ...dir, 'commands' ])
+    Cordo.findComponentHandlers([ ...dir, 'components' ])
+    Cordo.findUiStates([ ...dir, 'states' ])
+  }
+
+  public static updateBotId(newId: string) {
+    Cordo.config.botId = newId
+  }
+
+  public static updateBotClient(newClient: Client) {
+    Cordo.config.botClient = newClient
   }
 
   //
@@ -190,7 +198,7 @@ export default class Cordo {
   //
 
   public static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true) {
-    this.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
+    Cordo.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
   }
 
   public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true) {
@@ -320,7 +328,7 @@ export default class Cordo {
       i.data.flags = flags.split('-').join('').split('') as InteractionComponentFlag[]
     }
 
-    if ((await this.componentPermissionCheck(i)) !== 'passed') return
+    if ((await Cordo.componentPermissionCheck(i)) !== 'passed') return
 
     const context = CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)
     if (context?.resetTimeoutOnInteraction) {
@@ -350,8 +358,8 @@ export default class Cordo {
 
   private static interactionNotOwned(i: GenericInteraction, command?: string, owner?: string): any {
     return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
-      title: this.config.texts.interaction_not_owned_title,
-      description: this.config.texts.interaction_not_owned_description,
+      title: Cordo.config.texts.interaction_not_owned_title,
+      description: Cordo.config.texts.interaction_not_owned_description,
       flags: InteractionResponseFlags.EPHEMERAL,
       _context: { command, owner }
     })
