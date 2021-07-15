@@ -265,18 +265,20 @@ class Cordo {
             return 'passed';
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN))
             return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin);
-        let interactionOwner = i.message.interaction?.user;
-        if (!interactionOwner && i.message.message_reference && Cordo.config.botClient) {
-            const reference = i.message.message_reference;
-            const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id);
-            const message = await channel.messages.fetch(reference.message_id);
-            interactionOwner = {
-                ...message.author,
-                public_flags: 0
-            };
+        if (!i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE)) {
+            let interactionOwner = i.message.interaction?.user;
+            if (!interactionOwner && i.message.message_reference && Cordo.config.botClient) {
+                const reference = i.message.message_reference;
+                const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id);
+                const message = await channel.messages.fetch(reference.message_id);
+                interactionOwner = {
+                    ...message.author,
+                    public_flags: 0
+                };
+            }
+            if (interactionOwner?.id !== i.user.id)
+                return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner');
         }
-        if (!i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE) && interactionOwner?.id !== i.user.id)
-            return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner');
         if (!i.member)
             return 'passed';
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(i.member.permissions))

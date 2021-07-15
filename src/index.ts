@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { Client, GuildMember, Message, TextChannel } from 'discord.js'
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionReplyStateLevelTwo, InteractionUIState } from './types/custom'
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'
@@ -201,9 +201,10 @@ export default class Cordo {
     return Cordo.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
   }
 
-  public static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): InteractionReplyStateLevelTwo {
-    return Cordo.sendRichMessageInteractive(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
-  }
+  // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
+  // public static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): InteractionReplyStateLevelTwo {
+  //   return Cordo.sendRichMessageInteractive(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
+  // }
 
   public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): RichMessageInteraction {
     const fakeInteraction = Cordo.getRichMessageInteraction(channel, member)
@@ -224,13 +225,14 @@ export default class Cordo {
     return fakeInteraction
   }
 
-  public static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): InteractionReplyStateLevelTwo {
-    const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser)
-    const context = CordoReplies.newInteractionReplyContext(fakeInteraction)
-    CordoReplies.activeInteractionReplyContexts.push(context)
-    setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
-    return CordoReplies.getLevelTwoReplyState(context)
-  }
+  // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
+  // public static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): InteractionReplyStateLevelTwo {
+  //   const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser)
+  //   const context = CordoReplies.newInteractionReplyContext(fakeInteraction)
+  //   CordoReplies.activeInteractionReplyContexts.push(context)
+  //   setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
+  //   return CordoReplies.getLevelTwoReplyState(context)
+  // }
 
 
   /*
