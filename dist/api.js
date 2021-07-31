@@ -60,6 +60,8 @@ class CordoAPI {
             const rows = [];
             let newlineFlag = true;
             for (const comp of data.components) {
+                if (comp.visible === false)
+                    continue; // === false to not catch any null or undefined
                 if (comp.type !== const_1.ComponentType.LINE_BREAK && comp.flags?.length && !!comp.custom_id) {
                     comp.custom_id += `-${comp.flags.join('')}`;
                     if (!!i.member && !comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE)) {

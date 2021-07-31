@@ -1,5 +1,5 @@
 import { Client, GuildMember, Message, TextChannel } from 'discord.js';
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionReplyStateLevelTwo, InteractionUIState } from './types/custom';
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
 import { GenericInteraction, RichMessageInteraction } from './types/base';
 export * from './api';
@@ -52,9 +52,7 @@ export default class Cordo {
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
     static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser?: boolean): RichMessageInteraction;
-    static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser?: boolean): InteractionReplyStateLevelTwo;
     static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser?: boolean): RichMessageInteraction;
-    static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser?: boolean): InteractionReplyStateLevelTwo;
     private static getRichMessageInteraction;
     private static onCommand;
     private static componentPermissionCheck;

@@ -8,6 +8,7 @@ import { ButtonStyle, ComponentType, InteractionComponentFlag } from './const'
 
 export type MessageComponentButton = {
   type: ComponentType.BUTTON
+  visible: boolean
   label?: string
   emoji?: Partial<InteractionEmoji>
   disabled?: boolean
@@ -32,6 +33,7 @@ export type MessageComponentSelectOption = {
 
 export type MessageComponentSelectMenu = {
   type: ComponentType.SELECT
+  visible: boolean
   custom_id: string
   options: MessageComponentSelectOption[]
   placeholder?: string
@@ -45,6 +47,7 @@ export type MessageComponentSelectMenu = {
 
 export type LineBreak = {
   type: ComponentType.LINE_BREAK
+  visible: boolean
 }
 
 // Generic

@@ -171,9 +171,10 @@ class Cordo {
     static sendRichReply(replyTo, data, mentionUser = true) {
         return Cordo.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
     }
-    static sendRichReplyInteractive(replyTo, data, mentionUser = true) {
-        return Cordo.sendRichMessageInteractive(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
-    }
+    // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
+    // public static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): InteractionReplyStateLevelTwo {
+    //   return Cordo.sendRichMessageInteractive(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
+    // }
     static sendRichMessage(channel, member, data, replyTo, mentionUser = true) {
         const fakeInteraction = Cordo.getRichMessageInteraction(channel, member);
         api_1.default.normaliseData(data, fakeInteraction);
@@ -189,13 +190,14 @@ class Cordo {
         channel.client.api.channels(channel.id).messages.post({ data });
         return fakeInteraction;
     }
-    static sendRichMessageInteractive(channel, member, data, replyTo, mentionUser = true) {
-        const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser);
-        const context = replies_1.default.newInteractionReplyContext(fakeInteraction);
-        replies_1.default.activeInteractionReplyContexts.push(context);
-        setTimeout(() => replies_1.default.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
-        return replies_1.default.getLevelTwoReplyState(context);
-    }
+    // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
+    // public static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): InteractionReplyStateLevelTwo {
+    //   const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser)
+    //   const context = CordoReplies.newInteractionReplyContext(fakeInteraction)
+    //   CordoReplies.activeInteractionReplyContexts.push(context)
+    //   setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
+    //   return CordoReplies.getLevelTwoReplyState(context)
+    // }
     /*
      * INTERNAL
      */

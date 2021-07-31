@@ -67,6 +67,8 @@ export default class CordoAPI {
       const rows: MessageComponent[][] = []
       let newlineFlag = true
       for (const comp of data.components) {
+        if (comp.visible === false) continue // === false to not catch any null or undefined
+
         if (comp.type !== ComponentType.LINE_BREAK && comp.flags?.length && !!(comp as any).custom_id) {
           (comp as any).custom_id += `-${comp.flags.join('')}`
           if (!!(i as InteractionLocationGuild).member && !comp.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE)) {
