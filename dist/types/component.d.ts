@@ -2,7 +2,7 @@ import { InteractionEmoji } from './base';
 import { ButtonStyle, ComponentType, InteractionComponentFlag } from './const';
 export declare type MessageComponentButton = {
     type: ComponentType.BUTTON;
-    visible: boolean;
+    visible?: boolean;
     label?: string;
     emoji?: Partial<InteractionEmoji>;
     disabled?: boolean;
@@ -23,7 +23,7 @@ export declare type MessageComponentSelectOption = {
 };
 export declare type MessageComponentSelectMenu = {
     type: ComponentType.SELECT;
-    visible: boolean;
+    visible?: boolean;
     custom_id: string;
     options: MessageComponentSelectOption[];
     placeholder?: string;
@@ -34,7 +34,7 @@ export declare type MessageComponentSelectMenu = {
 };
 export declare type LineBreak = {
     type: ComponentType.LINE_BREAK;
-    visible: boolean;
+    visible?: boolean;
 };
 export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak;
 export declare type ActionRow = {
