@@ -236,6 +236,7 @@ class Cordo {
     }
     static onCommand(i) {
         try {
+            i.data.option = {};
             for (const option of i.data.options || [])
                 i.data.option[option.name] = option.value;
             if (Cordo.commandHandlers[i.data.name]) {

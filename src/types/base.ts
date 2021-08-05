@@ -130,6 +130,7 @@ export type ComponentInteraction = InteractionBase & (InteractionLocationGuild |
 export type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage
 
 export type ReplyableCommandInteraction = CommandInteraction & {
+  ack(): void
   reply(data: InteractionApplicationCommandCallbackData): void
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void

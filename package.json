@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "A discord.js addon for handling complex interactions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
