@@ -8,7 +8,7 @@ class CordoAPI {
     static interactionCallback(i, type, data, useRaw) {
         if (!useRaw)
             CordoAPI.normaliseData(data, i);
-        if (data.components)
+        if (data?.components)
             i._answerComponents = data.components;
         if (!i._answered) {
             i._answered = true;

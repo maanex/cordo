@@ -17,7 +17,8 @@ class CordoReplies {
             timeoutRunFunc: null,
             timeoutRunner: null,
             onInteraction: 'doNothing',
-            handlers: {}
+            handlers: {},
+            slottedHandlers: []
         };
     }
     static buildReplyableCommandInteraction(i) {
@@ -53,7 +54,9 @@ class CordoReplies {
             }
         };
     }
-    static buildReplyableComponentInteraction(i) {
+    static buildReplyableComponentInteraction(i, slotContext) {
+        if (slotContext)
+            i.slot = slotContext.slot;
         return {
             ...i,
             ack() {
@@ -115,7 +118,7 @@ class CordoReplies {
             },
             disableComponents() {
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, {
-                    components: context.interaction._answerComponents
+                    components: (context.interaction._answerComponents || [])
                         .map(row => ({
                         ...row,
                         components: row.components.map(c => ({
@@ -155,7 +158,9 @@ class CordoReplies {
                 context.timeoutRunFunc = () => {
                     janitor(CordoReplies.getJanitor(context));
                     delete context.handlers;
+                    delete context.slottedHandlers;
                     context.handlers = null;
+                    context.slottedHandlers = null;
                 };
                 context.timeoutRunner = setTimeout(context.timeoutRunFunc, timeout);
                 return CordoReplies.getLevelThreeReplyState(context);
@@ -172,6 +177,13 @@ class CordoReplies {
                 if (!context.handlers)
                     return; // => timeout already reached and object destroyed
                 context.handlers[customId] = handler;
+                if (customId.includes('$')) {
+                    context.slottedHandlers.push({
+                        id: customId,
+                        regex: new RegExp(customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
+                        handler
+                    });
+                }
                 return state;
             }
         };

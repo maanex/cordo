@@ -17,6 +17,7 @@ const api_1 = require("./api");
 const replies_1 = require("./replies");
 const default_logger_1 = require("./lib/default-logger");
 const permission_strings_1 = require("./lib/permission-strings");
+const utils_1 = require("./utils");
 __exportStar(require("./api"), exports);
 __exportStar(require("./replies"), exports);
 __exportStar(require("./lib/default-logger"), exports);
@@ -32,6 +33,7 @@ class Cordo {
             config: Cordo.config,
             commandHandlers: Cordo.commandHandlers,
             componentHandlers: Cordo.componentHandlers,
+            slottedComponentHandlers: Cordo.slottedComponentHandlers,
             uiStates: Cordo.uiStates,
             middlewares: Cordo.middlewares,
             logger: Cordo.logger,
@@ -62,6 +64,13 @@ class Cordo {
         if (Cordo.componentHandlers[id])
             Cordo.logger.warn(`Component handler for ${id} got assigned twice. Overriding.`);
         Cordo.componentHandlers[id] = handler;
+        if (id.includes('$')) {
+            this.slottedComponentHandlers.push({
+                id,
+                regex: new RegExp(id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
+                handler
+            });
+        }
     }
     static registerUiState(id, state) {
         if (Cordo.uiStates[id])
@@ -313,6 +322,28 @@ class Cordo {
         if ((await Cordo.componentPermissionCheck(i)) !== 'passed')
             return;
         const context = replies_1.default.findActiveInteractionReplyContext(i.message.interaction?.id);
+        let regexSearchResult;
+        if (context?.handlers?.[i.data.custom_id]) {
+            context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
+        }
+        else if (regexSearchResult = context?.slottedHandlers?.find(h => h.regex.test(i.data.custom_id))) {
+            const slot = utils_1.parseSlot(regexSearchResult.id, i.data.custom_id);
+            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { slot }));
+        }
+        else if (Cordo.componentHandlers[i.data.custom_id]) {
+            Cordo.componentHandlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
+        }
+        else if (regexSearchResult = Cordo.slottedComponentHandlers.find(h => h.regex.test(i.data.custom_id))) {
+            const slot = utils_1.parseSlot(regexSearchResult.id, i.data.custom_id);
+            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { slot }));
+        }
+        else if (Cordo.uiStates[i.data.custom_id]) {
+            replies_1.default.buildReplyableComponentInteraction(i).state();
+        }
+        else {
+            Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`);
+            api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+        }
         if (context?.onInteraction === 'restartTimeout') {
             clearTimeout(context.timeoutRunner);
             setTimeout(context.timeoutRunFunc, context.timeout);
@@ -323,19 +354,6 @@ class Cordo {
         }
         else if (context?.onInteraction === 'removeTimeout') {
             clearTimeout(context.timeoutRunner);
-        }
-        if (context?.handlers?.[i.data.custom_id]) {
-            context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
-        }
-        else if (Cordo.componentHandlers[i.data.custom_id]) {
-            Cordo.componentHandlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
-        }
-        else if (Cordo.uiStates[i.data.custom_id]) {
-            replies_1.default.buildReplyableComponentInteraction(i).state();
-        }
-        else {
-            Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`);
-            api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
     }
     static interactionNotPermitted(i, text) {
@@ -365,6 +383,7 @@ class Cordo {
 exports.default = Cordo;
 Cordo.commandHandlers = {};
 Cordo.componentHandlers = {};
+Cordo.slottedComponentHandlers = [];
 Cordo.uiStates = {};
 Cordo.config = {
     botId: null,

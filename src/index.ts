@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { Client, GuildMember, Message, TextChannel } from 'discord.js'
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom'
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'
@@ -9,6 +9,7 @@ import CordoAPI from './api'
 import CordoReplies from './replies'
 import DefaultLogger from './lib/default-logger'
 import PermissionStrings from './lib/permission-strings'
+import { parseSlot } from './utils'
 
 
 export * from './api'
@@ -24,6 +25,7 @@ export default class Cordo {
 
   private static commandHandlers: { [command: string]: InteractionCommandHandler } = {}
   private static componentHandlers: { [command: string]: InteractionComponentHandler } = {}
+  private static slottedComponentHandlers: SlottedComponentHandler[] = []
   private static uiStates: { [name: string]: InteractionUIState } = {}
   private static config: CordoConfig = {
     botId: null,
@@ -52,6 +54,7 @@ export default class Cordo {
       config: Cordo.config,
       commandHandlers: Cordo.commandHandlers,
       componentHandlers: Cordo.componentHandlers,
+      slottedComponentHandlers: Cordo.slottedComponentHandlers,
       uiStates: Cordo.uiStates,
       middlewares: Cordo.middlewares,
       logger: Cordo.logger,
@@ -83,6 +86,13 @@ export default class Cordo {
     if (Cordo.componentHandlers[id])
       Cordo.logger.warn(`Component handler for ${id} got assigned twice. Overriding.`)
     Cordo.componentHandlers[id] = handler
+    if (id.includes('$')) {
+      this.slottedComponentHandlers.push({
+        id,
+        regex: new RegExp(id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
+        handler
+      })
+    }
   }
 
   public static registerUiState(id: string, state: InteractionUIState) {
@@ -356,6 +366,25 @@ export default class Cordo {
     if ((await Cordo.componentPermissionCheck(i)) !== 'passed') return
 
     const context = CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)
+
+    let regexSearchResult: SlottedComponentHandler | undefined
+    if (context?.handlers?.[i.data.custom_id]) {
+      context.handlers?.[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
+    } else if (regexSearchResult = context?.slottedHandlers?.find(h => h.regex.test(i.data.custom_id))) {
+      const slot = parseSlot(regexSearchResult.id, i.data.custom_id)
+      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { slot }))
+    } else if (Cordo.componentHandlers[i.data.custom_id]) {
+      Cordo.componentHandlers[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
+    } else if (regexSearchResult = Cordo.slottedComponentHandlers.find(h => h.regex.test(i.data.custom_id))) {
+      const slot = parseSlot(regexSearchResult.id, i.data.custom_id)
+      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { slot }))
+    } else if (Cordo.uiStates[i.data.custom_id]) {
+      CordoReplies.buildReplyableComponentInteraction(i).state()
+    } else {
+      Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`)
+      CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
+    }
+
     if (context?.onInteraction === 'restartTimeout') {
       clearTimeout(context.timeoutRunner)
       setTimeout(context.timeoutRunFunc, context.timeout)
@@ -364,17 +393,6 @@ export default class Cordo {
       context.timeoutRunFunc()
     } else if (context?.onInteraction === 'removeTimeout') {
       clearTimeout(context.timeoutRunner)
-    }
-
-    if (context?.handlers?.[i.data.custom_id]) {
-      context.handlers?.[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
-    } else if (Cordo.componentHandlers[i.data.custom_id]) {
-      Cordo.componentHandlers[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
-    } else if (Cordo.uiStates[i.data.custom_id]) {
-      CordoReplies.buildReplyableComponentInteraction(i).state()
-    } else {
-      Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`)
-      CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
     }
   }
 

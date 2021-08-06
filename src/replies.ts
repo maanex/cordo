@@ -1,6 +1,6 @@
 import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo, InteractionReplyTimeoutOptions } from './types/custom'
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
-import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotContext } from './types/base'
 import CordoAPI from './api'
 import Cordo from './index'
 
@@ -26,7 +26,8 @@ export default class CordoReplies {
       timeoutRunFunc: null,
       timeoutRunner: null,
       onInteraction: 'doNothing',
-      handlers: {}
+      handlers: {},
+      slottedHandlers: []
     }
   }
 
@@ -64,7 +65,8 @@ export default class CordoReplies {
     }
   }
 
-  public static buildReplyableComponentInteraction(i: ComponentInteraction): ReplyableComponentInteraction {
+  public static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlotContext): ReplyableComponentInteraction {
+    if (slotContext) (i as ComponentInteraction & SlotContext).slot = slotContext.slot
     return {
       ...i,
       ack() {
@@ -170,7 +172,9 @@ export default class CordoReplies {
         context.timeoutRunFunc = () => {
           janitor(CordoReplies.getJanitor(context))
           delete context.handlers
+          delete context.slottedHandlers
           context.handlers = null
+          context.slottedHandlers = null
         }
         context.timeoutRunner = setTimeout(context.timeoutRunFunc, timeout)
         return CordoReplies.getLevelThreeReplyState(context)
@@ -187,6 +191,13 @@ export default class CordoReplies {
       on(customId: string, handler: InteractionComponentHandler) {
         if (!context.handlers) return // => timeout already reached and object destroyed
         context.handlers[customId] = handler
+        if (customId.includes('$')) {
+          context.slottedHandlers.push({
+            id: customId,
+            regex: new RegExp(customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
+            handler
+          })
+        }
         return state
       }
     }

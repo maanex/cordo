@@ -40,6 +40,12 @@ export type InteractionCommandHandler
 export type InteractionComponentHandler
   = ((i: ReplyableComponentInteraction) => HandlerSuccess)
 
+export type SlottedComponentHandler = {
+  regex: RegExp,
+  id: string,
+  handler: InteractionComponentHandler
+}
+
 // Reply flow
 
 export type InteractionReplyContext = {
@@ -50,6 +56,7 @@ export type InteractionReplyContext = {
   timeoutRunner: NodeJS.Timeout
   onInteraction: InteractionReplyTimeoutOptions['onInteraction']
   handlers: { [customId: string]: InteractionComponentHandler }
+  slottedHandlers: SlottedComponentHandler[]
 }
 
 export type InteractionReplyStateLevelThree = {

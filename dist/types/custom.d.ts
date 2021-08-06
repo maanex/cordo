@@ -23,6 +23,11 @@ export declare type InteractionApplicationCommandCallbackData = {
 };
 export declare type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
 export declare type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
+export declare type SlottedComponentHandler = {
+    regex: RegExp;
+    id: string;
+    handler: InteractionComponentHandler;
+};
 export declare type InteractionReplyContext = {
     id: string;
     interaction: GenericInteraction;
@@ -33,6 +38,7 @@ export declare type InteractionReplyContext = {
     handlers: {
         [customId: string]: InteractionComponentHandler;
     };
+    slottedHandlers: SlottedComponentHandler[];
 };
 export declare type InteractionReplyStateLevelThree = {
     _context: InteractionReplyContext;

@@ -1,5 +1,5 @@
 import { Client, GuildMember, Message, TextChannel } from 'discord.js';
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from './types/custom';
+import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
 import { GenericInteraction, RichMessageInteraction } from './types/base';
 export * from './api';
@@ -14,6 +14,7 @@ export * from './types/middleware';
 export default class Cordo {
     private static commandHandlers;
     private static componentHandlers;
+    private static slottedComponentHandlers;
     private static uiStates;
     private static config;
     private static logger;
@@ -26,6 +27,7 @@ export default class Cordo {
         componentHandlers: {
             [command: string]: InteractionComponentHandler;
         };
+        slottedComponentHandlers: SlottedComponentHandler[];
         uiStates: {
             [name: string]: InteractionUIState;
         };
