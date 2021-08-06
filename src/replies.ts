@@ -128,16 +128,16 @@ export default class CordoReplies {
       },
       disableComponents() {
         console.log("hi")
-        console.log(context.interaction._answerComponents)
+        console.log(JSON.stringify(context.interaction._answerComponents, null, 2))
         console.log("ho")
-        console.log((context.interaction._answerComponents as any)
+        console.log(JSON.stringify((context.interaction._answerComponents as any)
           .map(row => ({
             ...row,
             components: row.components.map(c => ({
               ...c,
               disabled: true
             }))
-          })))
+          })), null, 2))
         console.log("he")
 
         CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, {

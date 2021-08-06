@@ -66,9 +66,9 @@ export default class Cordo {
     Cordo.config = config
 
     if (config.contextPath) Cordo.findContext(config.contextPath)
-    if (config.commandHandlerPath) Cordo.findContext(config.commandHandlerPath)
-    if (config.componentHandlerPath) Cordo.findContext(config.componentHandlerPath)
-    if (config.uiStatesPath) Cordo.findContext(config.uiStatesPath)
+    if (config.commandHandlerPath) Cordo.findCommandHandlers(config.commandHandlerPath)
+    if (config.componentHandlerPath) Cordo.findComponentHandlers(config.componentHandlerPath)
+    if (config.uiStatesPath) Cordo.findUiStates(config.uiStatesPath)
   }
 
   //
@@ -142,9 +142,15 @@ export default class Cordo {
   public static findContext(dir: string | string[]) {
     if (typeof dir === 'string')
       dir = [ dir ]
-    Cordo.findCommandHandlers([ ...dir, 'commands' ])
-    Cordo.findComponentHandlers([ ...dir, 'components' ])
-    Cordo.findUiStates([ ...dir, 'states' ])
+    try {
+      Cordo.findCommandHandlers([ ...dir, 'commands' ])
+    } catch (ignore) {}
+    try {
+      Cordo.findComponentHandlers([ ...dir, 'components' ])
+    } catch (ignore) {}
+    try {
+      Cordo.findUiStates([ ...dir, 'states' ])
+    } catch (ignore) {}
   }
 
   public static updateBotId(newId: string) {
@@ -360,8 +366,8 @@ export default class Cordo {
       clearTimeout(context.timeoutRunner)
     }
 
-    if (context?.handlers[i.data.custom_id]) {
-      context.handlers[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
+    if (context?.handlers?.[i.data.custom_id]) {
+      context.handlers?.[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
     } else if (Cordo.componentHandlers[i.data.custom_id]) {
       Cordo.componentHandlers[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
     } else if (Cordo.uiStates[i.data.custom_id]) {

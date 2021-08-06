@@ -46,11 +46,11 @@ class Cordo {
         if (config.contextPath)
             Cordo.findContext(config.contextPath);
         if (config.commandHandlerPath)
-            Cordo.findContext(config.commandHandlerPath);
+            Cordo.findCommandHandlers(config.commandHandlerPath);
         if (config.componentHandlerPath)
-            Cordo.findContext(config.componentHandlerPath);
+            Cordo.findComponentHandlers(config.componentHandlerPath);
         if (config.uiStatesPath)
-            Cordo.findContext(config.uiStatesPath);
+            Cordo.findUiStates(config.uiStatesPath);
     }
     //
     static registerCommandHandler(command, handler) {
@@ -125,9 +125,18 @@ class Cordo {
     static findContext(dir) {
         if (typeof dir === 'string')
             dir = [dir];
-        Cordo.findCommandHandlers([...dir, 'commands']);
-        Cordo.findComponentHandlers([...dir, 'components']);
-        Cordo.findUiStates([...dir, 'states']);
+        try {
+            Cordo.findCommandHandlers([...dir, 'commands']);
+        }
+        catch (ignore) { }
+        try {
+            Cordo.findComponentHandlers([...dir, 'components']);
+        }
+        catch (ignore) { }
+        try {
+            Cordo.findUiStates([...dir, 'states']);
+        }
+        catch (ignore) { }
     }
     static updateBotId(newId) {
         Cordo.config.botId = newId;
@@ -315,8 +324,8 @@ class Cordo {
         else if (context?.onInteraction === 'removeTimeout') {
             clearTimeout(context.timeoutRunner);
         }
-        if (context?.handlers[i.data.custom_id]) {
-            context.handlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
+        if (context?.handlers?.[i.data.custom_id]) {
+            context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
         }
         else if (Cordo.componentHandlers[i.data.custom_id]) {
             Cordo.componentHandlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
