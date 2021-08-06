@@ -13,7 +13,7 @@ export function zipArrays<A, B>(a: Array<A>, b: Array<B>): Array<[A, B]> {
  *
  */
 
-export function parseSlot(template: string, value: string): Record<string, string> {
+export function parseParams(template: string, value: string): Record<string, string> {
   return zipArrays(template.split('_'), value.split('_'))
     .filter(e => e[0].startsWith('$'))
     .map(e => ([ e[0].substr(1), e[1] ]))

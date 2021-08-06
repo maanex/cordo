@@ -56,7 +56,7 @@ class CordoReplies {
     }
     static buildReplyableComponentInteraction(i, slotContext) {
         if (slotContext)
-            i.slot = slotContext.slot;
+            i.params = slotContext.params;
         return {
             ...i,
             ack() {

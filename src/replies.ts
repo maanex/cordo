@@ -1,6 +1,6 @@
 import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo, InteractionReplyTimeoutOptions } from './types/custom'
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
-import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotContext } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotedContext } from './types/base'
 import CordoAPI from './api'
 import Cordo from './index'
 
@@ -65,8 +65,8 @@ export default class CordoReplies {
     }
   }
 
-  public static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlotContext): ReplyableComponentInteraction {
-    if (slotContext) (i as ComponentInteraction & SlotContext).slot = slotContext.slot
+  public static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlotedContext): ReplyableComponentInteraction {
+    if (slotContext) (i as ComponentInteraction & SlotedContext).params = slotContext.params
     return {
       ...i,
       ack() {

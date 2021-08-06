@@ -109,8 +109,8 @@ export declare type GenericInteraction = InteractionBase & (InteractionLocationG
 export declare type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
 export declare type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent;
 export declare type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage;
-export declare type SlotContext = {
-    slot: Record<string, string>;
+export declare type SlotedContext = {
+    params: Record<string, string>;
 };
 export declare type ReplyableCommandInteraction = CommandInteraction & {
     ack(): void;
@@ -119,7 +119,7 @@ export declare type ReplyableCommandInteraction = CommandInteraction & {
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;
     state(state?: string, ...args: any): void;
 };
-export declare type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotContext> & {
+export declare type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
     ack(): void;
     reply(data: InteractionApplicationCommandCallbackData): void;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;

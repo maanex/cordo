@@ -9,7 +9,7 @@ import CordoAPI from './api'
 import CordoReplies from './replies'
 import DefaultLogger from './lib/default-logger'
 import PermissionStrings from './lib/permission-strings'
-import { parseSlot } from './utils'
+import { parseParams } from './utils'
 
 
 export * from './api'
@@ -371,13 +371,13 @@ export default class Cordo {
     if (context?.handlers?.[i.data.custom_id]) {
       context.handlers?.[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
     } else if (regexSearchResult = context?.slottedHandlers?.find(h => h.regex.test(i.data.custom_id))) {
-      const slot = parseSlot(regexSearchResult.id, i.data.custom_id)
-      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { slot }))
+      const params = parseParams(regexSearchResult.id, i.data.custom_id)
+      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { params }))
     } else if (Cordo.componentHandlers[i.data.custom_id]) {
       Cordo.componentHandlers[i.data.custom_id](CordoReplies.buildReplyableComponentInteraction(i))
     } else if (regexSearchResult = Cordo.slottedComponentHandlers.find(h => h.regex.test(i.data.custom_id))) {
-      const slot = parseSlot(regexSearchResult.id, i.data.custom_id)
-      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { slot }))
+      const params = parseParams(regexSearchResult.id, i.data.custom_id)
+      regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { params }))
     } else if (Cordo.uiStates[i.data.custom_id]) {
       CordoReplies.buildReplyableComponentInteraction(i).state()
     } else {
