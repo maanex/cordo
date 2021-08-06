@@ -12,7 +12,7 @@ export default class CordoAPI {
     if (!useRaw)
       CordoAPI.normaliseData(data, i)
 
-    if (data.components)
+    if (data?.components)
       i._answerComponents = data.components
 
     if (!i._answered) {

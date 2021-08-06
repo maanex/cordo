@@ -128,7 +128,7 @@ export default class CordoReplies {
       },
       disableComponents() {
         CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, {
-          components: (context.interaction._answerComponents as any)
+          components: ((context.interaction._answerComponents as any) || [])
             .map(row => ({
               ...row,
               components: row.components.map(c => ({
