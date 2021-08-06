@@ -114,13 +114,27 @@ class CordoReplies {
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
             },
             disableComponents() {
+                console.log("hi");
                 console.log(context.interaction._answerComponents);
-                console.log(12341234123412341234);
+                console.log("ho");
                 console.log(context.interaction._answerComponents
-                    .map(row => row.components.map(c => ({ ...c, disabled: true }))));
+                    .map(row => ({
+                    ...row,
+                    components: row.components.map(c => ({
+                        ...c,
+                        disabled: true
+                    }))
+                })));
+                console.log("he");
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, {
                     components: context.interaction._answerComponents
-                        .map(row => row.components.map(c => ({ ...c, disabled: true })))
+                        .map(row => ({
+                        ...row,
+                        components: row.components.map(c => ({
+                            ...c,
+                            disabled: true
+                        }))
+                    }))
                 }, true);
             },
             async state(state, ...args) {
