@@ -8,8 +8,12 @@ import Cordo from './index'
 
 export default class CordoAPI {
 
-  public static interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData) {
-    CordoAPI.normaliseData(data, i)
+  public static interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, useRaw?: boolean) {
+    if (!useRaw)
+      CordoAPI.normaliseData(data, i)
+
+    if (data.components)
+      i._answerComponents = data.components
 
     if (!i._answered) {
       i._answered = true

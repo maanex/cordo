@@ -214,6 +214,7 @@ class Cordo {
             guildData: Cordo._data.middlewares.fetchGuildData?.(channel.guild.id),
             userData: Cordo._data.middlewares.fetchUserData?.(member.id),
             _answered: false,
+            _answerComponents: [],
             guild_id: channel.guild.id,
             channel_id: channel.id,
             member: {
@@ -307,6 +308,8 @@ class Cordo {
             clearTimeout(context.timeoutRunner);
             setTimeout(context.timeoutRunFunc, context.timeout);
         }
+        if (context?.removeTimeoutOnInteraction)
+            clearTimeout(context.timeoutRunner);
         if (context?.handlers[i.data.custom_id]) {
             context.handlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
         }

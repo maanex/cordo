@@ -4,6 +4,7 @@
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
 import { ComponentType, InteractionComponentFlag, InteractionType } from './const'
 import { GuildData, UserData } from './middleware'
+import { MessageComponent } from './component'
 
 
 export type InteractionUser = {
@@ -120,6 +121,7 @@ export type InteractionBase = {
   guildData?: GuildData
   userData?: UserData
   _answered: boolean
+  _answerComponents: MessageComponent[]
 }
 
 //
@@ -151,7 +153,7 @@ export type ReplyableComponentInteraction = ComponentInteraction & {
 
 export type InteractionJanitor = {
   edit(data: InteractionApplicationCommandCallbackData): void
-  // disableComponents(): void
+  disableComponents(): void
   removeComponents(): void
   state(state?: string, ...args: any): void
 }

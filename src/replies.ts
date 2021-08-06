@@ -1,4 +1,4 @@
-import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo } from './types/custom'
+import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo, InteractionReplyTimeoutOptions } from './types/custom'
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction } from './types/base'
 import CordoAPI from './api'
@@ -26,6 +26,7 @@ export default class CordoReplies {
       timeoutRunFunc: null,
       timeoutRunner: null,
       resetTimeoutOnInteraction: false,
+      removeTimeoutOnInteraction: false,
       handlers: {}
     }
   }
@@ -126,6 +127,12 @@ export default class CordoReplies {
       removeComponents() {
         CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, { components: [] })
       },
+      disableComponents() {
+        CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, {
+          components: (context.interaction._answerComponents as any)
+            .map(row => row.components.map(c => ({ ...c, disabled: true })))
+        }, true)
+      },
       async state(state?: string, ...args: any) {
         if (!state) state = context.interaction.id
 
@@ -147,14 +154,15 @@ export default class CordoReplies {
    public static getLevelTwoReplyState(context: InteractionReplyContext): InteractionReplyStateLevelTwo {
     return {
       _context: context,
-      withTimeout(timeout: number, resetOnInteraction: boolean, janitor: (edit: InteractionJanitor) => any) {
+      withTimeout(timeout: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions) {
         if (timeout > 15 * 60 * 1000) {
           Cordo._data.logger.error('Interactions timeout cannot be bigger than 15 minutes')
           return {} as any
         }
 
         context.timeout = timeout
-        context.resetTimeoutOnInteraction = resetOnInteraction
+        context.resetTimeoutOnInteraction = options?.resetTimeoutOnInteraction
+        context.removeTimeoutOnInteraction = options?.removeTimeoutOnInteraction
         context.timeoutRunFunc = () => {
           janitor(CordoReplies.getJanitor(context))
           delete context.handlers

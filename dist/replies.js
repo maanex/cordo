@@ -17,6 +17,7 @@ class CordoReplies {
             timeoutRunFunc: null,
             timeoutRunner: null,
             resetTimeoutOnInteraction: false,
+            removeTimeoutOnInteraction: false,
             handlers: {}
         };
     }
@@ -113,6 +114,12 @@ class CordoReplies {
             removeComponents() {
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
             },
+            disableComponents() {
+                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, {
+                    components: context.interaction._answerComponents
+                        .map(row => row.components.map(c => ({ ...c, disabled: true })))
+                }, true);
+            },
             async state(state, ...args) {
                 if (!state)
                     state = context.interaction.id;
@@ -133,13 +140,14 @@ class CordoReplies {
     static getLevelTwoReplyState(context) {
         return {
             _context: context,
-            withTimeout(timeout, resetOnInteraction, janitor) {
+            withTimeout(timeout, janitor, options) {
                 if (timeout > 15 * 60 * 1000) {
                     index_1.default._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
                     return {};
                 }
                 context.timeout = timeout;
-                context.resetTimeoutOnInteraction = resetOnInteraction;
+                context.resetTimeoutOnInteraction = options?.resetTimeoutOnInteraction;
+                context.removeTimeoutOnInteraction = options?.removeTimeoutOnInteraction;
                 context.timeoutRunFunc = () => {
                     janitor(CordoReplies.getJanitor(context));
                     delete context.handlers;

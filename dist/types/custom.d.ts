@@ -30,6 +30,7 @@ export declare type InteractionReplyContext = {
     timeoutRunFunc: (...any: any) => any;
     timeoutRunner: NodeJS.Timeout;
     resetTimeoutOnInteraction: boolean;
+    removeTimeoutOnInteraction: boolean;
     handlers: {
         [customId: string]: InteractionComponentHandler;
     };
@@ -38,8 +39,12 @@ export declare type InteractionReplyStateLevelThree = {
     _context: InteractionReplyContext;
     on(customId: string, handler: InteractionComponentHandler): InteractionReplyStateLevelThree;
 };
+export declare type InteractionReplyTimeoutOptions = {
+    resetTimeoutOnInteraction?: boolean;
+    removeTimeoutOnInteraction?: boolean;
+};
 export declare type InteractionReplyStateLevelTwo = {
     _context: InteractionReplyContext;
-    withTimeout(millis: number, resetOnInteraction: boolean, janitor: (edit: InteractionJanitor) => any): InteractionReplyStateLevelThree;
+    withTimeout(millis: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions): InteractionReplyStateLevelThree;
 };
 export declare type InteractionUIState = (i: GenericInteraction, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;

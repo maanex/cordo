@@ -5,8 +5,11 @@ const permission_strings_1 = require("./lib/permission-strings");
 const const_1 = require("./types/const");
 const index_1 = require("./index");
 class CordoAPI {
-    static interactionCallback(i, type, data) {
-        CordoAPI.normaliseData(data, i);
+    static interactionCallback(i, type, data, useRaw) {
+        if (!useRaw)
+            CordoAPI.normaliseData(data, i);
+        if (data.components)
+            i._answerComponents = data.components;
         if (!i._answered) {
             i._answered = true;
             axios_1.default

@@ -1,6 +1,7 @@
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
 import { ComponentType, InteractionComponentFlag, InteractionType } from './const';
 import { GuildData, UserData } from './middleware';
+import { MessageComponent } from './component';
 export declare type InteractionUser = {
     id: string;
     username: string;
@@ -102,6 +103,7 @@ export declare type InteractionBase = {
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;
+    _answerComponents: MessageComponent[];
 };
 export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeRichMessage);
 export declare type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
@@ -126,6 +128,7 @@ export declare type ReplyableComponentInteraction = ComponentInteraction & {
 };
 export declare type InteractionJanitor = {
     edit(data: InteractionApplicationCommandCallbackData): void;
+    disableComponents(): void;
     removeComponents(): void;
     state(state?: string, ...args: any): void;
 };
