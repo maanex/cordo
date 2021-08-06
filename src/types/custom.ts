@@ -48,8 +48,7 @@ export type InteractionReplyContext = {
   timeout: number
   timeoutRunFunc: (...any: any) => any
   timeoutRunner: NodeJS.Timeout
-  resetTimeoutOnInteraction: boolean
-  removeTimeoutOnInteraction: boolean
+  onInteraction: InteractionReplyTimeoutOptions['onInteraction']
   handlers: { [customId: string]: InteractionComponentHandler }
 }
 
@@ -59,8 +58,7 @@ export type InteractionReplyStateLevelThree = {
 }
 
 export type InteractionReplyTimeoutOptions = {
-  resetTimeoutOnInteraction?: boolean
-  removeTimeoutOnInteraction?: boolean
+  onInteraction?: 'restartTimeout' | 'removeTimeout' | 'triggerTimeout' | 'doNothing'
 }
 
 export type InteractionReplyStateLevelTwo = {

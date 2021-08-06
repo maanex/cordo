@@ -16,8 +16,7 @@ class CordoReplies {
             timeout: -1,
             timeoutRunFunc: null,
             timeoutRunner: null,
-            resetTimeoutOnInteraction: false,
-            removeTimeoutOnInteraction: false,
+            onInteraction: 'doNothing',
             handlers: {}
         };
     }
@@ -115,6 +114,10 @@ class CordoReplies {
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
             },
             disableComponents() {
+                console.log(context.interaction._answerComponents);
+                console.log(12341234123412341234);
+                console.log(context.interaction._answerComponents
+                    .map(row => row.components.map(c => ({ ...c, disabled: true }))));
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, {
                     components: context.interaction._answerComponents
                         .map(row => row.components.map(c => ({ ...c, disabled: true })))
@@ -146,8 +149,7 @@ class CordoReplies {
                     return {};
                 }
                 context.timeout = timeout;
-                context.resetTimeoutOnInteraction = options?.resetTimeoutOnInteraction;
-                context.removeTimeoutOnInteraction = options?.removeTimeoutOnInteraction;
+                context.onInteraction = options?.onInteraction;
                 context.timeoutRunFunc = () => {
                     janitor(CordoReplies.getJanitor(context));
                     delete context.handlers;

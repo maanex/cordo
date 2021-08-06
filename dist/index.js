@@ -304,12 +304,17 @@ class Cordo {
         if ((await Cordo.componentPermissionCheck(i)) !== 'passed')
             return;
         const context = replies_1.default.findActiveInteractionReplyContext(i.message.interaction?.id);
-        if (context?.resetTimeoutOnInteraction) {
+        if (context?.onInteraction === 'restartTimeout') {
             clearTimeout(context.timeoutRunner);
             setTimeout(context.timeoutRunFunc, context.timeout);
         }
-        if (context?.removeTimeoutOnInteraction)
+        else if (context?.onInteraction === 'triggerTimeout') {
             clearTimeout(context.timeoutRunner);
+            context.timeoutRunFunc();
+        }
+        else if (context?.onInteraction === 'removeTimeout') {
+            clearTimeout(context.timeoutRunner);
+        }
         if (context?.handlers[i.data.custom_id]) {
             context.handlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
         }
