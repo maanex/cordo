@@ -194,7 +194,7 @@ export type RichMessageInteraction = InteractionBase & (InteractionLocationGuild
 export type SlotedContext = { params: Record<string, string> }
 
 export type ReplyableCommandInteraction = CommandInteraction & {
-  defer(privately: boolean): void
+  defer(privately?: boolean): void
   reply(data: InteractionApplicationCommandCallbackData): void
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
