@@ -34,8 +34,12 @@ export default class CordoReplies {
   public static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction {
     return {
       ...i,
-      ack() {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
+      defer(privately = false) {
+        CordoAPI.interactionCallback(
+          i,
+          InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+          privately ? { flags: InteractionResponseFlags.EPHEMERAL } : null
+        )
       },
       reply(data: InteractionApplicationCommandCallbackData) {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)

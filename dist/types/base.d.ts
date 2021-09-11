@@ -165,7 +165,7 @@ export declare type SlotedContext = {
     params: Record<string, string>;
 };
 export declare type ReplyableCommandInteraction = CommandInteraction & {
-    ack(): void;
+    defer(): void;
     reply(data: InteractionApplicationCommandCallbackData): void;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;

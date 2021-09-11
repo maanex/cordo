@@ -24,8 +24,8 @@ class CordoReplies {
     static buildReplyableCommandInteraction(i) {
         return {
             ...i,
-            ack() {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE);
+            defer(privately = false) {
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, privately ? { flags: const_1.InteractionResponseFlags.EPHEMERAL } : null);
             },
             reply(data) {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
