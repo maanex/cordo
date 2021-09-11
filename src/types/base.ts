@@ -43,6 +43,17 @@ export type PartialInteractionChannel = {
   permissions: Snowflake
 }
 
+export type InteractionMessageAttachment = {
+  id: Snowflake
+  filename: string
+  content_type?: string
+  size: number
+  url: string
+  proxy_url: string
+  height?: number
+  width?: number
+}
+
 export type InteractionMessage = {
   webhook_id?: string,
   type: number,
@@ -66,7 +77,7 @@ export type InteractionMessage = {
   components: any, // TODO
   channel_id: string,
   author: InteractionUser,
-  attachments: any[], // TODO
+  attachments: InteractionMessageAttachment[], // TODO
   application_id: string
 }
 

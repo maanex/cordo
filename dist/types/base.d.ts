@@ -31,6 +31,16 @@ export declare type PartialInteractionChannel = {
     type: ChannelType;
     permissions: Snowflake;
 };
+export declare type InteractionMessageAttachment = {
+    id: Snowflake;
+    filename: string;
+    content_type?: string;
+    size: number;
+    url: string;
+    proxy_url: string;
+    height?: number;
+    width?: number;
+};
 export declare type InteractionMessage = {
     webhook_id?: string;
     type: number;
@@ -54,7 +64,7 @@ export declare type InteractionMessage = {
     components: any;
     channel_id: string;
     author: InteractionUser;
-    attachments: any[];
+    attachments: InteractionMessageAttachment[];
     application_id: string;
 };
 export declare type PartialInteractionMessage = InteractionMessage;
