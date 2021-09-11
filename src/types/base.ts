@@ -2,13 +2,18 @@
 // INTERACTION BASE TYPES
 
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
-import { ComponentType, InteractionComponentFlag, InteractionType } from './const'
+import { InteractionCommandType, ComponentType, InteractionComponentFlag, InteractionType } from './const'
 import { GuildData, UserData } from './middleware'
 import { MessageComponent } from './component'
 
 
+export type Snowflake = string
+
+export type PermissionBits = string
+
+
 export type InteractionUser = {
-  id: string
+  id: Snowflake
   username: string
   avatar: string
   discriminator: string
@@ -18,15 +23,24 @@ export type InteractionUser = {
 
 export type InteractionMember = {
   user: InteractionUser
-  roles: string[]
+  roles: Snowflake[]
   premium_since: string | null
-  permissions: string
+  permissions: PermissionBits
   pending: boolean
   nick: string | null
   mute: boolean
   joined_at: string
   is_pending: boolean
   deaf: boolean
+}
+
+export type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>
+
+export type PartialInteractionChannel = {
+  id: Snowflake
+  name: string
+  type: ChannelType
+  permissions: Snowflake
 }
 
 export type InteractionMessage = {
@@ -44,7 +58,7 @@ export type InteractionMessage = {
     name: string,
     id: string
   },
-  id: string,
+  id: Snowflake,
   flags: number,
   embeds: any[], // TODO
   edited_timestamp: string | null,
@@ -56,10 +70,36 @@ export type InteractionMessage = {
   application_id: string
 }
 
+export type PartialInteractionMessage = InteractionMessage // TODO
+
 export type InteractionEmoji = {
-  id: string
+  id: Snowflake
   name: string
   animated: boolean
+}
+
+export type InteractionRole = {
+  id: Snowflake
+  name: string
+  color: number
+  hoist: boolean
+  position: number
+  permissions: PermissionBits
+  managed: boolean
+  mentionable: boolean
+  tags?: {
+    bot_id?: Snowflake,
+    integration_id?: Snowflake
+    premium_subscriber?: null
+  }
+}
+
+export type InteractionResolvedData = {
+  users?: Record<Snowflake, InteractionUser>
+  members?: Record<Snowflake, PartialInteractionMember>
+  roles?: Record<Snowflake, InteractionRole>
+  channels?: Record<Snowflake, PartialInteractionChannel>
+  messages?: Record<Snowflake, PartialInteractionMessage>
 }
 
 //
@@ -67,8 +107,8 @@ export type InteractionEmoji = {
 export type InteractionLocationGuild = {
   member: InteractionMember
   user?: InteractionUser
-  guild_id: string
-  channel_id: string
+  guild_id: Snowflake
+  channel_id: Snowflake
 }
 
 export type InteractionLocationDM = {
@@ -84,15 +124,25 @@ export type InteractionTypeCommand = {
   type: InteractionType.COMMAND
   message?: undefined
   data: {
-    id?: string
-    name?: string
-    custom_id?: string
+    id: Snowflake
+    name: string
+    resolved: InteractionResolvedData
     options?: {
       name: string
       value: string | number
     }[],
     option?: { [name: string]: string | number } // custom, parsed
-  }
+  } & ({
+    type: InteractionCommandType.CHAT_INPUT
+  } | {
+    type: InteractionCommandType.USER
+    target_id: Snowflake
+    target: InteractionUser
+  } | {
+    type: InteractionCommandType.MESSAGE
+    target_id: Snowflake
+    target: InteractionMessage
+  })
 }
 
 export type InteractionTypeComponent = {
@@ -113,11 +163,11 @@ export type InteractionTypeRichMessage = {
 //
 
 export type InteractionBase = {
-  id: string
+  id: Snowflake
   token: string
   version: number
   user: InteractionUser
-  application_id?: string
+  application_id?: Snowflake
   guildData?: GuildData
   userData?: UserData
   _answered: boolean

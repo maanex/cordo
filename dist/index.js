@@ -221,7 +221,7 @@ class Cordo {
      */
     static getRichMessageInteraction(channel, member) {
         return {
-            id: 'rich-message-' + Math.random().toString().substr(2),
+            id: 'rich-message-' + Math.random().toString().substring(2),
             token: null,
             version: 0,
             user: {
@@ -254,18 +254,23 @@ class Cordo {
         };
     }
     static onCommand(i) {
+        const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
         try {
             i.data.option = {};
             for (const option of i.data.options || [])
                 i.data.option[option.name] = option.value;
-            if (Cordo.commandHandlers[i.data.name]) {
-                Cordo.commandHandlers[i.data.name](replies_1.default.buildReplyableCommandInteraction(i));
+            if (i.data.type === const_1.InteractionCommandType.USER)
+                i.data.target = i.data.resolved.users[i.data.target_id];
+            if (i.data.type === const_1.InteractionCommandType.MESSAGE)
+                i.data.target = i.data.resolved.messages[i.data.target_id];
+            if (Cordo.commandHandlers[name]) {
+                Cordo.commandHandlers[name](replies_1.default.buildReplyableCommandInteraction(i));
             }
-            else if (Cordo.uiStates[i.data.name + '_main']) {
-                replies_1.default.buildReplyableCommandInteraction(i).state(i.data.name + '_main');
+            else if (Cordo.uiStates[name + '_main']) {
+                replies_1.default.buildReplyableCommandInteraction(i).state(name + '_main');
             }
             else {
-                Cordo.logger.warn(`Unhandled command "${i.data.name}"`);
+                Cordo.logger.warn(`Unhandled command "${name}"`);
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE);
             }
         }
@@ -327,15 +332,15 @@ class Cordo {
             context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
         }
         else if (regexSearchResult = context?.slottedHandlers?.find(h => h.regex.test(i.data.custom_id))) {
-            const slot = utils_1.parseSlot(regexSearchResult.id, i.data.custom_id);
-            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { slot }));
+            const params = utils_1.parseParams(regexSearchResult.id, i.data.custom_id);
+            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { params }));
         }
         else if (Cordo.componentHandlers[i.data.custom_id]) {
             Cordo.componentHandlers[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
         }
         else if (regexSearchResult = Cordo.slottedComponentHandlers.find(h => h.regex.test(i.data.custom_id))) {
-            const slot = utils_1.parseSlot(regexSearchResult.id, i.data.custom_id);
-            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { slot }));
+            const params = utils_1.parseParams(regexSearchResult.id, i.data.custom_id);
+            regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { params }));
         }
         else if (Cordo.uiStates[i.data.custom_id]) {
             replies_1.default.buildReplyableComponentInteraction(i).state();

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { Client, GuildMember, Message, TextChannel } from 'discord.js'
 import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
-import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType } from './types/const'
+import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType, InteractionCommandType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'
 import CordoAPI from './api'
@@ -258,7 +258,7 @@ export default class Cordo {
 
   private static getRichMessageInteraction(channel: TextChannel, member: GuildMember): RichMessageInteraction {
     return {
-      id: 'rich-message-' + Math.random().toString().substr(2),
+      id: 'rich-message-' + Math.random().toString().substring(2),
       token: null,
       version: 0,
       user: {
@@ -292,17 +292,23 @@ export default class Cordo {
   }
 
   private static onCommand(i: CommandInteraction) {
+    const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
     try {
       i.data.option = {}
       for (const option of i.data.options || [])
         i.data.option[option.name] = option.value
 
-      if (Cordo.commandHandlers[i.data.name]) {
-        Cordo.commandHandlers[i.data.name](CordoReplies.buildReplyableCommandInteraction(i))
-      } else if (Cordo.uiStates[i.data.name + '_main']) {
-        CordoReplies.buildReplyableCommandInteraction(i).state(i.data.name + '_main')
+      if (i.data.type === InteractionCommandType.USER)
+        i.data.target = i.data.resolved.users[i.data.target_id]
+      if (i.data.type === InteractionCommandType.MESSAGE)
+        i.data.target = i.data.resolved.messages[i.data.target_id]
+
+      if (Cordo.commandHandlers[name]) {
+        Cordo.commandHandlers[name](CordoReplies.buildReplyableCommandInteraction(i))
+      } else if (Cordo.uiStates[name + '_main']) {
+        CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
       } else {
-        Cordo.logger.warn(`Unhandled command "${i.data.name}"`)
+        Cordo.logger.warn(`Unhandled command "${name}"`)
         CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
       }
     } catch (ex) {

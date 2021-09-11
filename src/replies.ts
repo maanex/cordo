@@ -54,7 +54,7 @@ export default class CordoReplies {
         if (!state) state = i.data.id
 
         if (!Cordo._data.uiStates[state]) {
-          Cordo._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`)
+          Cordo._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`)
           return
         }
 

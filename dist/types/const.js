@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InteractionComponentFlag = exports.ButtonStyle = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
+exports.ChannelType = exports.InteractionComponentFlag = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
 var InteractionCallbackType;
 (function (InteractionCallbackType) {
     InteractionCallbackType[InteractionCallbackType["PONG"] = 1] = "PONG";
@@ -28,6 +28,12 @@ var ComponentType;
     ComponentType[ComponentType["BUTTON"] = 2] = "BUTTON";
     ComponentType[ComponentType["SELECT"] = 3] = "SELECT";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
+var InteractionCommandType;
+(function (InteractionCommandType) {
+    InteractionCommandType[InteractionCommandType["CHAT_INPUT"] = 1] = "CHAT_INPUT";
+    InteractionCommandType[InteractionCommandType["USER"] = 2] = "USER";
+    InteractionCommandType[InteractionCommandType["MESSAGE"] = 3] = "MESSAGE";
+})(InteractionCommandType = exports.InteractionCommandType || (exports.InteractionCommandType = {}));
 var ButtonStyle;
 (function (ButtonStyle) {
     ButtonStyle[ButtonStyle["PRIMARY"] = 1] = "PRIMARY";
@@ -46,4 +52,18 @@ var InteractionComponentFlag;
     InteractionComponentFlag["ACCESS_BOT_ADMIN"] = "x";
     InteractionComponentFlag["HIDE_IF_NOT_ALLOWED"] = "h";
 })(InteractionComponentFlag = exports.InteractionComponentFlag || (exports.InteractionComponentFlag = {}));
+var ChannelType;
+(function (ChannelType) {
+    ChannelType[ChannelType["GUILD_TEXT"] = 0] = "GUILD_TEXT";
+    ChannelType[ChannelType["DM"] = 1] = "DM";
+    ChannelType[ChannelType["GUILD_VOICE"] = 2] = "GUILD_VOICE";
+    ChannelType[ChannelType["GROUP_DM"] = 3] = "GROUP_DM";
+    ChannelType[ChannelType["GUILD_CATEGORY"] = 4] = "GUILD_CATEGORY";
+    ChannelType[ChannelType["GUILD_NEWS"] = 5] = "GUILD_NEWS";
+    ChannelType[ChannelType["GUILD_STORE"] = 6] = "GUILD_STORE";
+    ChannelType[ChannelType["GUILD_NEWS_THREAD"] = 10] = "GUILD_NEWS_THREAD";
+    ChannelType[ChannelType["GUILD_PUBLIC_THREAD"] = 11] = "GUILD_PUBLIC_THREAD";
+    ChannelType[ChannelType["GUILD_PRIVATE_THREAD"] = 12] = "GUILD_PRIVATE_THREAD";
+    ChannelType[ChannelType["GUILD_STAGE_VOICE"] = 13] = "GUILD_STAGE_VOICE";
+})(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
 //# sourceMappingURL=const.js.map

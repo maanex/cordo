@@ -1,9 +1,11 @@
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
-import { ComponentType, InteractionComponentFlag, InteractionType } from './const';
+import { InteractionCommandType, ComponentType, InteractionComponentFlag, InteractionType } from './const';
 import { GuildData, UserData } from './middleware';
 import { MessageComponent } from './component';
+export declare type Snowflake = string;
+export declare type PermissionBits = string;
 export declare type InteractionUser = {
-    id: string;
+    id: Snowflake;
     username: string;
     avatar: string;
     discriminator: string;
@@ -12,15 +14,22 @@ export declare type InteractionUser = {
 };
 export declare type InteractionMember = {
     user: InteractionUser;
-    roles: string[];
+    roles: Snowflake[];
     premium_since: string | null;
-    permissions: string;
+    permissions: PermissionBits;
     pending: boolean;
     nick: string | null;
     mute: boolean;
     joined_at: string;
     is_pending: boolean;
     deaf: boolean;
+};
+export declare type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
+export declare type PartialInteractionChannel = {
+    id: Snowflake;
+    name: string;
+    type: ChannelType;
+    permissions: Snowflake;
 };
 export declare type InteractionMessage = {
     webhook_id?: string;
@@ -37,7 +46,7 @@ export declare type InteractionMessage = {
         name: string;
         id: string;
     };
-    id: string;
+    id: Snowflake;
     flags: number;
     embeds: any[];
     edited_timestamp: string | null;
@@ -48,16 +57,39 @@ export declare type InteractionMessage = {
     attachments: any[];
     application_id: string;
 };
+export declare type PartialInteractionMessage = InteractionMessage;
 export declare type InteractionEmoji = {
-    id: string;
+    id: Snowflake;
     name: string;
     animated: boolean;
+};
+export declare type InteractionRole = {
+    id: Snowflake;
+    name: string;
+    color: number;
+    hoist: boolean;
+    position: number;
+    permissions: PermissionBits;
+    managed: boolean;
+    mentionable: boolean;
+    tags?: {
+        bot_id?: Snowflake;
+        integration_id?: Snowflake;
+        premium_subscriber?: null;
+    };
+};
+export declare type InteractionResolvedData = {
+    users?: Record<Snowflake, InteractionUser>;
+    members?: Record<Snowflake, PartialInteractionMember>;
+    roles?: Record<Snowflake, InteractionRole>;
+    channels?: Record<Snowflake, PartialInteractionChannel>;
+    messages?: Record<Snowflake, PartialInteractionMessage>;
 };
 export declare type InteractionLocationGuild = {
     member: InteractionMember;
     user?: InteractionUser;
-    guild_id: string;
-    channel_id: string;
+    guild_id: Snowflake;
+    channel_id: Snowflake;
 };
 export declare type InteractionLocationDM = {
     member?: undefined;
@@ -69,9 +101,9 @@ export declare type InteractionTypeCommand = {
     type: InteractionType.COMMAND;
     message?: undefined;
     data: {
-        id?: string;
-        name?: string;
-        custom_id?: string;
+        id: Snowflake;
+        name: string;
+        resolved: InteractionResolvedData;
         options?: {
             name: string;
             value: string | number;
@@ -79,7 +111,17 @@ export declare type InteractionTypeCommand = {
         option?: {
             [name: string]: string | number;
         };
-    };
+    } & ({
+        type: InteractionCommandType.CHAT_INPUT;
+    } | {
+        type: InteractionCommandType.USER;
+        target_id: Snowflake;
+        target: InteractionUser;
+    } | {
+        type: InteractionCommandType.MESSAGE;
+        target_id: Snowflake;
+        target: InteractionMessage;
+    });
 };
 export declare type InteractionTypeComponent = {
     type: InteractionType.COMPONENT;
@@ -95,11 +137,11 @@ export declare type InteractionTypeRichMessage = {
     type: InteractionType.RICH_MESSAGE;
 };
 export declare type InteractionBase = {
-    id: string;
+    id: Snowflake;
     token: string;
     version: number;
     user: InteractionUser;
-    application_id?: string;
+    application_id?: Snowflake;
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;
