@@ -104,8 +104,8 @@ export default class CordoAPI {
             if (newlineFlag) rows.push([])
             newlineFlag = false
 
-            if (comp.label?.length > 25)
-              comp.label = comp.label.substr(0, 25)
+            if (comp.label?.length > 50)
+              comp.label = comp.label.substr(0, 50)
 
             rows[rows.length - 1].push(comp)
 
@@ -114,8 +114,8 @@ export default class CordoAPI {
             break
           }
           case ComponentType.SELECT: {
-            if (comp.options?.length > 25)
-              comp.options.length = 25
+            if (comp.options?.length > 50)
+              comp.options.length = 50
 
             rows.push([ comp ])
             newlineFlag = true

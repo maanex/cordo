@@ -43,6 +43,9 @@ export declare type InteractionReplyContext = {
 export declare type InteractionReplyStateLevelThree = {
     _context: InteractionReplyContext;
     on(customId: string, handler: InteractionComponentHandler): InteractionReplyStateLevelThree;
+    edit(data: InteractionApplicationCommandCallbackData): void;
+    followUp(data: InteractionApplicationCommandCallbackData): void;
+    triggerJanitor(): void;
 };
 export declare type InteractionReplyTimeoutOptions = {
     onInteraction?: 'restartTimeout' | 'removeTimeout' | 'triggerTimeout' | 'doNothing';

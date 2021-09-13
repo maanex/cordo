@@ -62,6 +62,9 @@ export type InteractionReplyContext = {
 export type InteractionReplyStateLevelThree = {
   _context: InteractionReplyContext,
   on(customId: string, handler: InteractionComponentHandler): InteractionReplyStateLevelThree
+  edit(data: InteractionApplicationCommandCallbackData): void
+  followUp(data: InteractionApplicationCommandCallbackData): void
+  triggerJanitor(): void
 }
 
 export type InteractionReplyTimeoutOptions = {

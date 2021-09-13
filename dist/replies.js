@@ -6,6 +6,8 @@ const index_1 = require("./index");
 class CordoReplies {
     //
     static findActiveInteractionReplyContext(id) {
+        if (!id)
+            return null;
         return CordoReplies.activeInteractionReplyContexts.find(c => c.id === id);
     }
     //
@@ -76,7 +78,7 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: const_1.InteractionResponseFlags.EPHEMERAL });
             },
             edit(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)?.id);
             },
             editInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
@@ -151,7 +153,7 @@ class CordoReplies {
             withTimeout(timeout, janitor, options) {
                 if (timeout > 15 * 60 * 1000) {
                     index_1.default._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
-                    return {};
+                    timeout = 15 * 60 * 1000;
                 }
                 context.timeout = timeout;
                 context.onInteraction = options?.onInteraction;
@@ -185,6 +187,16 @@ class CordoReplies {
                     });
                 }
                 return state;
+            },
+            edit(data) {
+                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+            },
+            followUp(data) {
+                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+            },
+            triggerJanitor() {
+                clearTimeout(context.timeoutRunner);
+                context.timeoutRunFunc();
             }
         };
         return state;

@@ -13,6 +13,7 @@ export default class CordoReplies {
   //
 
   public static findActiveInteractionReplyContext(id: string): InteractionReplyContext | undefined {
+    if (!id) return null
     return CordoReplies.activeInteractionReplyContexts.find(c => c.id === id)
   }
 
@@ -89,7 +90,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL })
       },
       edit(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)?.id)
       },
       editInteractive(data: InteractionApplicationCommandCallbackData) {
         const context = CordoReplies.newInteractionReplyContext(i)
@@ -167,7 +168,7 @@ export default class CordoReplies {
       withTimeout(timeout: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions) {
         if (timeout > 15 * 60 * 1000) {
           Cordo._data.logger.error('Interactions timeout cannot be bigger than 15 minutes')
-          return {} as any
+          timeout = 15 * 60 * 1000
         }
 
         context.timeout = timeout
@@ -202,6 +203,16 @@ export default class CordoReplies {
           })
         }
         return state
+      },
+      edit(data: InteractionApplicationCommandCallbackData) {
+        CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, data)
+      },
+      followUp(data: InteractionApplicationCommandCallbackData) {
+        CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
+      },
+      triggerJanitor() {
+        clearTimeout(context.timeoutRunner)
+        context.timeoutRunFunc()
       }
     }
     return state
