@@ -317,7 +317,6 @@ class Cordo {
         return 'passed';
     }
     static async onComponent(i) {
-        console.log(i.data.custom_id);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [contextId, _reserved, customId, flagsRaw] = i.data.custom_id.includes(':')
             ? i.data.custom_id.split(':') // new format
