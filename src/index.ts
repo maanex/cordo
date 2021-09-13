@@ -361,17 +361,18 @@ export default class Cordo {
   }
 
   private static async onComponent(i: ComponentInteraction) {
-    i.data.flags = []
-    if (i.data.custom_id.includes('-')) {
-      const id = i.data.custom_id.split('-')[0]
-      const flags = i.data.custom_id.substr(id.length + 1)
-      i.data.custom_id = id
-      i.data.flags = flags.split('-').join('').split('') as InteractionComponentFlag[]
-    }
+    console.log(i.data.custom_id)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [ contextId, _reserved, customId, flagsRaw ] = i.data.custom_id.includes(':')
+      ? i.data.custom_id.split(':') // new format
+      : [ null, null, i.data.custom_id.split('-')[0], i.data.custom_id.split('-')[1] ] // legacy
+
+    i.data.custom_id = customId
+    i.data.flags = flagsRaw?.split('') as InteractionComponentFlag[] ?? []
 
     if ((await Cordo.componentPermissionCheck(i)) !== 'passed') return
 
-    const context = CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)
+    const context = CordoReplies.findActiveInteractionReplyContext(contextId)
 
     let regexSearchResult: SlottedComponentHandler | undefined
     if (context?.handlers?.[i.data.custom_id]) {
@@ -387,7 +388,8 @@ export default class Cordo {
     } else if (Cordo.uiStates[i.data.custom_id]) {
       CordoReplies.buildReplyableComponentInteraction(i).state()
     } else {
-      Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`)
+      if (!contextId)
+        Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`)
       CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
     }
 

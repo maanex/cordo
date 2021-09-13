@@ -31,9 +31,9 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
                 setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
@@ -66,9 +66,9 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
                 setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
@@ -79,9 +79,9 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
             },
             editInteractive(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
                 const context = CordoReplies.newInteractionReplyContext(i);
                 CordoReplies.activeInteractionReplyContexts.push(context);
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
                 setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
@@ -126,7 +126,7 @@ class CordoReplies {
                             disabled: true
                         }))
                     }))
-                }, true);
+                }, null, true);
             },
             async state(state, ...args) {
                 if (!state)

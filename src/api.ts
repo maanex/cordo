@@ -8,9 +8,9 @@ import Cordo from './index'
 
 export default class CordoAPI {
 
-  public static interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, useRaw?: boolean) {
+  public static interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean) {
     if (!useRaw)
-      CordoAPI.normaliseData(data, i)
+      CordoAPI.normaliseData(data, i, contextId)
 
     if (data?.components)
       i._answerComponents = data.components
@@ -46,7 +46,7 @@ export default class CordoAPI {
   /**
    * Transforms the shorthand way of writing into proper discord api compatible objects
    */
-  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction) {
+  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string) {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
     Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData))
@@ -73,9 +73,9 @@ export default class CordoAPI {
       for (const comp of data.components) {
         if (comp.visible === false) continue // === false to not catch any null or undefined
 
-        if (comp.type !== ComponentType.LINE_BREAK && comp.flags?.length && !!(comp as any).custom_id) {
-          (comp as any).custom_id += `-${comp.flags.join('')}`
-          if (!!(i as InteractionLocationGuild).member && !comp.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE)) {
+        if (comp.type !== ComponentType.LINE_BREAK && !!(comp as any).custom_id) {
+          (comp as any).custom_id = `${contextId ?? ''}::${(comp as any).custom_id}:${comp.flags?.join('') ?? ''}`
+          if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !comp.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE)) {
             const perms = BigInt((i as InteractionLocationGuild).member.permissions)
             if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null

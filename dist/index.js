@@ -317,16 +317,16 @@ class Cordo {
         return 'passed';
     }
     static async onComponent(i) {
-        i.data.flags = [];
-        if (i.data.custom_id.includes('-')) {
-            const id = i.data.custom_id.split('-')[0];
-            const flags = i.data.custom_id.substr(id.length + 1);
-            i.data.custom_id = id;
-            i.data.flags = flags.split('-').join('').split('');
-        }
+        console.log(i.data.custom_id);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [contextId, _reserved, customId, flagsRaw] = i.data.custom_id.includes(':')
+            ? i.data.custom_id.split(':') // new format
+            : [null, null, i.data.custom_id.split('-')[0], i.data.custom_id.split('-')[1]]; // legacy
+        i.data.custom_id = customId;
+        i.data.flags = flagsRaw?.split('') ?? [];
         if ((await Cordo.componentPermissionCheck(i)) !== 'passed')
             return;
-        const context = replies_1.default.findActiveInteractionReplyContext(i.message.interaction?.id);
+        const context = replies_1.default.findActiveInteractionReplyContext(contextId);
         let regexSearchResult;
         if (context?.handlers?.[i.data.custom_id]) {
             context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));
@@ -346,7 +346,8 @@ class Cordo {
             replies_1.default.buildReplyableComponentInteraction(i).state();
         }
         else {
-            Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`);
+            if (!contextId)
+                Cordo.logger.warn(`Unhandled component with custom_id "${i.data.custom_id}"`);
             api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
         if (context?.onInteraction === 'restartTimeout') {

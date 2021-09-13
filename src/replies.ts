@@ -30,7 +30,6 @@ export default class CordoReplies {
       slottedHandlers: []
     }
   }
-
   public static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction {
     return {
       ...i,
@@ -45,9 +44,9 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
       },
       replyInteractive(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id)
         setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
@@ -80,9 +79,9 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
       },
       replyInteractive(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id)
         setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
@@ -93,9 +92,9 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data)
       },
       editInteractive(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data)
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id)
         setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
         return CordoReplies.getLevelTwoReplyState(context)
       },
@@ -142,7 +141,7 @@ export default class CordoReplies {
                 disabled: true
               }))
             }))
-        }, true)
+        }, null, true)
       },
       async state(state?: string, ...args: any) {
         if (!state) state = context.interaction.id

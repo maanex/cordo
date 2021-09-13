@@ -5,9 +5,9 @@ const permission_strings_1 = require("./lib/permission-strings");
 const const_1 = require("./types/const");
 const index_1 = require("./index");
 class CordoAPI {
-    static interactionCallback(i, type, data, useRaw) {
+    static interactionCallback(i, type, data, contextId, useRaw) {
         if (!useRaw)
-            CordoAPI.normaliseData(data, i);
+            CordoAPI.normaliseData(data, i, contextId);
         if (data?.components)
             i._answerComponents = data.components;
         if (!i._answered) {
@@ -39,7 +39,7 @@ class CordoAPI {
     /**
      * Transforms the shorthand way of writing into proper discord api compatible objects
      */
-    static normaliseData(data, i) {
+    static normaliseData(data, i, contextId) {
         if (!data)
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
@@ -65,9 +65,9 @@ class CordoAPI {
             for (const comp of data.components) {
                 if (comp.visible === false)
                     continue; // === false to not catch any null or undefined
-                if (comp.type !== const_1.ComponentType.LINE_BREAK && comp.flags?.length && !!comp.custom_id) {
-                    comp.custom_id += `-${comp.flags.join('')}`;
-                    if (!!i.member && !comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE)) {
+                if (comp.type !== const_1.ComponentType.LINE_BREAK && !!comp.custom_id) {
+                    comp.custom_id = `${contextId ?? ''}::${comp.custom_id}:${comp.flags?.join('') ?? ''}`;
+                    if (comp.flags?.length && !!i.member && !comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE)) {
                         const perms = BigInt(i.member.permissions);
                         if (comp.flags.includes(const_1.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(perms)) {
                             if (comp.flags.includes(const_1.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
