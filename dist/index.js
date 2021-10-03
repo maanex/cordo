@@ -150,9 +150,6 @@ class Cordo {
     static updateBotId(newId) {
         Cordo.config.botId = newId;
     }
-    static updateBotClient(newClient) {
-        Cordo.config.botClient = newClient;
-    }
     //
     static addMiddlewareInteractionCallback(fun) {
         Cordo.middlewares.interactionCallback.push(fun);
@@ -185,74 +182,9 @@ class Cordo {
         else
             Cordo.logger.warn(`Unknown interaction type ${i.type}`);
     }
-    //
-    static sendRichReply(replyTo, data, mentionUser = true) {
-        return Cordo.sendRichMessage(replyTo.channel, replyTo.member, data, replyTo, mentionUser);
-    }
-    // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
-    // public static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): InteractionReplyStateLevelTwo {
-    //   return Cordo.sendRichMessageInteractive(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
-    // }
-    static sendRichMessage(channel, member, data, replyTo, mentionUser = true) {
-        const fakeInteraction = Cordo.getRichMessageInteraction(channel, member);
-        api_1.default.normaliseData(data, fakeInteraction);
-        if (replyTo) {
-            data.message_reference = {
-                message_id: replyTo.id,
-                guild_id: replyTo.guild.id,
-                fail_if_not_exists: false
-            };
-            if (!mentionUser && !data.allowed_mentions)
-                data.allowed_mentions = { parse: [] };
-        }
-        channel.client.api.channels(channel.id).messages.post({ data });
-        return fakeInteraction;
-    }
-    // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
-    // public static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): InteractionReplyStateLevelTwo {
-    //   const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser)
-    //   const context = CordoReplies.newInteractionReplyContext(fakeInteraction)
-    //   CordoReplies.activeInteractionReplyContexts.push(context)
-    //   setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
-    //   return CordoReplies.getLevelTwoReplyState(context)
-    // }
     /*
      * INTERNAL
      */
-    static getRichMessageInteraction(channel, member) {
-        return {
-            id: 'rich-message-' + Math.random().toString().substring(2),
-            token: null,
-            version: 0,
-            user: {
-                ...member.user,
-                public_flags: 0
-            },
-            application_id: null,
-            guildData: Cordo._data.middlewares.fetchGuildData?.(channel.guild.id),
-            userData: Cordo._data.middlewares.fetchUserData?.(member.id),
-            _answered: false,
-            _answerComponents: [],
-            guild_id: channel.guild.id,
-            channel_id: channel.id,
-            member: {
-                user: {
-                    ...member.user,
-                    public_flags: 0
-                },
-                roles: member.roles.cache.map(r => r.id),
-                premium_since: null,
-                permissions: member.permissions.bitfield + '',
-                pending: false,
-                nick: member.nickname,
-                mute: false,
-                joined_at: member.joinedAt.toISOString(),
-                is_pending: false,
-                deaf: false
-            },
-            type: const_1.InteractionType.RICH_MESSAGE
-        };
-    }
     static onCommand(i) {
         const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
         try {
@@ -293,18 +225,10 @@ class Cordo {
         if (i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_BOT_ADMIN))
             return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin);
         if (!i.data.flags.includes(const_1.InteractionComponentFlag.ACCESS_EVERYONE)) {
-            let interactionOwner = i.message.interaction?.user;
-            if (!interactionOwner && i.message.message_reference && Cordo.config.botClient) {
-                const reference = i.message.message_reference;
-                const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id);
-                const message = await channel.messages.fetch(reference.message_id);
-                interactionOwner = {
-                    ...message.author,
-                    public_flags: 0
-                };
-            }
-            if (interactionOwner?.id !== i.user.id)
+            const interactionOwner = i.message.interaction?.user;
+            if (interactionOwner?.id !== i.user.id) {
                 return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner');
+            }
         }
         if (!i.member)
             return 'passed';

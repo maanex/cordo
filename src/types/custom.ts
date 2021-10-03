@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 
-import { MessageEmbed } from 'discord.js'
-import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction } from './base'
+import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed } from './base'
 import { MessageComponent } from './component'
 import { InteractionResponseFlags } from './const'
 

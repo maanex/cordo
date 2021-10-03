@@ -1,5 +1,5 @@
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
-import { InteractionCommandType, ComponentType, InteractionComponentFlag, InteractionType } from './const';
+import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType } from './const';
 import { GuildData, UserData } from './middleware';
 import { MessageComponent } from './component';
 export declare type Snowflake = string;
@@ -68,6 +68,52 @@ export declare type InteractionMessage = {
     application_id: string;
 };
 export declare type PartialInteractionMessage = InteractionMessage;
+export declare type MessageEmbed = {
+    title?: string;
+    type?: 'rich' | 'image' | 'video' | 'gifv' | 'article' | 'link';
+    description?: string;
+    url?: string;
+    timestamp?: number;
+    color?: number;
+    footer?: {
+        text: string;
+        icon_url?: string;
+        proxy_icon_url?: string;
+    };
+    image?: {
+        url: string;
+        proxy_url?: string;
+        height?: number;
+        width?: number;
+    };
+    thumbnail?: {
+        url: string;
+        proxy_url?: string;
+        height?: number;
+        width?: number;
+    };
+    video?: {
+        url: string;
+        proxy_url?: string;
+        height?: number;
+        width?: number;
+    };
+    provider?: {
+        name?: string;
+        url?: string;
+    };
+    author?: {
+        name: string;
+        url?: string;
+        icon_url?: string;
+        proxy_icon_url?: string;
+    };
+    fields?: {
+        name: string;
+        value: string;
+        inline?: boolean;
+    }[];
+};
 export declare type InteractionEmoji = {
     id: Snowflake;
     name: string;

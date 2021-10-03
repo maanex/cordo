@@ -1,10 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { Client, GuildMember, Message, TextChannel } from 'discord.js'
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
+import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType, InteractionCommandType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
-import { CommandInteraction, ComponentInteraction, GenericInteraction, RichMessageInteraction } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction } from './types/base'
 import CordoAPI from './api'
 import CordoReplies from './replies'
 import DefaultLogger from './lib/default-logger'
@@ -167,10 +166,6 @@ export default class Cordo {
     Cordo.config.botId = newId
   }
 
-  public static updateBotClient(newClient: Client) {
-    Cordo.config.botClient = newClient
-  }
-
   //
 
   public static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware) {
@@ -211,85 +206,10 @@ export default class Cordo {
       Cordo.logger.warn(`Unknown interaction type ${(i as any).type}`)
   }
 
-  //
-
-  public static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): RichMessageInteraction {
-    return Cordo.sendRichMessage(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
-  }
-
-  // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
-  // public static sendRichReplyInteractive(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser = true): InteractionReplyStateLevelTwo {
-  //   return Cordo.sendRichMessageInteractive(replyTo.channel as TextChannel, replyTo.member, data, replyTo, mentionUser)
-  // }
-
-  public static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): RichMessageInteraction {
-    const fakeInteraction = Cordo.getRichMessageInteraction(channel, member)
-
-    CordoAPI.normaliseData(data, fakeInteraction)
-    if (replyTo) {
-      (data as any).message_reference = {
-        message_id: replyTo.id,
-        guild_id: replyTo.guild.id,
-        fail_if_not_exists: false
-      }
-
-      if (!mentionUser && !data.allowed_mentions)
-        data.allowed_mentions = { parse: [] }
-    }
-
-    (channel.client as any).api.channels(channel.id).messages.post({ data })
-    return fakeInteraction
-  }
-
-  // DISABLED BECAUSE EDITING REGULAR MESSAGES IS NOT SUPPORTED YET
-  // public static sendRichMessageInteractive(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser = true): InteractionReplyStateLevelTwo {
-  //   const fakeInteraction = Cordo.sendRichMessage(channel, member, data, replyTo, mentionUser)
-  //   const context = CordoReplies.newInteractionReplyContext(fakeInteraction)
-  //   CordoReplies.activeInteractionReplyContexts.push(context)
-  //   setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
-  //   return CordoReplies.getLevelTwoReplyState(context)
-  // }
-
 
   /*
    * INTERNAL
    */
-
-
-  private static getRichMessageInteraction(channel: TextChannel, member: GuildMember): RichMessageInteraction {
-    return {
-      id: 'rich-message-' + Math.random().toString().substring(2),
-      token: null,
-      version: 0,
-      user: {
-        ...member.user,
-        public_flags: 0
-      },
-      application_id: null,
-      guildData: Cordo._data.middlewares.fetchGuildData?.(channel.guild.id),
-      userData: Cordo._data.middlewares.fetchUserData?.(member.id),
-      _answered: false,
-      _answerComponents: [],
-      guild_id: channel.guild.id,
-      channel_id: channel.id,
-      member: {
-        user: {
-          ...member.user,
-          public_flags: 0
-        },
-        roles: member.roles.cache.map(r => r.id),
-        premium_since: null,
-        permissions: member.permissions.bitfield + '',
-        pending: false,
-        nick: member.nickname,
-        mute: false,
-        joined_at: member.joinedAt.toISOString(),
-        is_pending: false,
-        deaf: false
-      },
-      type: InteractionType.RICH_MESSAGE
-    }
-  }
 
   private static onCommand(i: CommandInteraction) {
     const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
@@ -332,19 +252,15 @@ export default class Cordo {
       return void Cordo.interactionNotPermitted(i, Cordo.config.texts.interaction_not_permitted_description_bot_admin)
 
     if (!i.data.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE)) {
-      let interactionOwner = i.message.interaction?.user
-      if (!interactionOwner && (i.message as any).message_reference && Cordo.config.botClient) {
-        const reference = (i.message as any).message_reference
-        const channel = await Cordo.config.botClient.channels.fetch(reference.channel_id) as TextChannel
-        const message = await channel.messages.fetch(reference.message_id)
-        interactionOwner = {
-          ...message.author,
-          public_flags: 0
-        }
-      }
+      const interactionOwner = i.message.interaction?.user
 
-      if (interactionOwner?.id !== i.user.id)
-        return void Cordo.interactionNotOwned(i, i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself', interactionOwner?.username || 'the interaction owner')
+      if (interactionOwner?.id !== i.user.id) {
+        return void Cordo.interactionNotOwned(
+          i,
+          i.message.interaction ? `/${i.message.interaction?.name}` : 'the command yourself',
+          interactionOwner?.username || 'the interaction owner'
+        )
+      }
     }
 
     if (!i.member)

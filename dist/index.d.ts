@@ -1,7 +1,6 @@
-import { Client, GuildMember, Message, TextChannel } from 'discord.js';
-import { InteractionApplicationCommandCallbackData, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom';
+import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
-import { GenericInteraction, RichMessageInteraction } from './types/base';
+import { GenericInteraction } from './types/base';
 export * from './api';
 export * from './replies';
 export * from './lib/default-logger';
@@ -48,14 +47,10 @@ export default class Cordo {
     static findUiStates(dir: string | string[], prefix?: string): void;
     static findContext(dir: string | string[]): void;
     static updateBotId(newId: string): void;
-    static updateBotClient(newClient: Client): void;
     static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware): void;
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
-    static sendRichReply(replyTo: Message, data: InteractionApplicationCommandCallbackData, mentionUser?: boolean): RichMessageInteraction;
-    static sendRichMessage(channel: TextChannel, member: GuildMember, data: InteractionApplicationCommandCallbackData, replyTo?: Message, mentionUser?: boolean): RichMessageInteraction;
-    private static getRichMessageInteraction;
     private static onCommand;
     private static componentPermissionCheck;
     private static onComponent;
