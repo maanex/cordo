@@ -17,6 +17,7 @@ export declare type InteractionApplicationCommandCallbackData = {
     title?: string;
     footer?: string;
     image?: string;
+    thumbnail?: string;
     color?: number;
     _context?: LocalisationContext;
 };

@@ -53,7 +53,8 @@ class CordoAPI {
                 title: data.title || undefined,
                 description: data.description || undefined,
                 footer: data.footer ? { text: data.footer } : undefined,
-                thumbnail: data.image ? { url: data.image } : undefined,
+                image: data.image ? { url: data.image } : undefined,
+                thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
                 color: data.color || 0x2F3136
             });
             delete data.description;
