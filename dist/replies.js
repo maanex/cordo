@@ -44,7 +44,7 @@ class CordoReplies {
             },
             async state(state, ...args) {
                 if (!state)
-                    state = i.data.id;
+                    state = i.data.name;
                 if (!index_1.default._data.uiStates[state]) {
                     index_1.default._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`);
                     return;

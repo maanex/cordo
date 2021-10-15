@@ -109,7 +109,11 @@ export default class Cordo {
 
       if (file.includes('.')) {
         if (!file.endsWith('.js')) continue
-        Cordo.registerCommandHandler(fullName, require(fullPath).default)
+        try {
+          Cordo.registerCommandHandler(fullName, require(fullPath).default)
+        } catch (ex) {
+          console.error(ex)
+        }
       } else {
         Cordo.findCommandHandlers(fullPath, fullName)
       }
