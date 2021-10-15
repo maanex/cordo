@@ -55,7 +55,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL })
       },
       async state(state?: string, ...args: any) {
-        if (!state) state = i.data.id
+        if (!state) state = i.data.name
 
         if (!Cordo._data.uiStates[state]) {
           Cordo._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`)

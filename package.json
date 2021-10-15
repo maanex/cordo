@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "A discord.js framework for handling complex interactions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/Maanex/cordo#readme",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.4"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
