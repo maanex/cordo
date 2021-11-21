@@ -1,7 +1,7 @@
 {
   "name": "cordo",
-  "version": "1.8.4",
-  "description": "A discord.js framework for handling complex interactions",
+  "version": "1.9.0",
+  "description": "A framework for handling complex discord api interactions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

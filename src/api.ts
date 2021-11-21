@@ -20,7 +20,9 @@ export default class CordoAPI {
       axios
         .post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
         .then((res) => {
-          if (res.status >= 300) {
+          if (Cordo._data.middlewares.apiResponseHandler) {
+            Cordo._data.middlewares.apiResponseHandler(res)
+          } else if (res.status >= 300) {
             Cordo._data.logger.warn('Interaction callback failed with error:')
             Cordo._data.logger.warn(JSON.stringify(res.data, null, 2))
             Cordo._data.logger.warn('Request payload:')

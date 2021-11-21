@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType, InteractionCommandType } from './types/const'
-import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware'
+import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware'
 import { CommandInteraction, ComponentInteraction, GenericInteraction } from './types/base'
 import CordoAPI from './api'
 import CordoReplies from './replies'
@@ -45,7 +45,8 @@ export default class Cordo {
   private static middlewares = {
     interactionCallback: [] as InteractionCallbackMiddleware[],
     fetchGuildData: null as GuildDataMiddleware,
-    fetchUserData: null as UserDataMiddleware
+    fetchUserData: null as UserDataMiddleware,
+    apiResponseHandler: null as ApiResponseHandlerMiddleware
   }
 
   public static get _data() {
@@ -182,6 +183,10 @@ export default class Cordo {
 
   public static setMiddlewareUserData(fun: UserDataMiddleware) {
     Cordo.middlewares.fetchUserData = fun
+  }
+
+  public static setMiddlewareApiResponseHandler(fun: ApiResponseHandlerMiddleware) {
+    Cordo.middlewares.apiResponseHandler = fun
   }
 
   //

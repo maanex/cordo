@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { InteractionApplicationCommandCallbackData } from './custom'
 
 
@@ -24,6 +25,7 @@ export type CordoConfig = {
 export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: GuildData) => any
 export type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>
 export type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>
+export type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any
 
 export type CustomLogger = {
   log(content: any): any

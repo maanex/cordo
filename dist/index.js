@@ -165,6 +165,9 @@ class Cordo {
     static setMiddlewareUserData(fun) {
         Cordo.middlewares.fetchUserData = fun;
     }
+    static setMiddlewareApiResponseHandler(fun) {
+        Cordo.middlewares.apiResponseHandler = fun;
+    }
     //
     static async emitInteraction(i) {
         i._answered = false;
@@ -337,6 +340,7 @@ Cordo.logger = new default_logger_1.default();
 Cordo.middlewares = {
     interactionCallback: [],
     fetchGuildData: null,
-    fetchUserData: null
+    fetchUserData: null,
+    apiResponseHandler: null
 };
 //# sourceMappingURL=index.js.map

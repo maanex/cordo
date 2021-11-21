@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { InteractionApplicationCommandCallbackData } from './custom';
 export declare type CordoConfig = {
     botId: string;
@@ -21,6 +22,7 @@ export declare type CordoConfig = {
 export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: GuildData) => any;
 export declare type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
 export declare type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
+export declare type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
 export declare type CustomLogger = {
     log(content: any): any;
     warn(content: any): any;

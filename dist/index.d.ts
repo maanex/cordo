@@ -1,5 +1,5 @@
 import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom';
-import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware } from './types/middleware';
+import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
 export * from './api';
 export * from './replies';
@@ -34,6 +34,7 @@ export default class Cordo {
             interactionCallback: InteractionCallbackMiddleware[];
             fetchGuildData: GuildDataMiddleware;
             fetchUserData: UserDataMiddleware;
+            apiResponseHandler: ApiResponseHandlerMiddleware;
         };
         logger: CustomLogger;
         isBotOwner: typeof Cordo.isBotOwner;
@@ -50,6 +51,7 @@ export default class Cordo {
     static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware): void;
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
+    static setMiddlewareApiResponseHandler(fun: ApiResponseHandlerMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
     private static onCommand;
     private static componentPermissionCheck;
