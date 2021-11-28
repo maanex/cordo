@@ -11,9 +11,9 @@ class CordoReplies {
         return CordoReplies.activeInteractionReplyContexts.find(c => c.id === id);
     }
     //
-    static newInteractionReplyContext(i) {
+    static newInteractionReplyContext(i, customId) {
         return {
-            id: i.id,
+            id: customId ?? i.id,
             interaction: i,
             timeout: -1,
             timeoutRunFunc: null,
@@ -84,7 +84,7 @@ class CordoReplies {
                 const prevContext = CordoReplies.findActiveInteractionReplyContext(i.id);
                 if (prevContext)
                     prevContext.timeoutRunFunc(true);
-                const context = CordoReplies.newInteractionReplyContext(i);
+                const context = CordoReplies.newInteractionReplyContext(i, prevContext?.id);
                 CordoReplies.activeInteractionReplyContexts.push(context);
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
                 setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);

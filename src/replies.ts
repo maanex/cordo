@@ -19,9 +19,9 @@ export default class CordoReplies {
 
   //
 
-  public static newInteractionReplyContext(i: GenericInteraction): InteractionReplyContext {
+  public static newInteractionReplyContext(i: GenericInteraction, customId?: string): InteractionReplyContext {
     return {
-      id: i.id,
+      id: customId ?? i.id,
       interaction: i,
       timeout: -1,
       timeoutRunFunc: null,
@@ -97,7 +97,7 @@ export default class CordoReplies {
         if (prevContext)
           prevContext.timeoutRunFunc(true)
 
-        const context = CordoReplies.newInteractionReplyContext(i)
+        const context = CordoReplies.newInteractionReplyContext(i, prevContext?.id)
         CordoReplies.activeInteractionReplyContexts.push(context)
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id)
         setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3)
