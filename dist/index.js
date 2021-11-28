@@ -291,6 +291,7 @@ class Cordo {
         }
         else if (context?.onInteraction === 'removeTimeout') {
             clearTimeout(context.timeoutRunner);
+            context.timeoutRunFunc(true);
         }
     }
     static interactionNotPermitted(i, text) {

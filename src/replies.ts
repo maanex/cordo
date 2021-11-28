@@ -93,6 +93,10 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)?.id)
       },
       editInteractive(data: InteractionApplicationCommandCallbackData) {
+        const prevContext = CordoReplies.findActiveInteractionReplyContext(i.id)
+        if (prevContext)
+          prevContext.timeoutRunFunc(true)
+
         const context = CordoReplies.newInteractionReplyContext(i)
         CordoReplies.activeInteractionReplyContexts.push(context)
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id)
@@ -173,8 +177,9 @@ export default class CordoReplies {
 
         context.timeout = timeout
         context.onInteraction = options?.onInteraction
-        context.timeoutRunFunc = () => {
-          janitor(CordoReplies.getJanitor(context))
+        context.timeoutRunFunc = (skipJanitor = false) => {
+          if (!skipJanitor)
+            janitor(CordoReplies.getJanitor(context))
           delete context.handlers
           delete context.slottedHandlers
           context.handlers = null

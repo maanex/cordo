@@ -325,6 +325,7 @@ export default class Cordo {
       context.timeoutRunFunc()
     } else if (context?.onInteraction === 'removeTimeout') {
       clearTimeout(context.timeoutRunner)
+      context.timeoutRunFunc(true)
     }
   }
 

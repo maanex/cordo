@@ -52,7 +52,7 @@ export type InteractionReplyContext = {
   id: string
   interaction: GenericInteraction
   timeout: number
-  timeoutRunFunc: (...any: any) => any
+  timeoutRunFunc: (skipJanitor?: boolean) => any
   timeoutRunner: NodeJS.Timeout
   onInteraction: InteractionReplyTimeoutOptions['onInteraction']
   handlers: { [customId: string]: InteractionComponentHandler }
