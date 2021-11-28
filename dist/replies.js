@@ -5,14 +5,8 @@ const api_1 = require("./api");
 const index_1 = require("./index");
 class CordoReplies {
     //
-    static findActiveInteractionReplyContext(id) {
-        if (!id)
-            return null;
-        return CordoReplies.activeInteractionReplyContexts.find(c => c.id === id);
-    }
-    //
     static newInteractionReplyContext(i, customId) {
-        return {
+        const context = {
             id: customId ?? i.id,
             interaction: i,
             timeout: -1,
@@ -22,6 +16,9 @@ class CordoReplies {
             handlers: {},
             slottedHandlers: []
         };
+        this.activeInteractionReplyContexts.set(context.id, context);
+        setTimeout((id) => CordoReplies.activeInteractionReplyContexts.delete(id), 15 * 60e3, context.id);
+        return context;
     }
     static buildReplyableCommandInteraction(i) {
         return {
@@ -34,9 +31,7 @@ class CordoReplies {
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
-                CordoReplies.activeInteractionReplyContexts.push(context);
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
-                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
@@ -69,26 +64,27 @@ class CordoReplies {
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
-                CordoReplies.activeInteractionReplyContexts.push(context);
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
-                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: const_1.InteractionResponseFlags.EPHEMERAL });
             },
             edit(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.findActiveInteractionReplyContext(i.message.interaction?.id)?.id);
+                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.activeInteractionReplyContexts.get(i.message.interaction?.id)?.id);
             },
             editInteractive(data) {
-                const prevContext = CordoReplies.findActiveInteractionReplyContext(i.id);
-                if (prevContext)
-                    prevContext.timeoutRunFunc(true);
-                const context = CordoReplies.newInteractionReplyContext(i, prevContext?.id);
-                CordoReplies.activeInteractionReplyContexts.push(context);
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
-                setTimeout(() => CordoReplies.activeInteractionReplyContexts.splice(0, 1), 15 * 60e3);
-                return CordoReplies.getLevelTwoReplyState(context);
+                const isAlreadyInteractive = CordoReplies.activeInteractionReplyContexts.has(i.message?.interaction?.id);
+                if (isAlreadyInteractive) {
+                    const context = CordoReplies.activeInteractionReplyContexts.get(i.message?.interaction?.id);
+                    api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
+                    return CordoReplies.getLevelTwoReplyState(context);
+                }
+                else {
+                    const context = CordoReplies.newInteractionReplyContext(i);
+                    api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
+                    return CordoReplies.getLevelTwoReplyState(context);
+                }
             },
             // disableComponents() { TODO
             //   API.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, {
@@ -161,6 +157,7 @@ class CordoReplies {
                 context.timeout = timeout;
                 context.onInteraction = options?.onInteraction;
                 context.timeoutRunFunc = (skipJanitor = false) => {
+                    CordoReplies.activeInteractionReplyContexts.delete(context.id);
                     if (!skipJanitor)
                         janitor(CordoReplies.getJanitor(context));
                     delete context.handlers;
@@ -208,5 +205,6 @@ class CordoReplies {
 }
 exports.default = CordoReplies;
 /* TODO @metrics */
-CordoReplies.activeInteractionReplyContexts = [];
+// public static readonly activeInteractionReplyContexts: InteractionReplyContext[] = []
+CordoReplies.activeInteractionReplyContexts = new Map();
 //# sourceMappingURL=replies.js.map

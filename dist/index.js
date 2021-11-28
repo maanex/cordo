@@ -257,7 +257,7 @@ class Cordo {
         i.data.flags = flagsRaw?.split('') ?? [];
         if ((await Cordo.componentPermissionCheck(i)) !== 'passed')
             return;
-        const context = replies_1.default.findActiveInteractionReplyContext(contextId);
+        const context = replies_1.default.activeInteractionReplyContexts.get(contextId);
         let regexSearchResult;
         if (context?.handlers?.[i.data.custom_id]) {
             context.handlers?.[i.data.custom_id](replies_1.default.buildReplyableComponentInteraction(i));

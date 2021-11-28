@@ -296,7 +296,7 @@ export default class Cordo {
 
     if ((await Cordo.componentPermissionCheck(i)) !== 'passed') return
 
-    const context = CordoReplies.findActiveInteractionReplyContext(contextId)
+    const context = CordoReplies.activeInteractionReplyContexts.get(contextId)
 
     let regexSearchResult: SlottedComponentHandler | undefined
     if (context?.handlers?.[i.data.custom_id]) {
