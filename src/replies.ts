@@ -38,14 +38,14 @@ export default class CordoReplies {
     return {
       ...i,
       defer(privately = false) {
-        CordoAPI.interactionCallback(
+        return CordoAPI.interactionCallback(
           i,
           InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
           privately ? { flags: InteractionResponseFlags.EPHEMERAL } : null
         )
       },
       reply(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
+        return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
       },
       replyInteractive(data: InteractionApplicationCommandCallbackData) {
         const context = CordoReplies.newInteractionReplyContext(i)
@@ -78,7 +78,7 @@ export default class CordoReplies {
         CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
       },
       reply(data: InteractionApplicationCommandCallbackData) {
-        CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
+        return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data)
       },
       replyInteractive(data: InteractionApplicationCommandCallbackData) {
         const context = CordoReplies.newInteractionReplyContext(i)

@@ -24,10 +24,10 @@ class CordoReplies {
         return {
             ...i,
             defer(privately = false) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, privately ? { flags: const_1.InteractionResponseFlags.EPHEMERAL } : null);
+                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, privately ? { flags: const_1.InteractionResponseFlags.EPHEMERAL } : null);
             },
             reply(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
@@ -60,7 +60,7 @@ class CordoReplies {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
             },
             reply(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);

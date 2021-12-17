@@ -1,3 +1,4 @@
+import { InteractionCallbackFollowup } from '..';
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
 import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType } from './const';
 import { GuildData, UserData } from './middleware';
@@ -211,15 +212,15 @@ export declare type SlotedContext = {
     params: Record<string, string>;
 };
 export declare type ReplyableCommandInteraction = CommandInteraction & {
-    defer(privately?: boolean): void;
-    reply(data: InteractionApplicationCommandCallbackData): void;
+    defer(privately?: boolean): Promise<InteractionCallbackFollowup>;
+    reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;
     state(state?: string, ...args: any): void;
 };
 export declare type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
     ack(): void;
-    reply(data: InteractionApplicationCommandCallbackData): void;
+    reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;
     edit(data: InteractionApplicationCommandCallbackData): void;

@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 
+import { InteractionMessage } from '..'
 import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed } from './base'
 import { MessageComponent } from './component'
 import { InteractionResponseFlags } from './const'
@@ -41,8 +42,8 @@ export type InteractionComponentHandler
   = ((i: ReplyableComponentInteraction) => HandlerSuccess)
 
 export type SlottedComponentHandler = {
-  regex: RegExp,
-  id: string,
+  regex: RegExp
+  id: string
   handler: InteractionComponentHandler
 }
 
@@ -60,7 +61,7 @@ export type InteractionReplyContext = {
 }
 
 export type InteractionReplyStateLevelThree = {
-  _context: InteractionReplyContext,
+  _context: InteractionReplyContext
   on(customId: string, handler: InteractionComponentHandler): InteractionReplyStateLevelThree
   edit(data: InteractionApplicationCommandCallbackData): void
   followUp(data: InteractionApplicationCommandCallbackData): void
@@ -72,8 +73,13 @@ export type InteractionReplyTimeoutOptions = {
 }
 
 export type InteractionReplyStateLevelTwo = {
-  _context: InteractionReplyContext,
+  _context: InteractionReplyContext
   withTimeout(millis: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions): InteractionReplyStateLevelThree
+}
+
+export type InteractionCallbackFollowup = {
+  getMessage(): Promise<InteractionMessage>
+  edit(data: InteractionApplicationCommandCallbackData, useRaw?: boolean): void
 }
 
 // States

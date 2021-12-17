@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 // INTERACTION BASE TYPES
 
+import { InteractionCallbackFollowup } from '..'
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
 import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType } from './const'
 import { GuildData, UserData } from './middleware'
@@ -241,8 +242,8 @@ export type RichMessageInteraction = InteractionBase & (InteractionLocationGuild
 export type SlotedContext = { params: Record<string, string> }
 
 export type ReplyableCommandInteraction = CommandInteraction & {
-  defer(privately?: boolean): void
-  reply(data: InteractionApplicationCommandCallbackData): void
+  defer(privately?: boolean): Promise<InteractionCallbackFollowup>
+  reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
   state(state?: string, ...args: any): void
@@ -250,7 +251,7 @@ export type ReplyableCommandInteraction = CommandInteraction & {
 
 export type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
   ack(): void
-  reply(data: InteractionApplicationCommandCallbackData): void
+  reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
   edit(data: InteractionApplicationCommandCallbackData): void

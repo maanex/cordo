@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { InteractionMessage } from '..';
 import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed } from './base';
 import { MessageComponent } from './component';
 import { InteractionResponseFlags } from './const';
@@ -53,5 +54,9 @@ export declare type InteractionReplyTimeoutOptions = {
 export declare type InteractionReplyStateLevelTwo = {
     _context: InteractionReplyContext;
     withTimeout(millis: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions): InteractionReplyStateLevelThree;
+};
+export declare type InteractionCallbackFollowup = {
+    getMessage(): Promise<InteractionMessage>;
+    edit(data: InteractionApplicationCommandCallbackData, useRaw?: boolean): void;
 };
 export declare type InteractionUIState = (i: GenericInteraction, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;

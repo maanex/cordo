@@ -1,14 +1,15 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import PermissionStrings from './lib/permission-strings'
 import { InteractionApplicationCommandCallbackData } from './types/custom'
 import { GenericInteraction, InteractionLocationGuild } from './types/base'
+import { InteractionResponseFlags } from './types/const'
 import { MessageComponent } from './types/component'
 import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
-import Cordo from './index'
+import Cordo, { InteractionCallbackFollowup } from './index'
 
 export default class CordoAPI {
 
-  public static interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean) {
+  public static async interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
     if (!useRaw)
       CordoAPI.normaliseData(data, i, contextId)
 
@@ -17,31 +18,46 @@ export default class CordoAPI {
 
     if (!i._answered) {
       i._answered = true
-      axios
-        .post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
-        .then((res) => {
-          if (Cordo._data.middlewares.apiResponseHandler) {
-            Cordo._data.middlewares.apiResponseHandler(res)
-          } else if (res.status >= 300) {
-            Cordo._data.logger.warn('Interaction callback failed with error:')
-            Cordo._data.logger.warn(JSON.stringify(res.data, null, 2))
-            Cordo._data.logger.warn('Request payload:')
-            Cordo._data.logger.warn(JSON.stringify({ type, data }, null, 2))
-          }
-        })
-      return
+      const res = await axios.post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
+      CordoAPI.handleCallbackResponse(res, type, data)
+    } else {
+      switch (type) {
+        case InteractionCallbackType.PONG: break
+        case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
+        case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
+        case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
+          const res = await axios.post(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null })
+          CordoAPI.handleCallbackResponse(res, type, data)
+          break
+        }
+        case InteractionCallbackType.UPDATE_MESSAGE: {
+          const res = await axios.patch(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null })
+          CordoAPI.handleCallbackResponse(res, type, data)
+          break
+        }
+      }
     }
 
-    switch (type) {
-      case InteractionCallbackType.PONG: break
-      case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
-      case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
-      case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE:
-        axios.post(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}`, data)
-        break
-      case InteractionCallbackType.UPDATE_MESSAGE:
-        axios.patch(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data)
-        break
+    return {
+      async getMessage() {
+        const res = await axios.get(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, { validateStatus: null }) 
+        if (res.status !== 200) return null
+        return res.data
+      },
+      edit(editData: any, editUseRaw: boolean = useRaw) {
+        CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, editData, contextId, editUseRaw)
+      }
+    }
+  }
+
+  private static handleCallbackResponse(res: AxiosResponse, type: number, data?: InteractionApplicationCommandCallbackData) {
+    if (Cordo._data.middlewares.apiResponseHandler) {
+      Cordo._data.middlewares.apiResponseHandler(res)
+    } else if (res.status >= 300) {
+      Cordo._data.logger.warn('Interaction callback failed with error:')
+      Cordo._data.logger.warn(JSON.stringify(res.data, null, 2))
+      Cordo._data.logger.warn('Request payload:')
+      Cordo._data.logger.warn(JSON.stringify({ type, data }, null, 2))
     }
   }
 
@@ -52,6 +68,8 @@ export default class CordoAPI {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
     Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData))
+
+    const isEmphemeral = (data.flags & InteractionResponseFlags.EPHEMERAL) !== 0
 
     if (!data.content)
       data.content = ''
@@ -77,8 +95,14 @@ export default class CordoAPI {
         if (comp.visible === false) continue // === false to not catch any null or undefined
 
         if (comp.type !== ComponentType.LINE_BREAK && !!(comp as any).custom_id) {
-          (comp as any).custom_id = `${contextId ?? ''}::${(comp as any).custom_id}:${comp.flags?.join('') ?? ''}`
-          if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !comp.flags.includes(InteractionComponentFlag.ACCESS_EVERYONE)) {
+          const hasAccessEveryoneFlag = comp.flags?.includes(InteractionComponentFlag.ACCESS_EVERYONE)
+          if (isEmphemeral && !hasAccessEveryoneFlag) {
+            if (!comp.flags) comp.flags = []
+            comp.flags.push(InteractionComponentFlag.ACCESS_EVERYONE)
+          }
+          ;(comp as any).custom_id = `${contextId ?? ''}::${(comp as any).custom_id}:${comp.flags?.join('') ?? ''}`
+
+          if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
             const perms = BigInt((i as InteractionLocationGuild).member.permissions)
             if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
