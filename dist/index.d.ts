@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom';
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
@@ -53,6 +54,7 @@ export default class Cordo {
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static setMiddlewareApiResponseHandler(fun: ApiResponseHandlerMiddleware): void;
     static emitInteraction(i: GenericInteraction): Promise<void>;
+    static useWithExpress(clientPublicKey: string): (req: Request, res: Response) => void;
     private static onCommand;
     private static componentPermissionCheck;
     private static onComponent;

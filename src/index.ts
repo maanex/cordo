@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions"
+import { Request, Response } from "express"
 import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState, SlottedComponentHandler } from './types/custom'
 import { InteractionCallbackType, InteractionComponentFlag, InteractionResponseFlags, InteractionType, InteractionCommandType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware'
@@ -194,6 +196,13 @@ export default class Cordo {
   public static async emitInteraction(i: GenericInteraction) {
     i._answered = false
 
+    if (Cordo.config.immediateDefer?.(i)) {
+      if (i.type === InteractionType.COMMAND)
+        CordoAPI.interactionCallback(i, InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
+      else if (i.type === InteractionType.COMPONENT)
+        CordoAPI.interactionCallback(i, InteractionResponseType.DEFERRED_UPDATE_MESSAGE)
+    }
+
     if (i.guild_id && !!Cordo.middlewares.fetchGuildData && typeof Cordo.middlewares.fetchGuildData === 'function') {
       i.guildData = Cordo.middlewares.fetchGuildData(i.guild_id)
       if (!!(i.guildData as any).then) i.guildData = await (i.guildData as any)
@@ -213,6 +222,20 @@ export default class Cordo {
       Cordo.onComponent(i)
     else
       Cordo.logger.warn(`Unknown interaction type ${(i as any).type}`)
+  }
+
+  public static useWithExpress(clientPublicKey: string) {
+    if (!clientPublicKey) 
+      throw new Error('You must specify a Discord client public key');
+  
+    const checkKey = verifyKeyMiddleware(clientPublicKey)
+  
+    return (req: Request, res: Response) => {
+      checkKey(req, res, () => {
+        res.status(200).end()
+        Cordo.emitInteraction(req.body)
+      })
+    }
   }
 
 
@@ -287,9 +310,7 @@ export default class Cordo {
 
   private static async onComponent(i: ComponentInteraction) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [ contextId, _reserved, customId, flagsRaw ] = i.data.custom_id.includes(':')
-      ? i.data.custom_id.split(':') // new format
-      : [ null, null, i.data.custom_id.split('-')[0], i.data.custom_id.split('-')[1] ] // legacy
+    const [ contextId, _reserved, customId, flagsRaw ] = i.data.custom_id.split(':') // new format
 
     i.data.custom_id = customId
     i.data.flags = flagsRaw?.split('') as InteractionComponentFlag[] ?? []

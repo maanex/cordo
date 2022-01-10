@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { GenericInteraction } from '..';
 import { InteractionApplicationCommandCallbackData } from './custom';
 export declare type CordoConfig = {
     botId: string;
@@ -7,6 +8,7 @@ export declare type CordoConfig = {
     uiStatesPath?: string | string[];
     contextPath?: string | string[];
     botAdmins?: string[] | ((userid: string) => boolean);
+    immediateDefer?: (i: GenericInteraction) => boolean;
     texts?: {
         interaction_not_owned_title: string;
         interaction_not_owned_description: string;
