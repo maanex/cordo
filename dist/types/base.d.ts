@@ -202,6 +202,7 @@ export declare type InteractionBase = {
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;
+    _httpCallback?: (payload: any) => any;
     _answerComponents: MessageComponent[];
 };
 export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeRichMessage);

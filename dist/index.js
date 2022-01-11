@@ -203,8 +203,9 @@ class Cordo {
         const checkKey = discord_interactions_1.verifyKeyMiddleware(clientPublicKey);
         return (req, res) => {
             checkKey(req, res, () => {
-                res.status(200).end();
-                Cordo.emitInteraction(req.body);
+                const interaction = req.body;
+                interaction._httpCallback = (payload) => res.status(200).json(payload);
+                Cordo.emitInteraction(interaction);
             });
         };
     }

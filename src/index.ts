@@ -232,8 +232,9 @@ export default class Cordo {
   
     return (req: Request, res: Response) => {
       checkKey(req, res, () => {
-        res.status(200).end()
-        Cordo.emitInteraction(req.body)
+        const interaction = req.body as GenericInteraction
+        interaction._httpCallback = (payload: any) => res.status(200).json(payload)
+        Cordo.emitInteraction(interaction)
       })
     }
   }

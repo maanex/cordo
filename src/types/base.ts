@@ -230,6 +230,7 @@ export type InteractionBase = {
   guildData?: GuildData
   userData?: UserData
   _answered: boolean
+  _httpCallback?: (payload: any) => any
   _answerComponents: MessageComponent[]
 }
 

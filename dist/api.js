@@ -13,8 +13,13 @@ class CordoAPI {
             i._answerComponents = data.components;
         if (!i._answered) {
             i._answered = true;
-            const res = await axios_1.default.post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null });
-            CordoAPI.handleCallbackResponse(res, type, data);
+            if (!!i._httpCallback) {
+                i._httpCallback({ type, data });
+            }
+            else {
+                const res = await axios_1.default.post(`https://discord.com/api/v9/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null });
+                CordoAPI.handleCallbackResponse(res, type, data);
+            }
         }
         else {
             switch (type) {
@@ -22,12 +27,12 @@ class CordoAPI {
                 case const_2.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break;
                 case const_2.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break;
                 case const_2.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
-                    const res = await axios_1.default.post(`https://discord.com/api/v8/webhooks/${index_1.default._data.config.botId}/${i.token}`, data, { validateStatus: null });
+                    const res = await axios_1.default.post(`https://discord.com/api/v9/webhooks/${index_1.default._data.config.botId}/${i.token}`, data, { validateStatus: null });
                     CordoAPI.handleCallbackResponse(res, type, data);
                     break;
                 }
                 case const_2.InteractionCallbackType.UPDATE_MESSAGE: {
-                    const res = await axios_1.default.patch(`https://discord.com/api/v8/webhooks/${index_1.default._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null });
+                    const res = await axios_1.default.patch(`https://discord.com/api/v9/webhooks/${index_1.default._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null });
                     CordoAPI.handleCallbackResponse(res, type, data);
                     break;
                 }

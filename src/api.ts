@@ -18,20 +18,24 @@ export default class CordoAPI {
 
     if (!i._answered) {
       i._answered = true
-      const res = await axios.post(`https://discord.com/api/v8/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
-      CordoAPI.handleCallbackResponse(res, type, data)
+      if (!!i._httpCallback) {
+        i._httpCallback({ type, data })
+      } else {
+        const res = await axios.post(`https://discord.com/api/v9/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null })
+        CordoAPI.handleCallbackResponse(res, type, data)
+      }
     } else {
       switch (type) {
         case InteractionCallbackType.PONG: break
         case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
         case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
         case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
-          const res = await axios.post(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null })
+          const res = await axios.post(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null })
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
         case InteractionCallbackType.UPDATE_MESSAGE: {
-          const res = await axios.patch(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null })
+          const res = await axios.patch(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null })
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
