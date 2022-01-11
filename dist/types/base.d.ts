@@ -199,6 +199,8 @@ export declare type InteractionBase = {
     version: number;
     user: InteractionUser;
     application_id?: Snowflake;
+    locale?: string;
+    guild_locale?: string;
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;
