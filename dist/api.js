@@ -68,7 +68,7 @@ class CordoAPI {
         if (!data)
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
-        index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData));
+        index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i));
         const isEmphemeral = (data.flags & const_1.InteractionResponseFlags.EPHEMERAL) !== 0;
         if (!data.content)
             data.content = '';

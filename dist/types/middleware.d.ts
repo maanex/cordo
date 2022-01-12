@@ -21,7 +21,7 @@ export declare type CordoConfig = {
         interaction_failed: string;
     };
 };
-export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, guild?: GuildData) => any;
+export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
 export declare type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
 export declare type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
 export declare type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;

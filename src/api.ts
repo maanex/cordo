@@ -71,7 +71,7 @@ export default class CordoAPI {
   public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string) {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
-    Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i.guildData))
+    Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i))
 
     const isEmphemeral = (data.flags & InteractionResponseFlags.EPHEMERAL) !== 0
 
