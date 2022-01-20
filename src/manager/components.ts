@@ -7,7 +7,7 @@ import { ComponentInteraction } from '../types/base'
 import { InteractionCallbackType, InteractionComponentFlag } from '../types/const'
 import { InteractionComponentHandler, InteractionReplyContext, SlottedComponentHandler } from '../types/custom'
 import PermissionChecks from '../lib/permission-checks'
-import { parseParams } from '../utils'
+import { parseParams } from '../lib/utils'
 import CordoStatesManager from './states'
 
 

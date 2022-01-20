@@ -8,6 +8,7 @@ import DefaultLogger from './lib/default-logger'
 import CordoCommandsManager from './manager/commands'
 import CordoComponentsManager from './manager/components'
 import CordoStatesManager from './manager/states'
+import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from "./types/custom"
 
 
 export * from './api'
@@ -95,6 +96,32 @@ export default class Cordo {
 
   public static updateBotId(newId: string) {
     Cordo.config.botId = newId
+  }
+
+  //
+
+  public static findCommandHandlers(dir: string | string[], prefix?: string) {
+    CordoCommandsManager.findCommandHandlers(dir, prefix)
+  }
+
+  public static registerCommandHandler(command: string, handler: InteractionCommandHandler) {
+    CordoCommandsManager.registerCommandHandler(command, handler)
+  }
+
+  public static findComponentHandlers(dir: string | string[], prefix?: string) {
+    CordoComponentsManager.findComponentHandlers(dir, prefix)
+  }
+
+  public static registerComponentHandler(id: string, handler: InteractionComponentHandler) {
+    CordoComponentsManager.registerComponentHandler(id, handler)
+  }
+
+  public static findUiStates(dir: string | string[], prefix?: string) {
+    CordoStatesManager.findUiStates(dir, prefix)
+  }
+
+  public static registerUiState(id: string, state: InteractionUIState) {
+    CordoStatesManager.registerUiState(id, state)
   }
 
   //
