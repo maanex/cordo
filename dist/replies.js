@@ -13,8 +13,8 @@ class CordoReplies {
             timeoutRunFunc: null,
             timeoutRunner: null,
             onInteraction: 'doNothing',
-            handlers: {},
-            slottedHandlers: []
+            handlers: new Map(),
+            slottedHandlers: new Set()
         };
         this.activeInteractionReplyContexts.set(context.id, context);
         setTimeout((id) => CordoReplies.activeInteractionReplyContexts.delete(id), 15 * 60e3, context.id);
@@ -40,11 +40,11 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.name;
-                if (!index_1.default._data.uiStates[state]) {
+                if (!index_1.default._data.uiStates.has(state)) {
                     index_1.default._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates[state](i, args);
+                let data = index_1.default._data.uiStates.get(state)(i, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
@@ -97,14 +97,25 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.custom_id;
-                if (!index_1.default._data.uiStates[state]) {
+                if (!index_1.default._data.uiStates.has(state)) {
                     index_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates[state](i, args);
+                let data = index_1.default._data.uiStates.get(state)(i, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+            }
+        };
+    }
+    static buildReplyableCommandAutocompleteInteraction(i) {
+        return {
+            ...i,
+            ack() {
+                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices: [] });
+            },
+            show(choices) {
+                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices });
             }
         };
     }
@@ -132,11 +143,11 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = context.interaction.id;
-                if (!index_1.default._data.uiStates[state]) {
-                    index_1.default._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
+                if (!index_1.default._data.uiStates.has(state)) {
+                    index_1.default._data.logger.warn(`Janitor tried to apply non-existent state ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates[state](context.interaction, args);
+                let data = index_1.default._data.uiStates.get(state)(context.interaction, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
@@ -179,9 +190,9 @@ class CordoReplies {
             on(customId, handler) {
                 if (!context.handlers)
                     return; // => timeout already reached and object destroyed
-                context.handlers[customId] = handler;
+                context.handlers.set(customId, handler);
                 if (customId.includes('$')) {
-                    context.slottedHandlers.push({
+                    context.slottedHandlers.add({
                         id: customId,
                         regex: new RegExp(customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
                         handler

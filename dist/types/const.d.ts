@@ -3,7 +3,8 @@ export declare enum InteractionCallbackType {
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
     DEFERRED_UPDATE_MESSAGE = 6,
-    UPDATE_MESSAGE = 7
+    UPDATE_MESSAGE = 7,
+    APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8
 }
 export declare enum InteractionResponseFlags {
     EPHEMERAL = 64
@@ -12,7 +13,8 @@ export declare enum InteractionType {
     /** negative number => custom */
     RICH_MESSAGE = -5,
     COMMAND = 2,
-    COMPONENT = 3
+    COMPONENT = 3,
+    COMMAND_AUTOCOMPLETE = 4
 }
 export declare enum ComponentType {
     /** negative number => custom */
@@ -54,4 +56,16 @@ export declare enum ChannelType {
     GUILD_PUBLIC_THREAD = 11,
     GUILD_PRIVATE_THREAD = 12,
     GUILD_STAGE_VOICE = 13
+}
+export declare enum ApplicationCommandOptionType {
+    SUB_COMMAND = 1,
+    SUB_COMMAND_GROUP = 2,
+    STRING = 3,
+    INTEGER = 4,
+    BOOLEAN = 5,
+    USER = 6,
+    CHANNEL = 7,
+    ROLE = 8,
+    MENTIONABLE = 9,
+    NUMBER = 10
 }

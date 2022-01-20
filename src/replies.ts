@@ -1,6 +1,6 @@
 import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo, InteractionReplyTimeoutOptions } from './types/custom'
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
-import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotedContext } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotedContext, ReplyableCommandAutocompleteInteraction, CommandAutocompleteInteraction, CommandArgumentChoice } from './types/base'
 import CordoAPI from './api'
 import Cordo from './index'
 
@@ -34,6 +34,7 @@ export default class CordoReplies {
 
     return context
   }
+
   public static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction {
     return {
       ...i,
@@ -123,6 +124,26 @@ export default class CordoReplies {
         let data = Cordo._data.uiStates.get(state)(i, args)
         if ((data as any).then) data = await data
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data as InteractionApplicationCommandCallbackData)
+      }
+    }
+  }
+
+  public static buildReplyableCommandAutocompleteInteraction(i: CommandAutocompleteInteraction): ReplyableCommandAutocompleteInteraction {
+    return {
+      ...i,
+      ack() {
+        return CordoAPI.interactionCallback(
+          i,
+          InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+          { choices: [] }
+        )
+      },
+      show(choices: CommandArgumentChoice[]) {
+        return CordoAPI.interactionCallback(
+          i,
+          InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+          { choices }
+        )
       }
     }
   }

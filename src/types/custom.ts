@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { InteractionMessage } from '..'
-import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed } from './base'
+import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed, ReplyableCommandAutocompleteInteraction, CommandArgumentChoice } from './base'
 import { MessageComponent } from './component'
 import { InteractionResponseFlags } from './const'
 
@@ -15,6 +15,10 @@ export type LocalisationContext = {
 export type HandlerSuccess = boolean | Promise<boolean> | any
 
 // Interesting
+
+export type InteractionDefferedCallbackData = {
+  flags?: InteractionResponseFlags
+}
 
 export type InteractionApplicationCommandCallbackData = {
   tts?: boolean
@@ -33,6 +37,10 @@ export type InteractionApplicationCommandCallbackData = {
   _context?: LocalisationContext
 }
 
+export type InteractionApplicationCommandAutocompleteCallbackData = {
+  choices: CommandArgumentChoice[]
+}
+
 // Handler
 
 export type InteractionCommandHandler
@@ -40,6 +48,9 @@ export type InteractionCommandHandler
 
 export type InteractionComponentHandler
   = ((i: ReplyableComponentInteraction) => HandlerSuccess)
+
+export type InteractionCommandAutocompleteHandler
+  = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess)
 
 export type SlottedComponentHandler = {
   regex: RegExp

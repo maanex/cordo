@@ -6,6 +6,7 @@ export declare type CordoConfig = {
     commandHandlerPath?: string | string[];
     componentHandlerPath?: string | string[];
     uiStatesPath?: string | string[];
+    autocompleterPath?: string | string[];
     contextPath?: string | string[];
     botAdmins?: string[] | ((userid: string) => boolean);
     immediateDefer?: (i: GenericInteraction) => boolean;
@@ -19,6 +20,8 @@ export declare type CordoConfig = {
         interaction_not_permitted_description_manage_server: string;
         interaction_not_permitted_description_manage_messages: string;
         interaction_failed: string;
+        interaction_invalid_title: string;
+        interaction_invalid_description: string;
     };
 };
 export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;

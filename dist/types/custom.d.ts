@@ -1,12 +1,15 @@
 /// <reference types="node" />
 import { InteractionMessage } from '..';
-import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed } from './base';
+import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed, ReplyableCommandAutocompleteInteraction, CommandArgumentChoice } from './base';
 import { MessageComponent } from './component';
 import { InteractionResponseFlags } from './const';
 export declare type LocalisationContext = {
     [key: string]: string;
 };
 export declare type HandlerSuccess = boolean | Promise<boolean> | any;
+export declare type InteractionDefferedCallbackData = {
+    flags?: InteractionResponseFlags;
+};
 export declare type InteractionApplicationCommandCallbackData = {
     tts?: boolean;
     content?: string;
@@ -22,8 +25,12 @@ export declare type InteractionApplicationCommandCallbackData = {
     color?: number;
     _context?: LocalisationContext;
 };
+export declare type InteractionApplicationCommandAutocompleteCallbackData = {
+    choices: CommandArgumentChoice[];
+};
 export declare type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
 export declare type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
+export declare type InteractionCommandAutocompleteHandler = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess);
 export declare type SlottedComponentHandler = {
     regex: RegExp;
     id: string;
@@ -36,10 +43,8 @@ export declare type InteractionReplyContext = {
     timeoutRunFunc: (skipJanitor?: boolean) => any;
     timeoutRunner: NodeJS.Timeout;
     onInteraction: InteractionReplyTimeoutOptions['onInteraction'];
-    handlers: {
-        [customId: string]: InteractionComponentHandler;
-    };
-    slottedHandlers: SlottedComponentHandler[];
+    handlers: Map<string, InteractionComponentHandler>;
+    slottedHandlers: Set<SlottedComponentHandler>;
 };
 export declare type InteractionReplyStateLevelThree = {
     _context: InteractionReplyContext;

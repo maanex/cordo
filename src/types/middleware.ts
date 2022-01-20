@@ -8,6 +8,7 @@ export type CordoConfig = {
   commandHandlerPath?: string | string[]
   componentHandlerPath?: string | string[]
   uiStatesPath?: string | string[]
+  autocompleterPath?: string | string[]
   contextPath?: string | string[]
   botAdmins?: string[] | ((userid: string) => boolean)
   immediateDefer?: (i: GenericInteraction) => boolean

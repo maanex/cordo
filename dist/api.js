@@ -4,6 +4,7 @@ const axios_1 = require("axios");
 const permission_strings_1 = require("./lib/permission-strings");
 const const_1 = require("./types/const");
 const const_2 = require("./types/const");
+const permission_checks_1 = require("./lib/permission-checks");
 const index_1 = require("./index");
 class CordoAPI {
     static async interactionCallback(i, type, data, contextId, useRaw) {
@@ -121,7 +122,7 @@ class CordoAPI {
                             else
                                 comp.disabled = true;
                         }
-                        else if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_BOT_ADMIN) && !index_1.default._data.isBotOwner(i.user.id)) {
+                        else if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_BOT_ADMIN) && !permission_checks_1.default.isBotOwner(i.user.id)) {
                             if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                                 comp.type = null;
                             else

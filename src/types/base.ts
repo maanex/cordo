@@ -3,7 +3,7 @@
 
 import { InteractionCallbackFollowup } from '..'
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
-import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType } from './const'
+import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType } from './const'
 import { GuildData, UserData } from './middleware'
 import { MessageComponent } from './component'
 
@@ -12,6 +12,11 @@ export type Snowflake = string
 
 export type PermissionBits = string
 
+
+export type CommandArgumentChoice = {
+  name: string
+  value: string
+}
 
 export type InteractionUser = {
   id: Snowflake
@@ -196,11 +201,11 @@ export type InteractionTypeCommand = {
   } | {
     type: InteractionCommandType.USER
     target_id: Snowflake
-    target: InteractionUser
+    target: InteractionUser // custom parsed
   } | {
     type: InteractionCommandType.MESSAGE
     target_id: Snowflake
-    target: InteractionMessage
+    target: InteractionMessage // custom parsed
   })
 }
 
@@ -212,6 +217,23 @@ export type InteractionTypeComponent = {
     custom_id: string
     values?: string[]
     flags: InteractionComponentFlag[]
+  }
+}
+
+export type InteractionTypeCommandAutocomplete = {
+  type: InteractionType.COMMAND_AUTOCOMPLETE
+  data: {
+    id: Snowflake
+    name: string
+    type: InteractionCommandType
+    version: Snowflake
+    options: {
+      type: ApplicationCommandOptionType
+      name: string
+      value: string
+      focused: boolean
+    }[]
+    input: string // custom parsed
   }
 }
 
@@ -238,10 +260,27 @@ export type InteractionBase = {
 
 //
 
-export type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeRichMessage)
-export type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand
-export type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent
-export type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage
+export type GenericInteraction
+  = InteractionBase
+  & (InteractionLocationGuild | InteractionLocationDM)
+  & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeRichMessage)
+export type CommandInteraction
+  = InteractionBase
+  & (InteractionLocationGuild | InteractionLocationDM)
+  & InteractionTypeCommand
+export type ComponentInteraction
+  = InteractionBase
+  & (InteractionLocationGuild | InteractionLocationDM)
+  & InteractionTypeComponent
+export type CommandAutocompleteInteraction
+  = InteractionBase
+  & (InteractionLocationGuild | InteractionLocationDM)
+  & InteractionTypeCommandAutocomplete
+export type RichMessageInteraction
+  = InteractionBase
+  & (InteractionLocationGuild | InteractionLocationDM)
+  & InteractionTypeRichMessage
+
 export type SlotedContext = { params: Record<string, string> }
 
 export type ReplyableCommandInteraction = CommandInteraction & {
@@ -262,6 +301,10 @@ export type ReplyableComponentInteraction = ComponentInteraction & Partial<Slote
   // disableComponents(): void
   removeComponents(): void
   state(state?: string, ...args: any): void
+}
+export type ReplyableCommandAutocompleteInteraction = CommandAutocompleteInteraction & {
+  ack(): void
+  show(choices: CommandArgumentChoice[]): void
 }
 
 export type InteractionJanitor = {

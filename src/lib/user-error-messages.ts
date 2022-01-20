@@ -34,7 +34,7 @@ export default class UserErrorMessages {
   }
 
   public static interactionFailed(i: GenericInteraction): any {
-    return CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, {
+    return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, {
       content: Cordo._data.config.texts.interaction_failed,
       flags: InteractionResponseFlags.EPHEMERAL
     })

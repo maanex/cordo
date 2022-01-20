@@ -1,6 +1,6 @@
-import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions"
+import { verifyKeyMiddleware } from "discord-interactions"
 import { Request, Response } from "express"
-import { InteractionType } from './types/const'
+import { InteractionCallbackType, InteractionType } from './types/const'
 import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware'
 import { GenericInteraction } from './types/base'
 import CordoAPI from './api'
@@ -8,7 +8,8 @@ import DefaultLogger from './lib/default-logger'
 import CordoCommandsManager from './manager/commands'
 import CordoComponentsManager from './manager/components'
 import CordoStatesManager from './manager/states'
-import { InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from "./types/custom"
+import { InteractionCommandAutocompleteHandler, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from "./types/custom"
+import CordoAutocompleterManager from "./manager/autocompleter"
 
 
 export * from './api'
@@ -76,6 +77,8 @@ export default class Cordo {
       CordoComponentsManager.findComponentHandlers(config.componentHandlerPath)
     if (config.uiStatesPath)
       CordoStatesManager.findUiStates(config.uiStatesPath)
+    if (config.autocompleterPath)
+      CordoAutocompleterManager.findAutocompleteHandlers(config.autocompleterPath)
   }
 
   //
@@ -91,6 +94,9 @@ export default class Cordo {
     } catch (ignore) {}
     try {
       CordoStatesManager.findUiStates([ ...dir, 'states' ])
+    } catch (ignore) {}
+    try {
+      CordoAutocompleterManager.findAutocompleteHandlers([ ...dir, 'autocompleter' ])
     } catch (ignore) {}
   }
 
@@ -124,6 +130,14 @@ export default class Cordo {
     CordoStatesManager.registerUiState(id, state)
   }
 
+  public static findAutocompleteHandlers(dir: string | string[], prefix?: string) {
+    CordoAutocompleterManager.findAutocompleteHandlers(dir, prefix)
+  }
+
+  public static registerAutocompleteHandler(id: string, handler: InteractionCommandAutocompleteHandler) {
+    CordoAutocompleterManager.registerAutocompleteHandler(id, handler)
+  }
+
   //
 
   public static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware) {
@@ -149,9 +163,9 @@ export default class Cordo {
 
     if (Cordo.config.immediateDefer?.(i)) {
       if (i.type === InteractionType.COMMAND)
-        CordoAPI.interactionCallback(i, InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
       else if (i.type === InteractionType.COMPONENT)
-        CordoAPI.interactionCallback(i, InteractionResponseType.DEFERRED_UPDATE_MESSAGE)
+        CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
     }
 
     if (i.guild_id && !!Cordo.middlewares.fetchGuildData && typeof Cordo.middlewares.fetchGuildData === 'function') {
@@ -171,6 +185,8 @@ export default class Cordo {
       CordoCommandsManager.onCommand(i)
     else if (i.type === InteractionType.COMPONENT)
       CordoComponentsManager.onComponent(i)
+    else if (i.type === InteractionType.COMMAND_AUTOCOMPLETE)
+      CordoAutocompleterManager.onCommandAutocomplete(i)
     else
       Cordo.logger.warn(`Unknown interaction type ${(i as any).type}`)
   }

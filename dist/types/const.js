@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChannelType = exports.InteractionComponentFlag = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
+exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
 var InteractionCallbackType;
 (function (InteractionCallbackType) {
     InteractionCallbackType[InteractionCallbackType["PONG"] = 1] = "PONG";
@@ -8,6 +8,7 @@ var InteractionCallbackType;
     InteractionCallbackType[InteractionCallbackType["DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE"] = 5] = "DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE";
     InteractionCallbackType[InteractionCallbackType["DEFERRED_UPDATE_MESSAGE"] = 6] = "DEFERRED_UPDATE_MESSAGE";
     InteractionCallbackType[InteractionCallbackType["UPDATE_MESSAGE"] = 7] = "UPDATE_MESSAGE";
+    InteractionCallbackType[InteractionCallbackType["APPLICATION_COMMAND_AUTOCOMPLETE_RESULT"] = 8] = "APPLICATION_COMMAND_AUTOCOMPLETE_RESULT";
 })(InteractionCallbackType = exports.InteractionCallbackType || (exports.InteractionCallbackType = {}));
 var InteractionResponseFlags;
 (function (InteractionResponseFlags) {
@@ -19,6 +20,7 @@ var InteractionType;
     InteractionType[InteractionType["RICH_MESSAGE"] = -5] = "RICH_MESSAGE";
     InteractionType[InteractionType["COMMAND"] = 2] = "COMMAND";
     InteractionType[InteractionType["COMPONENT"] = 3] = "COMPONENT";
+    InteractionType[InteractionType["COMMAND_AUTOCOMPLETE"] = 4] = "COMMAND_AUTOCOMPLETE";
 })(InteractionType = exports.InteractionType || (exports.InteractionType = {}));
 var ComponentType;
 (function (ComponentType) {
@@ -66,4 +68,17 @@ var ChannelType;
     ChannelType[ChannelType["GUILD_PRIVATE_THREAD"] = 12] = "GUILD_PRIVATE_THREAD";
     ChannelType[ChannelType["GUILD_STAGE_VOICE"] = 13] = "GUILD_STAGE_VOICE";
 })(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
+var ApplicationCommandOptionType;
+(function (ApplicationCommandOptionType) {
+    ApplicationCommandOptionType[ApplicationCommandOptionType["SUB_COMMAND"] = 1] = "SUB_COMMAND";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["SUB_COMMAND_GROUP"] = 2] = "SUB_COMMAND_GROUP";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["STRING"] = 3] = "STRING";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["INTEGER"] = 4] = "INTEGER";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["BOOLEAN"] = 5] = "BOOLEAN";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["USER"] = 6] = "USER";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["CHANNEL"] = 7] = "CHANNEL";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["ROLE"] = 8] = "ROLE";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["MENTIONABLE"] = 9] = "MENTIONABLE";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["NUMBER"] = 10] = "NUMBER";
+})(ApplicationCommandOptionType = exports.ApplicationCommandOptionType || (exports.ApplicationCommandOptionType = {}));
 //# sourceMappingURL=const.js.map

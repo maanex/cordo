@@ -1,16 +1,22 @@
 import axios, { AxiosResponse } from 'axios'
 import PermissionStrings from './lib/permission-strings'
-import { InteractionApplicationCommandCallbackData } from './types/custom'
+import { InteractionApplicationCommandCallbackData, InteractionCallbackFollowup } from './types/custom'
 import { GenericInteraction, InteractionLocationGuild } from './types/base'
 import { InteractionResponseFlags } from './types/const'
 import { MessageComponent } from './types/component'
 import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
 import PermissionChecks from './lib/permission-checks'
-import Cordo, { InteractionCallbackFollowup } from './index'
+import Cordo, { InteractionApplicationCommandAutocompleteCallbackData, InteractionDefferedCallbackData } from './index'
 
 export default class CordoAPI {
 
-  public static async interactionCallback(i: GenericInteraction, type: number, data?: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.PONG): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.DEFERRED_UPDATE_MESSAGE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.UPDATE_MESSAGE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data: InteractionApplicationCommandAutocompleteCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType, data?: any, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
     if (!useRaw)
       CordoAPI.normaliseData(data, i, contextId)
 

@@ -63,12 +63,16 @@ export default class CordoCommandsManager {
       if (CordoCommandsManager.commandHandlers.has(name)) {
         const handler = CordoCommandsManager.commandHandlers.get(name)
         handler(CordoReplies.buildReplyableCommandInteraction(i))
-      } else if (CordoStatesManager.uiStates.has(name + '_main')) {
-        CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
-      } else {
-        Cordo._data.logger.warn(`Unhandled command "${name}"`)
-        UserErrorMessages.interactionInvalid(i)
+        return
       }
+      
+      if (CordoStatesManager.uiStates.has(name + '_main')) {
+        CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
+        return
+      }
+
+      Cordo._data.logger.warn(`Unhandled command "${name}"`)
+      UserErrorMessages.interactionInvalid(i)
     } catch (ex) {
       this.onCommandFail(i, ex)
     }
