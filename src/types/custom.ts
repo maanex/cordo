@@ -56,8 +56,8 @@ export type InteractionReplyContext = {
   timeoutRunFunc: (skipJanitor?: boolean) => any
   timeoutRunner: NodeJS.Timeout
   onInteraction: InteractionReplyTimeoutOptions['onInteraction']
-  handlers: { [customId: string]: InteractionComponentHandler }
-  slottedHandlers: SlottedComponentHandler[]
+  handlers: Map<string, InteractionComponentHandler>
+  slottedHandlers: Set<SlottedComponentHandler>
 }
 
 export type InteractionReplyStateLevelThree = {

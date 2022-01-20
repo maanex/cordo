@@ -21,8 +21,8 @@ export default class CordoReplies {
       timeoutRunFunc: null,
       timeoutRunner: null,
       onInteraction: 'doNothing',
-      handlers: {},
-      slottedHandlers: []
+      handlers: new Map(),
+      slottedHandlers: new Set()
     }
 
     this.activeInteractionReplyContexts.set(context.id, context)
@@ -58,12 +58,12 @@ export default class CordoReplies {
       async state(state?: string, ...args: any) {
         if (!state) state = i.data.name
 
-        if (!Cordo._data.uiStates[state]) {
+        if (!Cordo._data.uiStates.has(state)) {
           Cordo._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`)
           return
         }
 
-        let data = Cordo._data.uiStates[state](i, args)
+        let data = Cordo._data.uiStates.get(state)(i, args)
         if ((data as any).then) data = await data
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data as InteractionApplicationCommandCallbackData)
       }
@@ -115,12 +115,12 @@ export default class CordoReplies {
       async state(state?: string, ...args: any) {
         if (!state) state = i.data.custom_id
 
-        if (!Cordo._data.uiStates[state]) {
+        if (!Cordo._data.uiStates.has(state)) {
           Cordo._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`)
           return
         }
 
-        let data = Cordo._data.uiStates[state](i, args)
+        let data = Cordo._data.uiStates.get(state)(i, args)
         if ((data as any).then) data = await data
         CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data as InteractionApplicationCommandCallbackData)
       }
@@ -152,12 +152,12 @@ export default class CordoReplies {
       async state(state?: string, ...args: any) {
         if (!state) state = context.interaction.id
 
-        if (!Cordo._data.uiStates[state]) {
-          Cordo._data.logger.warn(`Janitor tried to apply state non-existent ${state}`)
+        if (!Cordo._data.uiStates.has(state)) {
+          Cordo._data.logger.warn(`Janitor tried to apply non-existent state ${state}`)
           return
         }
 
-        let data = Cordo._data.uiStates[state](context.interaction, args)
+        let data = Cordo._data.uiStates.get(state)(context.interaction, args)
         if ((data as any).then) data = await data
         CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, data as InteractionApplicationCommandCallbackData)
       }
@@ -201,9 +201,10 @@ export default class CordoReplies {
       _context: context,
       on(customId: string, handler: InteractionComponentHandler) {
         if (!context.handlers) return // => timeout already reached and object destroyed
-        context.handlers[customId] = handler
+
+        context.handlers.set(customId, handler)
         if (customId.includes('$')) {
-          context.slottedHandlers.push({
+          context.slottedHandlers.add({
             id: customId,
             regex: new RegExp(customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
             handler

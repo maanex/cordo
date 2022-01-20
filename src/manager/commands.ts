@@ -1,0 +1,86 @@
+import * as fs from 'fs'
+import * as path from 'path'
+import Cordo from '..'
+import CordoReplies from '../replies'
+import { CommandInteraction } from '../types/base'
+import { InteractionCommandType } from '../types/const'
+import { InteractionCommandHandler } from '../types/custom'
+import UserErrorMessages from '../lib/user-error-messages'
+import CordoStatesManager from './states'
+
+
+export default class CordoCommandsManager {
+  
+  public static readonly commandHandlers: Map<string, InteractionCommandHandler> = new Map()
+
+  //
+
+  public static findCommandHandlers(dir: string | string[], prefix?: string) {
+    if (typeof dir !== 'string') dir = path.join(...dir)
+    for (const file of fs.readdirSync(dir)) {
+      const fullPath = path.join(dir, file)
+      let fullName = (prefix ? prefix + '_' : '') + file.split('.')[0]
+      while (fullName.endsWith('_')) fullName = fullName.substring(0, fullName.length - 1)
+
+      if (file.includes('.')) {
+        if (!file.endsWith('.js')) continue
+        try {
+          CordoCommandsManager.registerCommandHandler(fullName, require(fullPath).default)
+        } catch (ex) {
+          console.error(ex)
+        }
+      } else {
+        CordoCommandsManager.findCommandHandlers(fullPath, fullName)
+      }
+    }
+  }
+
+  public static registerCommandHandler(command: string, handler: InteractionCommandHandler) {
+    if (CordoCommandsManager.commandHandlers.has(command))
+      Cordo._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`)
+
+    CordoCommandsManager.commandHandlers.set(command, handler)
+  }
+
+  //
+
+  public static onCommand(i: CommandInteraction) {
+    const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
+    try {
+      i.data.option = {}
+      for (const option of i.data.options || [])
+        i.data.option[option.name] = option.value
+
+      //
+
+      if (i.data.type === InteractionCommandType.USER)
+        i.data.target = i.data.resolved.users[i.data.target_id]
+      if (i.data.type === InteractionCommandType.MESSAGE)
+        i.data.target = i.data.resolved.messages[i.data.target_id]
+
+      //
+
+      if (CordoCommandsManager.commandHandlers.has(name)) {
+        const handler = CordoCommandsManager.commandHandlers.get(name)
+        handler(CordoReplies.buildReplyableCommandInteraction(i))
+      } else if (CordoStatesManager.uiStates.has(name + '_main')) {
+        CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
+      } else {
+        Cordo._data.logger.warn(`Unhandled command "${name}"`)
+        UserErrorMessages.interactionInvalid(i)
+      }
+    } catch (ex) {
+      this.onCommandFail(i, ex)
+    }
+  }
+
+  private static onCommandFail(i: CommandInteraction, ex: any) {
+    Cordo._data.logger.warn(ex)
+    try {
+      UserErrorMessages.interactionFailed(i)
+    } catch (ex) {
+      Cordo._data.logger.warn(ex)
+    }
+  }
+
+}

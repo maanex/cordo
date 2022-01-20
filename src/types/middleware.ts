@@ -21,6 +21,8 @@ export type CordoConfig = {
     interaction_not_permitted_description_manage_server: string
     interaction_not_permitted_description_manage_messages: string
     interaction_failed: string
+    interaction_invalid_title: string
+    interaction_invalid_description: string
   }
 }
 

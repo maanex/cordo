@@ -5,6 +5,7 @@ import { GenericInteraction, InteractionLocationGuild } from './types/base'
 import { InteractionResponseFlags } from './types/const'
 import { MessageComponent } from './types/component'
 import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
+import PermissionChecks from './lib/permission-checks'
 import Cordo, { InteractionCallbackFollowup } from './index'
 
 export default class CordoAPI {
@@ -117,7 +118,7 @@ export default class CordoAPI {
             } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(perms)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
               else comp.disabled = true
-            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !Cordo._data.isBotOwner(i.user.id)) {
+            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !PermissionChecks.isBotOwner(i.user.id)) {
               if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
               else comp.disabled = true
             }
