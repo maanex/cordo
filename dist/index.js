@@ -34,8 +34,8 @@ class Cordo {
     //
     static init(config) {
         if (!config.texts)
-            config.texts = Cordo.config.texts;
-        Cordo.config = config;
+            config.texts = Cordo._data.config.texts;
+        Cordo._data.config = config;
         if (config.contextPath)
             Cordo.findContext(config.contextPath);
         if (config.commandHandlerPath)
@@ -69,7 +69,7 @@ class Cordo {
         catch (ignore) { }
     }
     static updateBotId(newId) {
-        Cordo.config.botId = newId;
+        Cordo._data.config.botId = newId;
     }
     //
     static findCommandHandlers(dir, prefix) {
@@ -98,35 +98,35 @@ class Cordo {
     }
     //
     static addMiddlewareInteractionCallback(fun) {
-        Cordo.middlewares.interactionCallback.push(fun);
+        Cordo._data.middlewares.interactionCallback.push(fun);
     }
     static setMiddlewareGuildData(fun) {
-        Cordo.middlewares.fetchGuildData = fun;
+        Cordo._data.middlewares.fetchGuildData = fun;
     }
     static setMiddlewareUserData(fun) {
-        Cordo.middlewares.fetchUserData = fun;
+        Cordo._data.middlewares.fetchUserData = fun;
     }
     static setMiddlewareApiResponseHandler(fun) {
-        Cordo.middlewares.apiResponseHandler = fun;
+        Cordo._data.middlewares.apiResponseHandler = fun;
     }
     //
     static async emitInteraction(i) {
         i._answered = false;
-        if (Cordo.config.immediateDefer?.(i)) {
+        if (Cordo._data.config.immediateDefer?.(i)) {
             if (i.type === const_1.InteractionType.COMMAND)
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE);
             else if (i.type === const_1.InteractionType.COMPONENT)
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
-        if (i.guild_id && !!Cordo.middlewares.fetchGuildData && typeof Cordo.middlewares.fetchGuildData === 'function') {
-            i.guildData = Cordo.middlewares.fetchGuildData(i.guild_id);
+        if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
+            i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id);
             if (!!i.guildData.then)
                 i.guildData = await i.guildData;
         }
         if (!i.user)
             i.user = i.member.user;
-        if (i.user.id && !!Cordo.middlewares.fetchUserData && typeof Cordo.middlewares.fetchUserData === 'function') {
-            i.userData = Cordo.middlewares.fetchUserData(i.user.id);
+        if (i.user.id && !!Cordo._data.middlewares.fetchUserData && typeof Cordo._data.middlewares.fetchUserData === 'function') {
+            i.userData = Cordo._data.middlewares.fetchUserData(i.user.id);
             if (!!i.userData.then)
                 i.userData = await i.userData;
         }
@@ -137,7 +137,7 @@ class Cordo {
         else if (i.type === const_1.InteractionType.COMMAND_AUTOCOMPLETE)
             autocompleter_1.default.onCommandAutocomplete(i);
         else
-            Cordo.logger.warn(`Unknown interaction type ${i.type}`);
+            Cordo._data.logger.warn(`Unknown interaction type ${i.type}`);
     }
     static useWithExpress(clientPublicKey) {
         if (!clientPublicKey)
@@ -153,36 +153,33 @@ class Cordo {
     }
 }
 exports.default = Cordo;
-Cordo.config = {
-    botId: null,
-    texts: {
-        interaction_not_owned_title: 'Nope!',
-        interaction_not_owned_description: 'You cannot interact with this widget as you did not create it. Run the command yourself to get a interactable widget.',
-        interaction_not_permitted_title: 'No permission!',
-        interaction_not_permitted_description_generic: 'You cannot do this.',
-        interaction_not_permitted_description_bot_admin: 'Only bot admins can do this.',
-        interaction_not_permitted_description_guild_admin: 'Only for server admins.',
-        interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do this.',
-        interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can dothis.',
-        interaction_failed: 'We are very sorry but an error occured while processing your command. Please try again.',
-        interaction_invalid_title: 'Error executing this command',
-        interaction_invalid_description: 'The command was not found. Please contact the developer.'
-    }
-};
-Cordo.logger = new default_logger_1.default();
-Cordo.middlewares = {
-    interactionCallback: [],
-    fetchGuildData: null,
-    fetchUserData: null,
-    apiResponseHandler: null
-};
 Cordo.__data = {
-    config: Cordo.config,
+    config: {
+        botId: null,
+        texts: {
+            interaction_not_owned_title: 'Nope!',
+            interaction_not_owned_description: 'You cannot interact with this widget as you did not create it. Run the command yourself to get a interactable widget.',
+            interaction_not_permitted_title: 'No permission!',
+            interaction_not_permitted_description_generic: 'You cannot do this.',
+            interaction_not_permitted_description_bot_admin: 'Only bot admins can do this.',
+            interaction_not_permitted_description_guild_admin: 'Only for server admins.',
+            interaction_not_permitted_description_manage_server: 'Only people with the "Manage Server" permission can do this.',
+            interaction_not_permitted_description_manage_messages: 'Only people with the "Manage Messages" permission can dothis.',
+            interaction_failed: 'We are very sorry but an error occured while processing your command. Please try again.',
+            interaction_invalid_title: 'Error executing this command',
+            interaction_invalid_description: 'The command was not found. Please contact the developer.'
+        }
+    },
     commandHandlers: commands_1.default.commandHandlers,
     componentHandlers: components_1.default.componentHandlers,
     slottedComponentHandlers: components_1.default.slottedComponentHandlers,
     uiStates: states_1.default.uiStates,
-    middlewares: Cordo.middlewares,
-    logger: Cordo.logger
+    middlewares: {
+        interactionCallback: [],
+        fetchGuildData: null,
+        fetchUserData: null,
+        apiResponseHandler: null
+    },
+    logger: new default_logger_1.default()
 };
 //# sourceMappingURL=index.js.map

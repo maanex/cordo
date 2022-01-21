@@ -12,9 +12,6 @@ export * from './types/const';
 export * from './types/custom';
 export * from './types/middleware';
 export default class Cordo {
-    private static config;
-    private static logger;
-    private static middlewares;
     private static __data;
     static get _data(): {
         config: CordoConfig;
