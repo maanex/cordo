@@ -52,6 +52,12 @@ export type InteractionComponentHandler
 export type InteractionCommandAutocompleteHandler
   = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess)
 
+export type SlottedCommandHandler = {
+  regex: RegExp
+  command: string
+  handler: InteractionCommandHandler
+}
+
 export type SlottedComponentHandler = {
   regex: RegExp
   id: string

@@ -31,6 +31,11 @@ export declare type InteractionApplicationCommandAutocompleteCallbackData = {
 export declare type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
 export declare type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
 export declare type InteractionCommandAutocompleteHandler = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess);
+export declare type SlottedCommandHandler = {
+    regex: RegExp;
+    command: string;
+    handler: InteractionCommandHandler;
+};
 export declare type SlottedComponentHandler = {
     regex: RegExp;
     id: string;

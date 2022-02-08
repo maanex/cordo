@@ -6,6 +6,7 @@ const __1 = require("..");
 const replies_1 = require("../replies");
 const const_1 = require("../types/const");
 const user_error_messages_1 = require("../lib/user-error-messages");
+const utils_1 = require("../lib/utils");
 const states_1 = require("./states");
 class CordoCommandsManager {
     //
@@ -36,10 +37,18 @@ class CordoCommandsManager {
         if (CordoCommandsManager.commandHandlers.has(command))
             __1.default._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`);
         CordoCommandsManager.commandHandlers.set(command, handler);
+        if (command.includes('$')) {
+            const regex = new RegExp(command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+'));
+            this.slottedCommandHandlers.add({ command, regex, handler });
+        }
     }
     //
     static onCommand(i) {
-        const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
+        let name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
+        while (i.data.options[0]?.type === const_1.ApplicationCommandOptionType.SUB_COMMAND) {
+            name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
+            i.data.options = i.data.options[0].options;
+        }
         try {
             i.data.option = {};
             for (const option of i.data.options || [])
@@ -50,21 +59,31 @@ class CordoCommandsManager {
             if (i.data.type === const_1.InteractionCommandType.MESSAGE)
                 i.data.target = i.data.resolved.messages[i.data.target_id];
             //
-            if (CordoCommandsManager.commandHandlers.has(name)) {
-                const handler = CordoCommandsManager.commandHandlers.get(name);
-                handler(replies_1.default.buildReplyableCommandInteraction(i));
-                return;
-            }
-            if (states_1.default.uiStates.has(name + '_main')) {
-                replies_1.default.buildReplyableCommandInteraction(i).state(name + '_main');
-                return;
-            }
-            __1.default._data.logger.warn(`Unhandled command "${name}"`);
-            user_error_messages_1.default.interactionInvalid(i);
+            CordoCommandsManager.findAndExecuteHandler(name, i);
         }
         catch (ex) {
             this.onCommandFail(i, ex);
         }
+    }
+    static findAndExecuteHandler(name, i) {
+        if (CordoCommandsManager.commandHandlers.has(name)) {
+            const handler = CordoCommandsManager.commandHandlers.get(name);
+            handler(replies_1.default.buildReplyableCommandInteraction(i));
+            return;
+        }
+        const regexSearchResult = [...CordoCommandsManager.slottedCommandHandlers.values()]
+            .find(h => h.regex.test(name));
+        if (regexSearchResult) {
+            const params = utils_1.parseParams(regexSearchResult.command, name);
+            regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
+            return;
+        }
+        if (states_1.default.uiStates.has(name + '_main')) {
+            replies_1.default.buildReplyableCommandInteraction(i).state(name + '_main');
+            return;
+        }
+        __1.default._data.logger.warn(`Unhandled command "${name}"`);
+        user_error_messages_1.default.interactionInvalid(i);
     }
     static onCommandFail(i, ex) {
         __1.default._data.logger.warn(ex);
@@ -78,4 +97,5 @@ class CordoCommandsManager {
 }
 exports.default = CordoCommandsManager;
 CordoCommandsManager.commandHandlers = new Map();
+CordoCommandsManager.slottedCommandHandlers = new Set();
 //# sourceMappingURL=commands.js.map

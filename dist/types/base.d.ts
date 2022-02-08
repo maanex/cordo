@@ -146,6 +146,19 @@ export declare type InteractionResolvedData = {
     channels?: Record<Snowflake, PartialInteractionChannel>;
     messages?: Record<Snowflake, PartialInteractionMessage>;
 };
+export declare type InteractionTypeCommandOptionsRegular = {
+    type: Omit<ApplicationCommandOptionType, ApplicationCommandOptionType.SUB_COMMAND>;
+    name: string;
+    value: string | number;
+    options: undefined;
+};
+export declare type InteractionTypeCommandOptionsSubCommand = {
+    type: ApplicationCommandOptionType.SUB_COMMAND;
+    name: string;
+    value: undefined;
+    options: InteractionTypeCommandOptions[];
+};
+export declare type InteractionTypeCommandOptions = InteractionTypeCommandOptionsRegular | InteractionTypeCommandOptionsSubCommand;
 export declare type InteractionLocationGuild = {
     member: InteractionMember;
     user?: InteractionUser;
@@ -165,10 +178,7 @@ export declare type InteractionTypeCommand = {
         id: Snowflake;
         name: string;
         resolved: InteractionResolvedData;
-        options?: {
-            name: string;
-            value: string | number;
-        }[];
+        options?: InteractionTypeCommandOptions[];
         option?: {
             [name: string]: string | number;
         };
@@ -235,7 +245,7 @@ export declare type RichMessageInteraction = InteractionBase & (InteractionLocat
 export declare type SlotedContext = {
     params: Record<string, string>;
 };
-export declare type ReplyableCommandInteraction = CommandInteraction & {
+export declare type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
     defer(privately?: boolean): Promise<InteractionCallbackFollowup>;
     reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;

@@ -35,7 +35,8 @@ export default class CordoReplies {
     return context
   }
 
-  public static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction {
+  public static buildReplyableCommandInteraction(i: CommandInteraction, slotContext?: SlotedContext): ReplyableCommandInteraction {
+    if (slotContext) (i as CommandInteraction & SlotedContext).params = slotContext.params
     return {
       ...i,
       defer(privately = false) {

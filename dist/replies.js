@@ -20,7 +20,9 @@ class CordoReplies {
         setTimeout((id) => CordoReplies.activeInteractionReplyContexts.delete(id), 15 * 60e3, context.id);
         return context;
     }
-    static buildReplyableCommandInteraction(i) {
+    static buildReplyableCommandInteraction(i, slotContext) {
+        if (slotContext)
+            i.params = slotContext.params;
         return {
             ...i,
             defer(privately = false) {

@@ -3,15 +3,17 @@ import * as path from 'path'
 import Cordo from '..'
 import CordoReplies from '../replies'
 import { CommandInteraction } from '../types/base'
-import { InteractionCommandType } from '../types/const'
-import { InteractionCommandHandler } from '../types/custom'
+import { ApplicationCommandOptionType, InteractionCommandType } from '../types/const'
+import { InteractionCommandHandler, SlottedCommandHandler } from '../types/custom'
 import UserErrorMessages from '../lib/user-error-messages'
+import { parseParams } from '../lib/utils'
 import CordoStatesManager from './states'
 
 
 export default class CordoCommandsManager {
   
   public static readonly commandHandlers: Map<string, InteractionCommandHandler> = new Map()
+  public static readonly slottedCommandHandlers: Set<SlottedCommandHandler> = new Set()
 
   //
 
@@ -40,12 +42,23 @@ export default class CordoCommandsManager {
       Cordo._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`)
 
     CordoCommandsManager.commandHandlers.set(command, handler)
+    
+    if (command.includes('$')) {
+      const regex = new RegExp(command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+'))
+      this.slottedCommandHandlers.add({ command, regex, handler })
+    }
   }
 
   //
 
   public static onCommand(i: CommandInteraction) {
-    const name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
+    let name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
+
+    while (i.data.options[0]?.type === ApplicationCommandOptionType.SUB_COMMAND) {
+      name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
+      i.data.options = i.data.options[0].options
+    }
+
     try {
       i.data.option = {}
       for (const option of i.data.options || [])
@@ -60,22 +73,35 @@ export default class CordoCommandsManager {
 
       //
 
-      if (CordoCommandsManager.commandHandlers.has(name)) {
-        const handler = CordoCommandsManager.commandHandlers.get(name)
-        handler(CordoReplies.buildReplyableCommandInteraction(i))
-        return
-      }
-      
-      if (CordoStatesManager.uiStates.has(name + '_main')) {
-        CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
-        return
-      }
-
-      Cordo._data.logger.warn(`Unhandled command "${name}"`)
-      UserErrorMessages.interactionInvalid(i)
+      CordoCommandsManager.findAndExecuteHandler(name, i)
     } catch (ex) {
       this.onCommandFail(i, ex)
     }
+  }
+
+  private static findAndExecuteHandler(name: string, i: CommandInteraction) {
+    if (CordoCommandsManager.commandHandlers.has(name)) {
+      const handler = CordoCommandsManager.commandHandlers.get(name)
+      handler(CordoReplies.buildReplyableCommandInteraction(i))
+      return
+    }
+    
+    const regexSearchResult = [ ...CordoCommandsManager.slottedCommandHandlers.values() ]
+      .find(h => h.regex.test(name))
+
+    if (regexSearchResult) {
+      const params = parseParams(regexSearchResult.command, name)
+      regexSearchResult.handler(CordoReplies.buildReplyableCommandInteraction(i, { params }))
+      return
+    }
+
+    if (CordoStatesManager.uiStates.has(name + '_main')) {
+      CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
+      return
+    }
+
+    Cordo._data.logger.warn(`Unhandled command "${name}"`)
+    UserErrorMessages.interactionInvalid(i)
   }
 
   private static onCommandFail(i: CommandInteraction, ex: any) {

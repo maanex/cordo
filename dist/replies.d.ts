@@ -3,7 +3,7 @@ import { CommandInteraction, ComponentInteraction, GenericInteraction, Replyable
 export default class CordoReplies {
     static readonly activeInteractionReplyContexts: Map<string, InteractionReplyContext>;
     static newInteractionReplyContext(i: GenericInteraction, customId?: string): InteractionReplyContext;
-    static buildReplyableCommandInteraction(i: CommandInteraction): ReplyableCommandInteraction;
+    static buildReplyableCommandInteraction(i: CommandInteraction, slotContext?: SlotedContext): ReplyableCommandInteraction;
     static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlotedContext): ReplyableComponentInteraction;
     static buildReplyableCommandAutocompleteInteraction(i: CommandAutocompleteInteraction): ReplyableCommandAutocompleteInteraction;
     private static getJanitor;

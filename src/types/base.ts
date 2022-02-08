@@ -166,6 +166,24 @@ export type InteractionResolvedData = {
   messages?: Record<Snowflake, PartialInteractionMessage>
 }
 
+export type InteractionTypeCommandOptionsRegular = {
+  type: Omit<ApplicationCommandOptionType, ApplicationCommandOptionType.SUB_COMMAND>
+  name: string
+  value: string | number
+  options: undefined
+}
+
+export type InteractionTypeCommandOptionsSubCommand = {
+  type: ApplicationCommandOptionType.SUB_COMMAND
+  name: string
+  value: undefined
+  options: InteractionTypeCommandOptions[]
+}
+
+export type InteractionTypeCommandOptions
+  = InteractionTypeCommandOptionsRegular
+  | InteractionTypeCommandOptionsSubCommand
+
 //
 
 export type InteractionLocationGuild = {
@@ -191,10 +209,7 @@ export type InteractionTypeCommand = {
     id: Snowflake
     name: string
     resolved: InteractionResolvedData
-    options?: {
-      name: string
-      value: string | number
-    }[]
+    options?: InteractionTypeCommandOptions[]
     option?: { [name: string]: string | number } // custom parsed
   } & ({
     type: InteractionCommandType.CHAT_INPUT
@@ -283,7 +298,7 @@ export type RichMessageInteraction
 
 export type SlotedContext = { params: Record<string, string> }
 
-export type ReplyableCommandInteraction = CommandInteraction & {
+export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
   defer(privately?: boolean): Promise<InteractionCallbackFollowup>
   reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
