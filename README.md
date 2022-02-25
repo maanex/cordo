@@ -4,7 +4,9 @@ Cordo is a custom api wrapper built for interactions first. It functions as an a
 
 Originally built for the FreeStuff Bot, this codebase could find various usecases so we decided to outsource it. Here's an [Example bot](https://github.com/Maanex/cordo-example-bot) written with it.
 
-Use `npm i cordo` or `yarn add cordo` to install.
+Or if you prefer real-life examples check out [FreeStuff Bot](https://github.com/FreeStuffBot/discord/tree/master/src/bot).
+
+Use `npm i cordo` or `yarn add cordo` to install. Types are included.
 
 
 ## How it works (aka quick docs / tutorial)
@@ -28,6 +30,22 @@ States are an extra layer to the Commands and Components that let you define com
 User presses button -> Check if this interaction has any overrides on timeout -> Check if there are global Component handlers -> Check if there is a state with the same name to take -> Error
 
 User runs command -> Check if command handler exists -> Check if there is a state with the command name and _main -> Error
+
+
+## API Coverage
+
+✔️ Slash Commands
+
+✔️ Command Groups
+
+✔️ Command Autocomplete
+
+✔️ Button Components
+
+✔️ Dropdown Components
+
+❌ Modals
+
 
 ## Naming Convensions
 
@@ -53,16 +71,27 @@ For those verbs preferably pick:
 Component and State names correct and incorrect examples:
 
 ❌ back
+
 ❌ back_button
+
 ❌ state_back
+
 ❌ settings_back
+
 ❌ settings_advanced_more
+
 ❌ command_free_button_one
+
 ✔️ settings_main
+
 ✔️ settings_description
+
 ✔️ free_show_details
+
 ✔️ settings_more
 
 ## Best practices
 
 While theoretically the entire system could be built on soly using states, it is recomended to use interaction.reply and interaction.edit over states in non-interactive environments to save resources. States have a larger overhead than a simply interaction reply.
+
+Cordo is best when it's used stateless. Try to reduce interactive responses to a minimum and always put as much information as possible in the custom ids. This allows for easy scaling as well as a great user experience. It might take some time to get used to but once you understand how to build on this, cordo naturally organizes your code.
