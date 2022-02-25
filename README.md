@@ -4,7 +4,7 @@ Cordo is a custom api wrapper built for interactions first. It functions as an a
 
 Originally built for the FreeStuff Bot, this codebase could find various usecases so we decided to outsource it. Here's an [Example bot](https://github.com/Maanex/cordo-example-bot) written with it.
 
-Or if you prefer real-life examples check out [FreeStuff Bot](https://github.com/FreeStuffBot/discord/tree/master/src/bot).
+Or if you prefer real-life examples check out [FreeStuff Bot](https://github.com/FreeStuffBot/discord/tree/master/src/bot) or [Tudebot](https://github.com/Maanex/tudebot4/tree/master/src/cordo).
 
 Use `npm i cordo` or `yarn add cordo` to install. Types are included.
 
