@@ -45,7 +45,7 @@ class CordoCommandsManager {
     //
     static onCommand(i) {
         let name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
-        while (i.data.options[0]?.type === const_1.ApplicationCommandOptionType.SUB_COMMAND) {
+        while (i.data.options?.[0]?.type === const_1.ApplicationCommandOptionType.SUB_COMMAND) {
             name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
             i.data.options = i.data.options[0].options;
         }
