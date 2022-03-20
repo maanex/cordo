@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 // INTERACTION BASE TYPES
 
-import { InteractionCallbackFollowup } from '..'
+import { InteractionCallbackFollowup, InteractionOpenModalData } from '..'
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
 import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType } from './const'
 import { GuildData, UserData } from './middleware'
@@ -252,8 +252,14 @@ export type InteractionTypeCommandAutocomplete = {
   }
 }
 
-export type InteractionTypeRichMessage = {
-  type: InteractionType.RICH_MESSAGE
+export type InteractionTypeModalSubmit = {
+  type: InteractionType.MODAL_SUBMIT,
+  data: {
+    custom_id: string
+    components: MessageComponent[]
+    /** parsed components, { [custom_id]: value } */
+    data: Record<string, any>
+  }
 }
 
 //
@@ -278,7 +284,7 @@ export type InteractionBase = {
 export type GenericInteraction
   = InteractionBase
   & (InteractionLocationGuild | InteractionLocationDM)
-  & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeRichMessage)
+  & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeModalSubmit)
 export type CommandInteraction
   = InteractionBase
   & (InteractionLocationGuild | InteractionLocationDM)
@@ -291,11 +297,10 @@ export type CommandAutocompleteInteraction
   = InteractionBase
   & (InteractionLocationGuild | InteractionLocationDM)
   & InteractionTypeCommandAutocomplete
-export type RichMessageInteraction
+export type ModalSubmitInteraction
   = InteractionBase
   & (InteractionLocationGuild | InteractionLocationDM)
-  & InteractionTypeRichMessage
-
+  & InteractionTypeModalSubmit
 export type SlotedContext = { params: Record<string, string> }
 
 export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
@@ -303,6 +308,7 @@ export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedCon
   reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
+  openModal(data: InteractionOpenModalData): void
   state(state?: string, ...args: any): void
 }
 
@@ -313,14 +319,22 @@ export type ReplyableComponentInteraction = ComponentInteraction & Partial<Slote
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
   edit(data: InteractionApplicationCommandCallbackData): void
   editInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
+  openModal(data: InteractionOpenModalData): void
   // disableComponents(): void
   removeComponents(): void
   state(state?: string, ...args: any): void
 }
+
 export type ReplyableCommandAutocompleteInteraction = CommandAutocompleteInteraction & {
   ack(): void
   show(choices: CommandArgumentChoice[]): void
 }
+
+// TODO modal
+// export type ReplyableCommandAutocompleteInteraction = CommandAutocompleteInteraction & {
+//   ack(): void
+//   show(choices: CommandArgumentChoice[]): void
+// }
 
 export type InteractionJanitor = {
   edit(data: InteractionApplicationCommandCallbackData): void

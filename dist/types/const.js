@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
+exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.TextInputStyle = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
 var InteractionCallbackType;
 (function (InteractionCallbackType) {
     InteractionCallbackType[InteractionCallbackType["PONG"] = 1] = "PONG";
@@ -9,6 +9,7 @@ var InteractionCallbackType;
     InteractionCallbackType[InteractionCallbackType["DEFERRED_UPDATE_MESSAGE"] = 6] = "DEFERRED_UPDATE_MESSAGE";
     InteractionCallbackType[InteractionCallbackType["UPDATE_MESSAGE"] = 7] = "UPDATE_MESSAGE";
     InteractionCallbackType[InteractionCallbackType["APPLICATION_COMMAND_AUTOCOMPLETE_RESULT"] = 8] = "APPLICATION_COMMAND_AUTOCOMPLETE_RESULT";
+    InteractionCallbackType[InteractionCallbackType["MODAL"] = 9] = "MODAL";
 })(InteractionCallbackType = exports.InteractionCallbackType || (exports.InteractionCallbackType = {}));
 var InteractionResponseFlags;
 (function (InteractionResponseFlags) {
@@ -16,11 +17,11 @@ var InteractionResponseFlags;
 })(InteractionResponseFlags = exports.InteractionResponseFlags || (exports.InteractionResponseFlags = {}));
 var InteractionType;
 (function (InteractionType) {
-    /** negative number => custom */
-    InteractionType[InteractionType["RICH_MESSAGE"] = -5] = "RICH_MESSAGE";
+    InteractionType[InteractionType["PING"] = 1] = "PING";
     InteractionType[InteractionType["COMMAND"] = 2] = "COMMAND";
     InteractionType[InteractionType["COMPONENT"] = 3] = "COMPONENT";
     InteractionType[InteractionType["COMMAND_AUTOCOMPLETE"] = 4] = "COMMAND_AUTOCOMPLETE";
+    InteractionType[InteractionType["MODAL_SUBMIT"] = 5] = "MODAL_SUBMIT";
 })(InteractionType = exports.InteractionType || (exports.InteractionType = {}));
 var ComponentType;
 (function (ComponentType) {
@@ -29,6 +30,7 @@ var ComponentType;
     ComponentType[ComponentType["ROW"] = 1] = "ROW";
     ComponentType[ComponentType["BUTTON"] = 2] = "BUTTON";
     ComponentType[ComponentType["SELECT"] = 3] = "SELECT";
+    ComponentType[ComponentType["TEXT"] = 4] = "TEXT";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
 var InteractionCommandType;
 (function (InteractionCommandType) {
@@ -44,6 +46,11 @@ var ButtonStyle;
     ButtonStyle[ButtonStyle["DANGER"] = 4] = "DANGER";
     ButtonStyle[ButtonStyle["LINK"] = 5] = "LINK";
 })(ButtonStyle = exports.ButtonStyle || (exports.ButtonStyle = {}));
+var TextInputStyle;
+(function (TextInputStyle) {
+    TextInputStyle[TextInputStyle["SHORT"] = 1] = "SHORT";
+    TextInputStyle[TextInputStyle["PARAGRAPH"] = 2] = "PARAGRAPH";
+})(TextInputStyle = exports.TextInputStyle || (exports.TextInputStyle = {}));
 var InteractionComponentFlag;
 (function (InteractionComponentFlag) {
     InteractionComponentFlag["ACCESS_EVERYONE"] = "e";
@@ -80,5 +87,6 @@ var ApplicationCommandOptionType;
     ApplicationCommandOptionType[ApplicationCommandOptionType["ROLE"] = 8] = "ROLE";
     ApplicationCommandOptionType[ApplicationCommandOptionType["MENTIONABLE"] = 9] = "MENTIONABLE";
     ApplicationCommandOptionType[ApplicationCommandOptionType["NUMBER"] = 10] = "NUMBER";
+    ApplicationCommandOptionType[ApplicationCommandOptionType["ATTACHMENT"] = 11] = "ATTACHMENT";
 })(ApplicationCommandOptionType = exports.ApplicationCommandOptionType || (exports.ApplicationCommandOptionType = {}));
 //# sourceMappingURL=const.js.map

@@ -6,7 +6,8 @@ export enum InteractionCallbackType {
   DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5,
   DEFERRED_UPDATE_MESSAGE = 6,
   UPDATE_MESSAGE = 7,
-  APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8
+  APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
+  MODAL = 9
 }
 
 export enum InteractionResponseFlags {
@@ -14,11 +15,11 @@ export enum InteractionResponseFlags {
 }
 
 export enum InteractionType {
-  /** negative number => custom */
-  RICH_MESSAGE = -5,
+  PING = 1,
   COMMAND = 2,
   COMPONENT = 3,
-  COMMAND_AUTOCOMPLETE = 4
+  COMMAND_AUTOCOMPLETE = 4,
+  MODAL_SUBMIT = 5
 }
 
 export enum ComponentType {
@@ -26,7 +27,8 @@ export enum ComponentType {
   LINE_BREAK = -5,
   ROW = 1,
   BUTTON = 2,
-  SELECT = 3
+  SELECT = 3,
+  TEXT = 4
 }
 
 export enum InteractionCommandType {
@@ -41,6 +43,11 @@ export enum ButtonStyle {
   SUCCESS = 3,
   DANGER = 4,
   LINK = 5
+}
+
+export enum TextInputStyle {
+  SHORT = 1,
+  PARAGRAPH = 2
 }
 
 export enum InteractionComponentFlag {
@@ -77,5 +84,6 @@ export enum ApplicationCommandOptionType {
   CHANNEL = 7,
   ROLE = 8,
   MENTIONABLE = 9,
-  NUMBER = 10
+  NUMBER = 10,
+  ATTACHMENT = 11
 }

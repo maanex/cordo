@@ -9,7 +9,7 @@ const index_1 = require("./index");
 class CordoAPI {
     static async interactionCallback(i, type, data, contextId, useRaw) {
         if (!useRaw)
-            CordoAPI.normaliseData(data, i, contextId);
+            CordoAPI.normaliseData(data, i, contextId, type);
         if (data?.components)
             i._answerComponents = data.components;
         if (!i._answered) {
@@ -37,6 +37,8 @@ class CordoAPI {
                     CordoAPI.handleCallbackResponse(res, type, data);
                     break;
                 }
+                case const_2.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT: break;
+                case const_2.InteractionCallbackType.MODAL: break;
             }
         }
         return {
@@ -65,28 +67,13 @@ class CordoAPI {
     /**
      * Transforms the shorthand way of writing into proper discord api compatible objects
      */
-    static normaliseData(data, i, contextId) {
+    static normaliseData(data, i, contextId, type) {
         if (!data)
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
         index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i));
+        CordoAPI.normalizeFindAndResolveSmartEmbed(data, type);
         const isEmphemeral = (data.flags & const_1.InteractionResponseFlags.EPHEMERAL) !== 0;
-        if (!data.content)
-            data.content = '';
-        if (data.description || data.title) {
-            if (!data.embeds)
-                data.embeds = [];
-            data.embeds.push({
-                title: data.title || undefined,
-                description: data.description || undefined,
-                footer: data.footer ? { text: data.footer } : undefined,
-                image: data.image ? { url: data.image } : undefined,
-                thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
-                color: data.color || 0x2F3136
-            });
-            delete data.description;
-            delete data.title;
-        }
         if (data.components?.length && data.components[0].type !== const_2.ComponentType.ROW) {
             const rows = [];
             let newlineFlag = true;
@@ -101,7 +88,7 @@ class CordoAPI {
                         comp.flags.push(const_2.InteractionComponentFlag.ACCESS_EVERYONE);
                     }
                     ;
-                    comp.custom_id = `${contextId ?? ''}::${comp.custom_id}:${comp.flags?.join('') ?? ''}`;
+                    comp.custom_id = CordoAPI.compileCustomId(comp.custom_id, comp.flags, contextId);
                     if (comp.flags?.length && !!i.member && !hasAccessEveryoneFlag) {
                         const perms = BigInt(i.member.permissions);
                         if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(perms)) {
@@ -158,6 +145,34 @@ class CordoAPI {
             }
             data.components = rows.map(c => ({ type: const_2.ComponentType.ROW, components: c }));
         }
+    }
+    static normalizeFindAndResolveSmartEmbed(data, type) {
+        if (type === const_2.InteractionCallbackType.MODAL)
+            return;
+        if (!data.content)
+            data.content = '';
+        if (!data.description && !data.title)
+            return;
+        if (!data.embeds)
+            data.embeds = [];
+        data.embeds.push({
+            title: data.title || undefined,
+            description: data.description || undefined,
+            footer: data.footer ? { text: data.footer } : undefined,
+            image: data.image ? { url: data.image } : undefined,
+            thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
+            color: data.color || 0x2F3136
+        });
+        delete data.description;
+        delete data.title;
+    }
+    //
+    static compileCustomId(customId, flags, contextId) {
+        return `${contextId ?? ''}::${customId}:${flags?.join('') ?? ''}`;
+    }
+    static parseCustomId(rawId) {
+        const [contextId, _reserved, customId, flagsRaw] = rawId.split(':');
+        return { contextId, _reserved, customId, flagsRaw };
     }
 }
 exports.default = CordoAPI;

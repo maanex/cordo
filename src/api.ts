@@ -6,7 +6,7 @@ import { InteractionResponseFlags } from './types/const'
 import { MessageComponent } from './types/component'
 import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
 import PermissionChecks from './lib/permission-checks'
-import Cordo, { InteractionApplicationCommandAutocompleteCallbackData, InteractionDefferedCallbackData } from './index'
+import Cordo, { InteractionApplicationCommandAutocompleteCallbackData, InteractionDefferedCallbackData, InteractionOpenModalData } from './index'
 
 export default class CordoAPI {
 
@@ -16,9 +16,10 @@ export default class CordoAPI {
   public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.DEFERRED_UPDATE_MESSAGE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
   public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.UPDATE_MESSAGE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
   public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data: InteractionApplicationCommandAutocompleteCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.MODAL, data: InteractionOpenModalData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
   public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType, data?: any, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
     if (!useRaw)
-      CordoAPI.normaliseData(data, i, contextId)
+      CordoAPI.normaliseData(data, i, contextId, type)
 
     if (data?.components)
       i._answerComponents = data.components
@@ -46,6 +47,8 @@ export default class CordoAPI {
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
+        case InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT: break
+        case InteractionCallbackType.MODAL: break
       }
     }
 
@@ -75,29 +78,14 @@ export default class CordoAPI {
   /**
    * Transforms the shorthand way of writing into proper discord api compatible objects
    */
-  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string) {
+  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string, type?: InteractionCallbackType) {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
     Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i))
+    
+    CordoAPI.normalizeFindAndResolveSmartEmbed(data, type)
 
     const isEmphemeral = (data.flags & InteractionResponseFlags.EPHEMERAL) !== 0
-
-    if (!data.content)
-      data.content = ''
-
-    if (data.description || data.title) {
-      if (!data.embeds) data.embeds = []
-      data.embeds.push({
-        title: data.title || undefined,
-        description: data.description || undefined,
-        footer: data.footer ? { text: data.footer } : undefined,
-        image: data.image ? { url: data.image } : undefined,
-        thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
-        color: data.color || 0x2F3136
-      })
-      delete data.description
-      delete data.title
-    }
 
     if (data.components?.length && (data.components[0].type as any) !== ComponentType.ROW) {
       const rows: MessageComponent[][] = []
@@ -111,7 +99,7 @@ export default class CordoAPI {
             if (!comp.flags) comp.flags = []
             comp.flags.push(InteractionComponentFlag.ACCESS_EVERYONE)
           }
-          ;(comp as any).custom_id = `${contextId ?? ''}::${(comp as any).custom_id}:${comp.flags?.join('') ?? ''}`
+          ;(comp as any).custom_id = CordoAPI.compileCustomId((comp as any).custom_id, comp.flags, contextId)
 
           if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
             const perms = BigInt((i as InteractionLocationGuild).member.permissions)
@@ -162,6 +150,45 @@ export default class CordoAPI {
       }
       data.components = rows.map(c => ({ type: ComponentType.ROW, components: c })) as any
     }
+  }
+
+  private static normalizeFindAndResolveSmartEmbed(data: InteractionApplicationCommandCallbackData, type: InteractionCallbackType) {
+    if (type === InteractionCallbackType.PONG) return
+    if (type === InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT) return
+    if (type === InteractionCallbackType.MODAL) return
+
+    if (!data.content)
+      data.content = ''
+
+    if (!data.description && !data.title) return
+
+    if (!data.embeds) data.embeds = []
+    data.embeds.push({
+      title: data.title || undefined,
+      description: data.description || undefined,
+      footer: data.footer ? { text: data.footer } : undefined,
+      image: data.image ? { url: data.image } : undefined,
+      thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
+      color: data.color || 0x2F3136
+    })
+    delete data.description
+    delete data.title
+  }
+
+  //
+
+  public static compileCustomId(customId: string, flags?: InteractionComponentFlag[], contextId?: string) {
+    return `${contextId ?? ''}::${customId}:${flags?.join('') ?? ''}`
+  }
+
+  public static parseCustomId(rawId: string): {
+    contextId,
+    _reserved,
+    customId,
+    flagsRaw
+  } {
+    const [ contextId, _reserved, customId, flagsRaw ] = rawId.split(':')
+    return { contextId, _reserved, customId, flagsRaw }
   }
 
 }

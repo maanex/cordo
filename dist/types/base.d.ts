@@ -1,4 +1,4 @@
-import { InteractionCallbackFollowup } from '..';
+import { InteractionCallbackFollowup, InteractionOpenModalData } from '..';
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
 import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType } from './const';
 import { GuildData, UserData } from './middleware';
@@ -220,8 +220,14 @@ export declare type InteractionTypeCommandAutocomplete = {
         input: string;
     };
 };
-export declare type InteractionTypeRichMessage = {
-    type: InteractionType.RICH_MESSAGE;
+export declare type InteractionTypeModalSubmit = {
+    type: InteractionType.MODAL_SUBMIT;
+    data: {
+        custom_id: string;
+        components: MessageComponent[];
+        /** parsed components, { [custom_id]: value } */
+        data: Record<string, any>;
+    };
 };
 export declare type InteractionBase = {
     id: Snowflake;
@@ -237,11 +243,11 @@ export declare type InteractionBase = {
     _httpCallback?: (payload: any) => any;
     _answerComponents: MessageComponent[];
 };
-export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeRichMessage);
+export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeModalSubmit);
 export declare type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
 export declare type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent;
 export declare type CommandAutocompleteInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommandAutocomplete;
-export declare type RichMessageInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeRichMessage;
+export declare type ModalSubmitInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeModalSubmit;
 export declare type SlotedContext = {
     params: Record<string, string>;
 };
@@ -250,6 +256,7 @@ export declare type ReplyableCommandInteraction = CommandInteraction & Partial<S
     reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;
+    openModal(data: InteractionOpenModalData): void;
     state(state?: string, ...args: any): void;
 };
 export declare type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
@@ -259,6 +266,7 @@ export declare type ReplyableComponentInteraction = ComponentInteraction & Parti
     replyPrivately(data: InteractionApplicationCommandCallbackData): void;
     edit(data: InteractionApplicationCommandCallbackData): void;
     editInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
+    openModal(data: InteractionOpenModalData): void;
     removeComponents(): void;
     state(state?: string, ...args: any): void;
 };

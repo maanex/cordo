@@ -28,6 +28,11 @@ export declare type InteractionApplicationCommandCallbackData = {
 export declare type InteractionApplicationCommandAutocompleteCallbackData = {
     choices: CommandArgumentChoice[];
 };
+export declare type InteractionOpenModalData = {
+    custom_id: string;
+    title: string;
+    components: MessageComponent[];
+};
 export declare type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
 export declare type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
 export declare type InteractionCommandAutocompleteHandler = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess);

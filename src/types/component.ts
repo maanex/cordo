@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { InteractionEmoji } from './base'
-import { ButtonStyle, ComponentType, InteractionComponentFlag } from './const'
+import { ButtonStyle, ComponentType, InteractionComponentFlag, TextInputStyle } from './const'
 
 
 // Button
@@ -41,6 +41,19 @@ export type MessageComponentSelectMenu = {
   max_values?: number
   disabled?: boolean
   flags?: InteractionComponentFlag[]
+}
+
+export type MessageComponentTextInput = {
+  type: ComponentType.TEXT
+  visible?: boolean
+  custom_id: string
+  style: TextInputStyle
+  label: string
+  min_length?: number
+  max_length?: number
+  required?: boolean
+  value?: string
+  placeholder?: string
 }
 
 // Custom

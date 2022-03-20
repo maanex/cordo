@@ -2,7 +2,7 @@ import { InteractionApplicationCommandCallbackData, InteractionComponentHandler,
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
 import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotedContext, ReplyableCommandAutocompleteInteraction, CommandAutocompleteInteraction, CommandArgumentChoice } from './types/base'
 import CordoAPI from './api'
-import Cordo from './index'
+import Cordo, { InteractionOpenModalData } from './index'
 
 
 export default class CordoReplies {
@@ -57,6 +57,9 @@ export default class CordoReplies {
       replyPrivately(data: InteractionApplicationCommandCallbackData) {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL })
       },
+      openModal(data: InteractionOpenModalData) {
+        CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data)
+      },
       async state(state?: string, ...args: any) {
         if (!state) state = i.data.name
 
@@ -105,6 +108,9 @@ export default class CordoReplies {
           CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id)
           return CordoReplies.getLevelTwoReplyState(context)
         }
+      },
+      openModal(data: InteractionOpenModalData) {
+        CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data)
       },
       // disableComponents() { TODO
       //   API.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, {

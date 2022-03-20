@@ -41,6 +41,12 @@ export type InteractionApplicationCommandAutocompleteCallbackData = {
   choices: CommandArgumentChoice[]
 }
 
+export type InteractionOpenModalData = {
+  custom_id: string
+  title: string
+  components: MessageComponent[]
+}
+
 // Handler
 
 export type InteractionCommandHandler

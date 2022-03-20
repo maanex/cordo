@@ -40,8 +40,7 @@ class CordoComponentsManager {
     }
     //
     static async onComponent(i) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [contextId, _reserved, customId, flagsRaw] = i.data.custom_id.split(':'); // new format
+        const { contextId, customId, flagsRaw } = api_1.default.parseCustomId(i.data.custom_id);
         i.data.custom_id = customId;
         i.data.flags = flagsRaw?.split('') ?? [];
         if (!(await permission_checks_1.default.componentPermissionCheck(i)))

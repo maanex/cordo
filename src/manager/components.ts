@@ -49,8 +49,7 @@ export default class CordoComponentsManager {
   //
 
   public static async onComponent(i: ComponentInteraction) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [ contextId, _reserved, customId, flagsRaw ] = i.data.custom_id.split(':') // new format
+    const { contextId, customId, flagsRaw } = CordoAPI.parseCustomId(i.data.custom_id)
 
     i.data.custom_id = customId
     i.data.flags = flagsRaw?.split('') as InteractionComponentFlag[] ?? []
