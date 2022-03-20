@@ -48,7 +48,7 @@ export declare type LineBreak = {
     type: ComponentType.LINE_BREAK;
     visible?: boolean;
 };
-export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak;
+export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput;
 export declare type ActionRow = {
     type: ComponentType.ROW;
     components: MessageComponent[];

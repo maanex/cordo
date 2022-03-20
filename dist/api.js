@@ -147,6 +147,10 @@ class CordoAPI {
         }
     }
     static normalizeFindAndResolveSmartEmbed(data, type) {
+        if (type === const_2.InteractionCallbackType.PONG)
+            return;
+        if (type === const_2.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
+            return;
         if (type === const_2.InteractionCallbackType.MODAL)
             return;
         if (!data.content)

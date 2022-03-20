@@ -65,7 +65,7 @@ export type LineBreak = {
 
 // Generic
 
-export type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak
+export type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput
 
 // Action Row
 

@@ -93,32 +93,7 @@ export default class CordoAPI {
       for (const comp of data.components) {
         if (comp.visible === false) continue // === false to not catch any null or undefined
 
-        if (comp.type !== ComponentType.LINE_BREAK && !!(comp as any).custom_id) {
-          const hasAccessEveryoneFlag = comp.flags?.includes(InteractionComponentFlag.ACCESS_EVERYONE)
-          if (isEmphemeral && !hasAccessEveryoneFlag) {
-            if (!comp.flags) comp.flags = []
-            comp.flags.push(InteractionComponentFlag.ACCESS_EVERYONE)
-          }
-          ;(comp as any).custom_id = CordoAPI.compileCustomId((comp as any).custom_id, comp.flags, contextId)
-
-          if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
-            const perms = BigInt((i as InteractionLocationGuild).member.permissions)
-            if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
-              if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
-              else comp.disabled = true
-            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_SERVER) && !PermissionStrings.containsManageServer(perms)) {
-              if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
-              else comp.disabled = true
-            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(perms)) {
-              if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
-              else comp.disabled = true
-            } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !PermissionChecks.isBotOwner(i.user.id)) {
-              if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
-              else comp.disabled = true
-            }
-          }
-          delete comp.flags
-        }
+        CordoAPI.normalizeApplyFlags(comp, i, contextId, isEmphemeral)
 
         switch (comp.type) {
           case ComponentType.LINE_BREAK: {
@@ -173,6 +148,37 @@ export default class CordoAPI {
     })
     delete data.description
     delete data.title
+  }
+
+  private static normalizeApplyFlags(comp: MessageComponent, i: GenericInteraction, contextId: string, isEmphemeral: boolean) {
+    if (comp.type === ComponentType.LINE_BREAK) return
+    if (comp.type === ComponentType.TEXT) return
+    if (!(comp as any).custom_id) return
+
+    const hasAccessEveryoneFlag = comp.flags?.includes(InteractionComponentFlag.ACCESS_EVERYONE)
+    if (isEmphemeral && !hasAccessEveryoneFlag) {
+      if (!comp.flags) comp.flags = []
+      comp.flags.push(InteractionComponentFlag.ACCESS_EVERYONE)
+    }
+    ;(comp as any).custom_id = CordoAPI.compileCustomId((comp as any).custom_id, comp.flags, contextId)
+
+    if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
+      const perms = BigInt((i as InteractionLocationGuild).member.permissions)
+      if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
+        if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
+        else comp.disabled = true
+      } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_SERVER) && !PermissionStrings.containsManageServer(perms)) {
+        if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
+        else comp.disabled = true
+      } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(perms)) {
+        if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
+        else comp.disabled = true
+      } else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !PermissionChecks.isBotOwner(i.user.id)) {
+        if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null
+        else comp.disabled = true
+      }
+      delete comp.flags
+    }
   }
 
   //
