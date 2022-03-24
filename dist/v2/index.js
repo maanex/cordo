@@ -11,22 +11,15 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_interactions_1 = require("discord-interactions");
-const const_1 = require("./types/const");
-const api_1 = require("./api");
-const default_logger_1 = require("./lib/default-logger");
-const commands_1 = require("./manager/commands");
-const components_1 = require("./manager/components");
-const states_1 = require("./manager/states");
-const autocompleter_1 = require("./manager/autocompleter");
 __exportStar(require("./api"), exports);
-__exportStar(require("./replies"), exports);
-__exportStar(require("./lib/default-logger"), exports);
-__exportStar(require("./lib/permission-strings"), exports);
-__exportStar(require("./types/base"), exports);
-__exportStar(require("./types/component"), exports);
-__exportStar(require("./types/const"), exports);
-__exportStar(require("./types/custom"), exports);
-__exportStar(require("./types/middleware"), exports);
+// export * from './replies'
+// export * from './lib/default-logger'
+// export * from './lib/permission-strings'
+// export * from './types/base'
+// export * from './types/component'
+// export * from './types/const'
+// export * from './types/custom'
+// export * from './types/middleware'
 class Cordo {
     static get _data() {
         return Cordo.__data;
@@ -39,32 +32,32 @@ class Cordo {
         if (config.contextPath)
             Cordo.findContext(config.contextPath);
         if (config.commandHandlerPath)
-            commands_1.default.findCommandHandlers(config.commandHandlerPath);
+            CordoCommandsManager.findCommandHandlers(config.commandHandlerPath);
         if (config.componentHandlerPath)
-            components_1.default.findComponentHandlers(config.componentHandlerPath);
+            CordoComponentsManager.findComponentHandlers(config.componentHandlerPath);
         if (config.uiStatesPath)
-            states_1.default.findUiStates(config.uiStatesPath);
+            CordoStatesManager.findUiStates(config.uiStatesPath);
         if (config.autocompleterPath)
-            autocompleter_1.default.findAutocompleteHandlers(config.autocompleterPath);
+            CordoAutocompleterManager.findAutocompleteHandlers(config.autocompleterPath);
     }
     //
     static findContext(dir) {
         if (typeof dir === 'string')
             dir = [dir];
         try {
-            commands_1.default.findCommandHandlers([...dir, 'commands']);
+            CordoCommandsManager.findCommandHandlers([...dir, 'commands']);
         }
         catch (ignore) { }
         try {
-            components_1.default.findComponentHandlers([...dir, 'components']);
+            CordoComponentsManager.findComponentHandlers([...dir, 'components']);
         }
         catch (ignore) { }
         try {
-            states_1.default.findUiStates([...dir, 'states']);
+            CordoStatesManager.findUiStates([...dir, 'states']);
         }
         catch (ignore) { }
         try {
-            autocompleter_1.default.findAutocompleteHandlers([...dir, 'autocompleter']);
+            CordoAutocompleterManager.findAutocompleteHandlers([...dir, 'autocompleter']);
         }
         catch (ignore) { }
     }
@@ -73,28 +66,28 @@ class Cordo {
     }
     //
     static findCommandHandlers(dir, prefix) {
-        commands_1.default.findCommandHandlers(dir, prefix);
+        CordoCommandsManager.findCommandHandlers(dir, prefix);
     }
     static registerCommandHandler(command, handler) {
-        commands_1.default.registerCommandHandler(command, handler);
+        CordoCommandsManager.registerCommandHandler(command, handler);
     }
     static findComponentHandlers(dir, prefix) {
-        components_1.default.findComponentHandlers(dir, prefix);
+        CordoComponentsManager.findComponentHandlers(dir, prefix);
     }
     static registerComponentHandler(id, handler) {
-        components_1.default.registerComponentHandler(id, handler);
+        CordoComponentsManager.registerComponentHandler(id, handler);
     }
     static findUiStates(dir, prefix) {
-        states_1.default.findUiStates(dir, prefix);
+        CordoStatesManager.findUiStates(dir, prefix);
     }
     static registerUiState(id, state) {
-        states_1.default.registerUiState(id, state);
+        CordoStatesManager.registerUiState(id, state);
     }
     static findAutocompleteHandlers(dir, prefix) {
-        autocompleter_1.default.findAutocompleteHandlers(dir, prefix);
+        CordoAutocompleterManager.findAutocompleteHandlers(dir, prefix);
     }
     static registerAutocompleteHandler(id, handler) {
-        autocompleter_1.default.registerAutocompleteHandler(id, handler);
+        CordoAutocompleterManager.registerAutocompleteHandler(id, handler);
     }
     //
     static addMiddlewareInteractionCallback(fun) {
@@ -113,10 +106,10 @@ class Cordo {
     static async emitInteraction(i) {
         i._answered = false;
         if (Cordo._data.config.immediateDefer?.(i)) {
-            if (i.type === const_1.InteractionType.COMMAND)
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE);
-            else if (i.type === const_1.InteractionType.COMPONENT)
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+            if (i.type === InteractionType.COMMAND)
+                CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE);
+            else if (i.type === InteractionType.COMPONENT)
+                CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
         if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
             i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id);
@@ -130,14 +123,12 @@ class Cordo {
             if (!!i.userData.then)
                 i.userData = await i.userData;
         }
-        if (i.type === const_1.InteractionType.COMMAND)
-            commands_1.default.onCommand(i);
-        else if (i.type === const_1.InteractionType.COMPONENT)
-            components_1.default.onComponent(i);
-        else if (i.type === const_1.InteractionType.COMMAND_AUTOCOMPLETE)
-            autocompleter_1.default.onCommandAutocomplete(i);
-        else if (i.type === const_1.InteractionType.MODAL_SUBMIT) // TODO fix this, temp solution
-            components_1.default.onComponent(i);
+        if (i.type === InteractionType.COMMAND)
+            CordoCommandsManager.onCommand(i);
+        else if (i.type === InteractionType.COMPONENT)
+            CordoComponentsManager.onComponent(i);
+        else if (i.type === InteractionType.COMMAND_AUTOCOMPLETE)
+            CordoAutocompleterManager.onCommandAutocomplete(i);
         else
             Cordo._data.logger.warn(`Unknown interaction type ${i.type}`);
     }
@@ -172,16 +163,16 @@ Cordo.__data = {
             interaction_invalid_description: 'The command was not found. Please contact the developer.'
         }
     },
-    commandHandlers: commands_1.default.commandHandlers,
-    componentHandlers: components_1.default.componentHandlers,
-    slottedComponentHandlers: components_1.default.slottedComponentHandlers,
-    uiStates: states_1.default.uiStates,
+    commandHandlers: CordoCommandsManager.commandHandlers,
+    componentHandlers: CordoComponentsManager.componentHandlers,
+    slottedComponentHandlers: CordoComponentsManager.slottedComponentHandlers,
+    uiStates: CordoStatesManager.uiStates,
     middlewares: {
         interactionCallback: [],
         fetchGuildData: null,
         fetchUserData: null,
         apiResponseHandler: null
     },
-    logger: new default_logger_1.default()
+    logger: new DefaultLogger()
 };
 //# sourceMappingURL=index.js.map

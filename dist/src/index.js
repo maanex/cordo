@@ -136,8 +136,6 @@ class Cordo {
             components_1.default.onComponent(i);
         else if (i.type === const_1.InteractionType.COMMAND_AUTOCOMPLETE)
             autocompleter_1.default.onCommandAutocomplete(i);
-        else if (i.type === const_1.InteractionType.MODAL_SUBMIT) // TODO fix this, temp solution
-            components_1.default.onComponent(i);
         else
             Cordo._data.logger.warn(`Unknown interaction type ${i.type}`);
     }

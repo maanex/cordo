@@ -1,23 +1,16 @@
 import axios, { AxiosResponse } from 'axios'
-import PermissionStrings from './lib/permission-strings'
-import { InteractionApplicationCommandCallbackData, InteractionCallbackFollowup } from './types/custom'
-import { GenericInteraction, InteractionLocationGuild } from './types/base'
-import { InteractionResponseFlags } from './types/const'
-import { MessageComponent } from './types/component'
-import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const'
-import PermissionChecks from './lib/permission-checks'
-import Cordo, { InteractionApplicationCommandAutocompleteCallbackData, InteractionDefferedCallbackData, InteractionOpenModalData } from './index'
+import { Const } from './types/const'
 
 export default class CordoAPI {
 
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.PONG): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.DEFERRED_UPDATE_MESSAGE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.UPDATE_MESSAGE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data: InteractionApplicationCommandAutocompleteCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType.MODAL, data: InteractionOpenModalData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
-  public static async interactionCallback(i: GenericInteraction, type: InteractionCallbackType, data?: any, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.PONG): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE, data?: InteractionDefferedCallbackData): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.UPDATE_MESSAGE, data: InteractionApplicationCommandCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, data: InteractionApplicationCommandAutocompleteCallbackData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType.MODAL, data: InteractionOpenModalData, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup>
+  public static async interactionCallback(i: GenericInteraction, type: Const.InteractionCallbackType, data?: any, contextId?: string, useRaw?: boolean): Promise<InteractionCallbackFollowup> {
     if (!useRaw)
       CordoAPI.normaliseData(data, i, contextId, type)
 
@@ -34,21 +27,21 @@ export default class CordoAPI {
       }
     } else {
       switch (type) {
-        case InteractionCallbackType.PONG: break
-        case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
-        case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
-        case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
+        case Const.InteractionCallbackType.PONG: break
+        case Const.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
+        case Const.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
+        case Const.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
           const res = await axios.post(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null })
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
-        case InteractionCallbackType.UPDATE_MESSAGE: {
+        case Const.InteractionCallbackType.UPDATE_MESSAGE: {
           const res = await axios.patch(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null })
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
-        case InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT: break
-        case InteractionCallbackType.MODAL: break
+        case Const.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT: break
+        case Const.InteractionCallbackType.MODAL: break
       }
     }
 
@@ -65,14 +58,14 @@ export default class CordoAPI {
   }
 
   private static handleCallbackResponse(res: AxiosResponse, type: number, data?: InteractionApplicationCommandCallbackData) {
-    if (Cordo._data.middlewares.apiResponseHandler) {
-      Cordo._data.middlewares.apiResponseHandler(res)
-    } else if (res.status >= 300) {
-      Cordo._data.logger.warn('Interaction callback failed with error:')
-      Cordo._data.logger.warn(JSON.stringify(res.data, null, 2))
-      Cordo._data.logger.warn('Request payload:')
-      Cordo._data.logger.warn(JSON.stringify({ type, data }, null, 2))
-    }
+    // if (Cordo._data.middlewares.apiResponseHandler) {
+    //   Cordo._data.middlewares.apiResponseHandler(res)
+    // } else if (res.status >= 300) {
+    //   Cordo._data.logger.warn('Interaction callback failed with error:')
+    //   Cordo._data.logger.warn(JSON.stringify(res.data, null, 2))
+    //   Cordo._data.logger.warn('Request payload:')
+    //   Cordo._data.logger.warn(JSON.stringify({ type, data }, null, 2))
+    // }
   }
 
   /**
@@ -118,10 +111,6 @@ export default class CordoAPI {
             if (comp.options?.length > 50)
               comp.options.length = 50
 
-            rows.push([ comp ])
-            newlineFlag = true
-          }
-          case ComponentType.TEXT: {
             rows.push([ comp ])
             newlineFlag = true
           }

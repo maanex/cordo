@@ -1,26 +1,16 @@
 import { verifyKeyMiddleware } from "discord-interactions"
 import { Request, Response } from "express"
-import { InteractionCallbackType, InteractionType } from './types/const'
-import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware'
-import { GenericInteraction } from './types/base'
-import CordoAPI from './api'
-import DefaultLogger from './lib/default-logger'
-import CordoCommandsManager from './manager/commands'
-import CordoComponentsManager from './manager/components'
-import CordoStatesManager from './manager/states'
-import { InteractionCommandAutocompleteHandler, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from "./types/custom"
-import CordoAutocompleterManager from "./manager/autocompleter"
 
 
 export * from './api'
-export * from './replies'
-export * from './lib/default-logger'
-export * from './lib/permission-strings'
-export * from './types/base'
-export * from './types/component'
-export * from './types/const'
-export * from './types/custom'
-export * from './types/middleware'
+// export * from './replies'
+// export * from './lib/default-logger'
+// export * from './lib/permission-strings'
+// export * from './types/base'
+// export * from './types/component'
+// export * from './types/const'
+// export * from './types/custom'
+// export * from './types/middleware'
 
 export default class Cordo {
 
@@ -182,8 +172,6 @@ export default class Cordo {
       CordoComponentsManager.onComponent(i)
     else if (i.type === InteractionType.COMMAND_AUTOCOMPLETE)
       CordoAutocompleterManager.onCommandAutocomplete(i)
-    else if (i.type === InteractionType.MODAL_SUBMIT) // TODO fix this, temp solution
-      CordoComponentsManager.onComponent(i as any)
     else
       Cordo._data.logger.warn(`Unknown interaction type ${(i as any).type}`)
   }
