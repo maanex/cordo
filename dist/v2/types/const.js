@@ -17,14 +17,13 @@ var Const;
     (function (InteractionResponseFlags) {
         InteractionResponseFlags[InteractionResponseFlags["EPHEMERAL"] = 64] = "EPHEMERAL";
     })(InteractionResponseFlags = Const.InteractionResponseFlags || (Const.InteractionResponseFlags = {}));
-    let InteractionType;
-    (function (InteractionType) {
-        InteractionType[InteractionType["PING"] = 1] = "PING";
-        InteractionType[InteractionType["COMMAND"] = 2] = "COMMAND";
-        InteractionType[InteractionType["COMPONENT"] = 3] = "COMPONENT";
-        InteractionType[InteractionType["COMMAND_AUTOCOMPLETE"] = 4] = "COMMAND_AUTOCOMPLETE";
-        InteractionType[InteractionType["MODAL_SUBMIT"] = 5] = "MODAL_SUBMIT";
-    })(InteractionType = Const.InteractionType || (Const.InteractionType = {}));
+    Const.InteractionType = {
+        PING: 1,
+        COMMAND: 2,
+        COMPONENT: 3,
+        COMMAND_AUTOCOMPLETE: 4,
+        MODAL_SUBMIT: 5
+    };
     let ComponentType;
     (function (ComponentType) {
         /** negative number => custom */

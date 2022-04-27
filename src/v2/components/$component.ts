@@ -1,4 +1,4 @@
-import { ComponentType } from "../../src/types/const"
+import { ComponentType } from "../../types/const"
 
 
 export type SerializedMessageComponent<Type extends ComponentType> = {

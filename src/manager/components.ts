@@ -41,7 +41,7 @@ export default class CordoComponentsManager {
     CordoComponentsManager.componentHandlers.set(id, handler)
 
     if (id.includes('$')) {
-      const regex = new RegExp(id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+'))
+      const regex = new RegExp('^' + id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$')
       this.slottedComponentHandlers.add({ id, regex, handler })
     }
   }
@@ -89,7 +89,7 @@ export default class CordoComponentsManager {
       handler(CordoReplies.buildReplyableComponentInteraction(i))
       return
     }
-    
+
     regexSearchResult = [ ...CordoComponentsManager.slottedComponentHandlers.values() ]
       .find(h => h.regex.test(i.data.custom_id))
 
@@ -98,7 +98,7 @@ export default class CordoComponentsManager {
       regexSearchResult.handler(CordoReplies.buildReplyableComponentInteraction(i, { params }))
       return
     }
-    
+
     if (CordoStatesManager.uiStates.has(i.data.custom_id)) {
       CordoReplies.buildReplyableComponentInteraction(i).state()
       return
@@ -121,7 +121,7 @@ export default class CordoComponentsManager {
       context.timeoutRunFunc()
       return
     }
-    
+
     if (context.onInteraction === 'removeTimeout') {
       clearTimeout(context.timeoutRunner)
       context.timeoutRunFunc(true)

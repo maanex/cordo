@@ -12,3 +12,5 @@ export type ExactlyOne<T, U>
 
 export type StringNotStartWith<Target, Prefix extends string>
   = Target extends `${Prefix}${string}` ? never : Target
+
+export type ListOmit<T, S> = T extends S ? never : T

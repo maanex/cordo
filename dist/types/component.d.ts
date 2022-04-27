@@ -1,5 +1,5 @@
 import { InteractionEmoji } from './base';
-import { ButtonStyle, ComponentType, InteractionComponentFlag, TextInputStyle } from './const';
+import { ButtonStyle, ChannelType, ComponentType, InteractionComponentFlag, TextInputStyle } from './const';
 export declare type MessageComponentButton = {
     type: ComponentType.BUTTON;
     visible?: boolean;
@@ -44,11 +44,22 @@ export declare type MessageComponentTextInput = {
     value?: string;
     placeholder?: string;
 };
+export declare type MessageComponentContentSelectMenu = {
+    type: ComponentType.USER_SELECT | ComponentType.ROLE_SELECT | ComponentType.MENTIONABLE_SELECT | ComponentType.CHANNEL_SELECT;
+    visible?: boolean;
+    custom_id: string;
+    placeholder?: string;
+    min_values?: number;
+    max_values?: number;
+    disabled?: boolean;
+    channel_types?: ChannelType[];
+    flags?: InteractionComponentFlag[];
+};
 export declare type LineBreak = {
     type: ComponentType.LINE_BREAK;
     visible?: boolean;
 };
-export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput;
+export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput | MessageComponentContentSelectMenu;
 export declare type ActionRow = {
     type: ComponentType.ROW;
     components: MessageComponent[];

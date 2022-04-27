@@ -4,3 +4,4 @@ export declare type Without<T, U> = {
 };
 export declare type ExactlyOne<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 export declare type StringNotStartWith<Target, Prefix extends string> = Target extends `${Prefix}${string}` ? never : Target;
+export declare type ListOmit<T, S> = T extends S ? never : T;

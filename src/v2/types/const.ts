@@ -1,6 +1,8 @@
 
 export namespace Const {
 
+  export type TODO = any
+
   export enum InteractionCallbackType {
     PONG = 1,
     CHANNEL_MESSAGE_WITH_SOURCE = 4,
@@ -15,13 +17,15 @@ export namespace Const {
     EPHEMERAL = 64
   }
 
-  export enum InteractionType {
-    PING = 1,
-    COMMAND = 2,
-    COMPONENT = 3,
-    COMMAND_AUTOCOMPLETE = 4,
-    MODAL_SUBMIT = 5
+  export const InteractionType = {
+    PING: 1 as 1,
+    COMMAND: 2 as 2,
+    COMPONENT: 3 as 3,
+    COMMAND_AUTOCOMPLETE: 4 as 4,
+    MODAL_SUBMIT: 5 as 5
   }
+  export type InteractionTypeMapping = typeof InteractionType
+  export type InteractionTypeNames = keyof InteractionTypeMapping
 
   export enum ComponentType {
     /** negative number => custom */
@@ -88,5 +92,37 @@ export namespace Const {
     NUMBER = 10,
     ATTACHMENT = 11
   }
+
+  export type Language
+    = 'da'
+    | 'de'
+    | 'en-GB'
+    | 'en-US'
+    | 'es-ES'
+    | 'fr'
+    | 'hr'
+    | 'it'
+    | 'lt'
+    | 'hu'
+    | 'nl'
+    | 'no'
+    | 'pl'
+    | 'pt-BR'
+    | 'ro'
+    | 'fi'
+    | 'sv-SE'
+    | 'vi'
+    | 'tr'
+    | 'cs'
+    | 'el'
+    | 'bg'
+    | 'ru'
+    | 'uk'
+    | 'hi'
+    | 'th'
+    | 'zh-CN'
+    | 'ja'
+    | 'zh-TW'
+    | 'ko'
 
 }

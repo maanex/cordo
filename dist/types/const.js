@@ -31,6 +31,10 @@ var ComponentType;
     ComponentType[ComponentType["BUTTON"] = 2] = "BUTTON";
     ComponentType[ComponentType["SELECT"] = 3] = "SELECT";
     ComponentType[ComponentType["TEXT"] = 4] = "TEXT";
+    ComponentType[ComponentType["USER_SELECT"] = 5] = "USER_SELECT";
+    ComponentType[ComponentType["ROLE_SELECT"] = 6] = "ROLE_SELECT";
+    ComponentType[ComponentType["MENTIONABLE_SELECT"] = 7] = "MENTIONABLE_SELECT";
+    ComponentType[ComponentType["CHANNEL_SELECT"] = 8] = "CHANNEL_SELECT";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
 var InteractionCommandType;
 (function (InteractionCommandType) {

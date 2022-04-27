@@ -120,10 +120,32 @@ export default class CordoAPI {
 
             rows.push([ comp ])
             newlineFlag = true
+            break
           }
           case ComponentType.TEXT: {
             rows.push([ comp ])
             newlineFlag = true
+            break
+          }
+          case ComponentType.USER_SELECT: {
+            rows.push([ comp ])
+            newlineFlag = true
+            break
+          }
+          case ComponentType.ROLE_SELECT: {
+            rows.push([ comp ])
+            newlineFlag = true
+            break
+          }
+          case ComponentType.MENTIONABLE_SELECT: {
+            rows.push([ comp ])
+            newlineFlag = true
+            break
+          }
+          case ComponentType.CHANNEL_SELECT: {
+            rows.push([ comp ])
+            newlineFlag = true
+            break
           }
         }
       }

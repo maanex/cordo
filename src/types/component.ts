@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { InteractionEmoji } from './base'
-import { ButtonStyle, ComponentType, InteractionComponentFlag, TextInputStyle } from './const'
+import { ButtonStyle, ChannelType, ComponentType, InteractionComponentFlag, TextInputStyle } from './const'
 
 
 // Button
@@ -56,6 +56,18 @@ export type MessageComponentTextInput = {
   placeholder?: string
 }
 
+export type MessageComponentContentSelectMenu = {
+  type: ComponentType.USER_SELECT | ComponentType.ROLE_SELECT | ComponentType.MENTIONABLE_SELECT | ComponentType.CHANNEL_SELECT
+  visible?: boolean
+  custom_id: string
+  placeholder?: string
+  min_values?: number
+  max_values?: number
+  disabled?: boolean
+  channel_types?: ChannelType[]
+  flags?: InteractionComponentFlag[]
+}
+
 // Custom
 
 export type LineBreak = {
@@ -65,7 +77,7 @@ export type LineBreak = {
 
 // Generic
 
-export type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput
+export type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput | MessageComponentContentSelectMenu
 
 // Action Row
 

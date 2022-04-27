@@ -44,7 +44,7 @@ export default class CordoCommandsManager {
     CordoCommandsManager.commandHandlers.set(command, handler)
     
     if (command.includes('$')) {
-      const regex = new RegExp(command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+'))
+      const regex = new RegExp('^' + command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$')
       this.slottedCommandHandlers.add({ command, regex, handler })
     }
   }

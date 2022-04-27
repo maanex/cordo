@@ -1,8 +1,8 @@
-import { InteractionEmoji } from "../../src/types/base"
-import { ComponentType, InteractionComponentFlag } from "../../src/types/const"
+import { InteractionEmoji } from "../../types/base"
+import { ComponentType, InteractionComponentFlag } from "../../types/const"
 import CordoAPI from "../api"
 import { Const } from "../types/const"
-import { ExactlyOne, OneOrBoth, StringNotStartWith } from "../types/helper"
+import { ExactlyOne, OneOrBoth } from "../types/helper"
 import { MessageComponent, SerializionContext } from "./$component"
 
 
@@ -39,8 +39,7 @@ type CreateButtonInlineLabel
   | Partial<InteractionEmoji>
   | [ Partial<InteractionEmoji>, string ]
 
-const ValidUrlPrefixes = [ 'http', 'discord://' ] as const
-type ValidUrlPrefixType = (typeof ValidUrlPrefixes)[number]
+type ValidUrlPrefixType = 'https://' | 'http://' | 'discord://'
 
 /*
  *
@@ -102,21 +101,21 @@ function withCustomId([ customId, rawLabel, style, disabled, rawFlags ]: any[]):
   }
 }
 
+//
 
-export default function button<ID extends string>(options: CreateButtonOptions<ID>): MessageComponent<ComponentType.BUTTON, ID>
-export default function button<ID extends string>(url: `${ValidUrlPrefixType}${string}`, label: CreateButtonInlineLabel, disabled?: boolean): MessageComponent<ComponentType.BUTTON, ID>
-export default function button<ID extends string>(customId: StringNotStartWith<ID, ValidUrlPrefixType>, label: CreateButtonInlineLabel, style?: ButtonStyle, disabled?: boolean, flags?: InteractionComponentFlag | InteractionComponentFlag[]): MessageComponent<ComponentType.BUTTON, ID>
-export default function button<ID extends string>(...args: any[]): MessageComponent<ComponentType.BUTTON, ID> {
+export function button<ID extends string>(options: CreateButtonOptions<ID>): MessageComponent<ComponentType.BUTTON, ID>
+export function button<ID extends string>(customId: ID, label: CreateButtonInlineLabel, style?: ButtonStyle, disabled?: boolean, flags?: InteractionComponentFlag | InteractionComponentFlag[]): MessageComponent<ComponentType.BUTTON, ID>
+export function button<ID extends string>(...args: any[]): MessageComponent<ComponentType.BUTTON, ID> {
   if (args.length === 1)
     return withOptions(args) as MessageComponent<ComponentType.BUTTON, ID>
-  
-  for (const prefix of ValidUrlPrefixes) {
-    if (args[0].startsWith(prefix))
-      return withUrl(args) as MessageComponent<ComponentType.BUTTON, ID>
-  }
 
   return withCustomId(args) as MessageComponent<ComponentType.BUTTON, ID>
 }
+button.link = function (url: `${ValidUrlPrefixType}${string}`, label: CreateButtonInlineLabel, disabled?: boolean): MessageComponent<ComponentType.BUTTON, null> {
+  return withUrl([ url, label, disabled ]) as MessageComponent<ComponentType.BUTTON, null>
+}
+
+//
 
 function parseButtonStyle(style: ButtonStyle, hasCustomId: boolean): Const.ButtonStyle {
   switch (style) {

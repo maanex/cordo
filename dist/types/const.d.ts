@@ -23,7 +23,11 @@ export declare enum ComponentType {
     ROW = 1,
     BUTTON = 2,
     SELECT = 3,
-    TEXT = 4
+    TEXT = 4,
+    USER_SELECT = 5,
+    ROLE_SELECT = 6,
+    MENTIONABLE_SELECT = 7,
+    CHANNEL_SELECT = 8
 }
 export declare enum InteractionCommandType {
     CHAT_INPUT = 1,

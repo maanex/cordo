@@ -1,4 +1,5 @@
 export declare namespace Const {
+    type TODO = any;
     enum InteractionCallbackType {
         PONG = 1,
         CHANNEL_MESSAGE_WITH_SOURCE = 4,
@@ -11,13 +12,15 @@ export declare namespace Const {
     enum InteractionResponseFlags {
         EPHEMERAL = 64
     }
-    enum InteractionType {
-        PING = 1,
-        COMMAND = 2,
-        COMPONENT = 3,
-        COMMAND_AUTOCOMPLETE = 4,
-        MODAL_SUBMIT = 5
-    }
+    const InteractionType: {
+        PING: 1;
+        COMMAND: 2;
+        COMPONENT: 3;
+        COMMAND_AUTOCOMPLETE: 4;
+        MODAL_SUBMIT: 5;
+    };
+    type InteractionTypeMapping = typeof InteractionType;
+    type InteractionTypeNames = keyof InteractionTypeMapping;
     enum ComponentType {
         /** negative number => custom */
         LINE_BREAK = -5,
@@ -77,4 +80,5 @@ export declare namespace Const {
         NUMBER = 10,
         ATTACHMENT = 11
     }
+    type Language = 'da' | 'de' | 'en-GB' | 'en-US' | 'es-ES' | 'fr' | 'hr' | 'it' | 'lt' | 'hu' | 'nl' | 'no' | 'pl' | 'pt-BR' | 'ro' | 'fi' | 'sv-SE' | 'vi' | 'tr' | 'cs' | 'el' | 'bg' | 'ru' | 'uk' | 'hi' | 'th' | 'zh-CN' | 'ja' | 'zh-TW' | 'ko';
 }

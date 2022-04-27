@@ -73,9 +73,16 @@ export type InteractionMessage = {
   author: InteractionUser
   attachments: InteractionMessageAttachment[]
   application_id: string
+  message_reference?: {
+    message_id: string
+    guild_id: string
+    channel_id: string
+  }
 }
 
 export type PartialInteractionMessage = InteractionMessage // TODO
+
+export type EditableInteractionMessage = InteractionMessage & { edit() } // TODO
 
 export type MessageEmbed = {
   title?: string
@@ -144,4 +151,10 @@ export type InteractionRole = {
     integration_id?: Snowflake
     premium_subscriber?: null
   }
+}
+
+export type InteractionChoice = {
+  name: string
+  name_localizations?: Map<Const.Language, string>
+  value: string | number
 }

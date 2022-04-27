@@ -103,10 +103,32 @@ class CordoAPI {
                             comp.options.length = 50;
                         rows.push([comp]);
                         newlineFlag = true;
+                        break;
                     }
                     case const_2.ComponentType.TEXT: {
                         rows.push([comp]);
                         newlineFlag = true;
+                        break;
+                    }
+                    case const_2.ComponentType.USER_SELECT: {
+                        rows.push([comp]);
+                        newlineFlag = true;
+                        break;
+                    }
+                    case const_2.ComponentType.ROLE_SELECT: {
+                        rows.push([comp]);
+                        newlineFlag = true;
+                        break;
+                    }
+                    case const_2.ComponentType.MENTIONABLE_SELECT: {
+                        rows.push([comp]);
+                        newlineFlag = true;
+                        break;
+                    }
+                    case const_2.ComponentType.CHANNEL_SELECT: {
+                        rows.push([comp]);
+                        newlineFlag = true;
+                        break;
                     }
                 }
             }

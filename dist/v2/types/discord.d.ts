@@ -65,6 +65,9 @@ export declare type InteractionMessage = {
     application_id: string;
 };
 export declare type PartialInteractionMessage = InteractionMessage;
+export declare type EditableInteractionMessage = InteractionMessage & {
+    edit(): any;
+};
 export declare type MessageEmbed = {
     title?: string;
     type?: 'rich' | 'image' | 'video' | 'gifv' | 'article' | 'link';
@@ -130,4 +133,9 @@ export declare type InteractionRole = {
         integration_id?: Snowflake;
         premium_subscriber?: null;
     };
+};
+export declare type InteractionChoice = {
+    name: string;
+    name_localizations?: Map<Const.Language, string>;
+    value: string | number;
 };
