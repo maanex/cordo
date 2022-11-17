@@ -1,7 +1,7 @@
 import { Const } from './const';
-export declare type Snowflake = string;
-export declare type PermissionBits = string;
-export declare type InteractionUser = {
+export type Snowflake = string;
+export type PermissionBits = string;
+export type InteractionUser = {
     id: Snowflake;
     username: string;
     avatar: string;
@@ -9,7 +9,7 @@ export declare type InteractionUser = {
     public_flags: number;
     bot: boolean;
 };
-export declare type InteractionMember = {
+export type InteractionMember = {
     user: InteractionUser;
     roles: Snowflake[];
     premium_since: string | null;
@@ -21,14 +21,14 @@ export declare type InteractionMember = {
     is_pending: boolean;
     deaf: boolean;
 };
-export declare type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
-export declare type PartialInteractionChannel = {
+export type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
+export type PartialInteractionChannel = {
     id: Snowflake;
     name: string;
     type: Const.ChannelType;
     permissions: Snowflake;
 };
-export declare type InteractionMessageAttachment = {
+export type InteractionMessageAttachment = {
     id: Snowflake;
     filename: string;
     content_type?: string;
@@ -38,7 +38,7 @@ export declare type InteractionMessageAttachment = {
     height?: number;
     width?: number;
 };
-export declare type InteractionMessage = {
+export type InteractionMessage = {
     webhook_id?: string;
     type: number;
     tts: boolean;
@@ -63,12 +63,17 @@ export declare type InteractionMessage = {
     author: InteractionUser;
     attachments: InteractionMessageAttachment[];
     application_id: string;
+    message_reference?: {
+        message_id: string;
+        guild_id: string;
+        channel_id: string;
+    };
 };
-export declare type PartialInteractionMessage = InteractionMessage;
-export declare type EditableInteractionMessage = InteractionMessage & {
+export type PartialInteractionMessage = InteractionMessage;
+export type EditableInteractionMessage = InteractionMessage & {
     edit(): any;
 };
-export declare type MessageEmbed = {
+export type MessageEmbed = {
     title?: string;
     type?: 'rich' | 'image' | 'video' | 'gifv' | 'article' | 'link';
     description?: string;
@@ -114,12 +119,12 @@ export declare type MessageEmbed = {
         inline?: boolean;
     }[];
 };
-export declare type InteractionEmoji = {
+export type InteractionEmoji = {
     id: Snowflake;
     name: string;
     animated: boolean;
 };
-export declare type InteractionRole = {
+export type InteractionRole = {
     id: Snowflake;
     name: string;
     color: number;
@@ -134,7 +139,7 @@ export declare type InteractionRole = {
         premium_subscriber?: null;
     };
 };
-export declare type InteractionChoice = {
+export type InteractionChoice = {
     name: string;
     name_localizations?: Map<Const.Language, string>;
     value: string | number;

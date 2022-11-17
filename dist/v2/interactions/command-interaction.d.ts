@@ -1,7 +1,7 @@
 import { Const } from "../types/const";
 import { EditableInteractionMessage, InteractionMember, InteractionMessage, InteractionMessageAttachment, InteractionRole, InteractionUser, PartialInteractionChannel, PartialInteractionMessage, Snowflake } from "../types/discord";
 import { CommandOption, InteractionReplies, TextBasedInteractionCallbackData } from "./$shared-types";
-declare type Resolved = {
+type Resolved = {
     users?: Map<Snowflake, InteractionUser>;
     members?: Map<Snowflake, InteractionMember>;
     roles?: Map<Snowflake, InteractionRole>;
@@ -9,27 +9,27 @@ declare type Resolved = {
     messages?: Map<Snowflake, PartialInteractionMessage>;
     attachments?: Map<Snowflake, InteractionMessageAttachment>;
 };
-declare type TargetForChatInput = {
+type TargetForChatInput = {
     type: Const.InteractionCommandType.CHAT_INPUT;
     target: undefined;
     targetId: undefined;
 };
-declare type TargetForUser = {
+type TargetForUser = {
     type: Const.InteractionCommandType.USER;
     target: InteractionUser;
     targetId: Snowflake;
 };
-declare type TargetForMessage = {
+type TargetForMessage = {
     type: Const.InteractionCommandType.MESSAGE;
     target: InteractionMessage;
     targetId: Snowflake;
 };
-declare type TargetForUnknown = {
+type TargetForUnknown = {
     type: Const.InteractionCommandType;
     target: unknown;
     targetId: unknown;
 };
-export declare type RawCommandInteractionData = {
+export type RawCommandInteractionData = {
     id: Snowflake;
     name: string;
     type: Const.InteractionCommandType;
@@ -37,7 +37,7 @@ export declare type RawCommandInteractionData = {
     options?: CommandOption[];
     target_id?: Snowflake;
 };
-export declare type CommandInteractionData = {
+export type CommandInteractionData = {
     id: Snowflake;
     name: string;
     type: Const.InteractionCommandType;
@@ -46,7 +46,7 @@ export declare type CommandInteractionData = {
     targetId: undefined;
     options: Record<string, string | number>;
 } & (TargetForChatInput | TargetForUser | TargetForMessage | TargetForUnknown);
-export declare type CommandInteractionReplyFunctions = {
+export type CommandInteractionReplyFunctions = {
     defer(privately?: boolean): Promise<InteractionMessage>;
     reply<CustomIds extends string>(data: CommandInteractionCallbackData<CustomIds>): Promise<EditableInteractionMessage>;
     replyInteractive<CustomIds extends string>(data: CommandInteractionCallbackData<CustomIds>): InteractionReplies.LevelTwoState<CustomIds>;
@@ -55,6 +55,6 @@ export declare type CommandInteractionReplyFunctions = {
     openModalInteractive(data: Const.TODO): Const.TODO;
     applyState(state?: string, data?: any): void;
 };
-export declare type CommandInteractionCallbackData<CustomIds extends string> = TextBasedInteractionCallbackData<CustomIds>;
+export type CommandInteractionCallbackData<CustomIds extends string> = TextBasedInteractionCallbackData<CustomIds>;
 export declare function parseCommandInteractionData(data: RawCommandInteractionData): CommandInteractionData;
 export {};

@@ -202,7 +202,7 @@ class CordoReplies {
                 if (customId.includes('$')) {
                     context.slottedHandlers.add({
                         id: customId,
-                        regex: new RegExp(customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+')),
+                        regex: new RegExp('^' + customId.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$'),
                         handler
                     });
                 }

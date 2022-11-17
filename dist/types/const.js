@@ -78,6 +78,8 @@ var ChannelType;
     ChannelType[ChannelType["GUILD_PUBLIC_THREAD"] = 11] = "GUILD_PUBLIC_THREAD";
     ChannelType[ChannelType["GUILD_PRIVATE_THREAD"] = 12] = "GUILD_PRIVATE_THREAD";
     ChannelType[ChannelType["GUILD_STAGE_VOICE"] = 13] = "GUILD_STAGE_VOICE";
+    ChannelType[ChannelType["GUILD_DIRECTORY"] = 14] = "GUILD_DIRECTORY";
+    ChannelType[ChannelType["GUILD_FORUM"] = 15] = "GUILD_FORUM";
 })(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
 var ApplicationCommandOptionType;
 (function (ApplicationCommandOptionType) {

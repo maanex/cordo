@@ -3,13 +3,13 @@ import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTw
 import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType } from './const';
 import { GuildData, UserData } from './middleware';
 import { MessageComponent } from './component';
-export declare type Snowflake = string;
-export declare type PermissionBits = string;
-export declare type CommandArgumentChoice = {
+export type Snowflake = string;
+export type PermissionBits = string;
+export type CommandArgumentChoice = {
     name: string;
     value: string;
 };
-export declare type InteractionUser = {
+export type InteractionUser = {
     id: Snowflake;
     username: string;
     avatar: string;
@@ -17,7 +17,7 @@ export declare type InteractionUser = {
     public_flags: number;
     bot: boolean;
 };
-export declare type InteractionMember = {
+export type InteractionMember = {
     user: InteractionUser;
     roles: Snowflake[];
     premium_since: string | null;
@@ -29,14 +29,14 @@ export declare type InteractionMember = {
     is_pending: boolean;
     deaf: boolean;
 };
-export declare type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
-export declare type PartialInteractionChannel = {
+export type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
+export type PartialInteractionChannel = {
     id: Snowflake;
     name: string;
     type: ChannelType;
     permissions: Snowflake;
 };
-export declare type InteractionMessageAttachment = {
+export type InteractionMessageAttachment = {
     id: Snowflake;
     filename: string;
     content_type?: string;
@@ -46,7 +46,7 @@ export declare type InteractionMessageAttachment = {
     height?: number;
     width?: number;
 };
-export declare type InteractionMessage = {
+export type InteractionMessage = {
     webhook_id?: string;
     type: number;
     tts: boolean;
@@ -72,8 +72,8 @@ export declare type InteractionMessage = {
     attachments: InteractionMessageAttachment[];
     application_id: string;
 };
-export declare type PartialInteractionMessage = InteractionMessage;
-export declare type MessageEmbed = {
+export type PartialInteractionMessage = InteractionMessage;
+export type MessageEmbed = {
     title?: string;
     type?: 'rich' | 'image' | 'video' | 'gifv' | 'article' | 'link';
     description?: string;
@@ -119,12 +119,12 @@ export declare type MessageEmbed = {
         inline?: boolean;
     }[];
 };
-export declare type InteractionEmoji = {
+export type InteractionEmoji = {
     id: Snowflake;
     name: string;
     animated: boolean;
 };
-export declare type InteractionRole = {
+export type InteractionRole = {
     id: Snowflake;
     name: string;
     color: number;
@@ -139,39 +139,39 @@ export declare type InteractionRole = {
         premium_subscriber?: null;
     };
 };
-export declare type InteractionResolvedData = {
+export type InteractionResolvedData = {
     users?: Record<Snowflake, InteractionUser>;
     members?: Record<Snowflake, PartialInteractionMember>;
     roles?: Record<Snowflake, InteractionRole>;
     channels?: Record<Snowflake, PartialInteractionChannel>;
     messages?: Record<Snowflake, PartialInteractionMessage>;
 };
-export declare type InteractionTypeCommandOptionsRegular = {
+export type InteractionTypeCommandOptionsRegular = {
     type: Omit<ApplicationCommandOptionType, ApplicationCommandOptionType.SUB_COMMAND>;
     name: string;
     value: string | number;
     options: undefined;
 };
-export declare type InteractionTypeCommandOptionsSubCommand = {
+export type InteractionTypeCommandOptionsSubCommand = {
     type: ApplicationCommandOptionType.SUB_COMMAND;
     name: string;
     value: undefined;
     options: InteractionTypeCommandOptions[];
 };
-export declare type InteractionTypeCommandOptions = InteractionTypeCommandOptionsRegular | InteractionTypeCommandOptionsSubCommand;
-export declare type InteractionLocationGuild = {
+export type InteractionTypeCommandOptions = InteractionTypeCommandOptionsRegular | InteractionTypeCommandOptionsSubCommand;
+export type InteractionLocationGuild = {
     member: InteractionMember;
     user?: InteractionUser;
     guild_id: Snowflake;
     channel_id: Snowflake;
 };
-export declare type InteractionLocationDM = {
+export type InteractionLocationDM = {
     member?: undefined;
     user: InteractionUser;
     guild_id?: undefined;
     channel_id?: undefined;
 };
-export declare type InteractionTypeCommand = {
+export type InteractionTypeCommand = {
     type: InteractionType.COMMAND;
     message?: undefined;
     data: {
@@ -194,7 +194,7 @@ export declare type InteractionTypeCommand = {
         target: InteractionMessage;
     });
 };
-export declare type InteractionTypeComponent = {
+export type InteractionTypeComponent = {
     type: InteractionType.COMPONENT;
     message: InteractionMessage;
     data: {
@@ -204,7 +204,7 @@ export declare type InteractionTypeComponent = {
         flags: InteractionComponentFlag[];
     };
 };
-export declare type InteractionTypeCommandAutocomplete = {
+export type InteractionTypeCommandAutocomplete = {
     type: InteractionType.COMMAND_AUTOCOMPLETE;
     data: {
         id: Snowflake;
@@ -220,7 +220,7 @@ export declare type InteractionTypeCommandAutocomplete = {
         input: string;
     };
 };
-export declare type InteractionTypeModalSubmit = {
+export type InteractionTypeModalSubmit = {
     type: InteractionType.MODAL_SUBMIT;
     data: {
         custom_id: string;
@@ -229,7 +229,7 @@ export declare type InteractionTypeModalSubmit = {
         data: Record<string, any>;
     };
 };
-export declare type InteractionBase = {
+export type InteractionBase = {
     id: Snowflake;
     token: string;
     version: number;
@@ -243,15 +243,15 @@ export declare type InteractionBase = {
     _httpCallback?: (payload: any) => any;
     _answerComponents: MessageComponent[];
 };
-export declare type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeModalSubmit);
-export declare type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
-export declare type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent;
-export declare type CommandAutocompleteInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommandAutocomplete;
-export declare type ModalSubmitInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeModalSubmit;
-export declare type SlotedContext = {
+export type GenericInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & (InteractionTypeCommand | InteractionTypeComponent | InteractionTypeCommandAutocomplete | InteractionTypeModalSubmit);
+export type CommandInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommand;
+export type ComponentInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeComponent;
+export type CommandAutocompleteInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeCommandAutocomplete;
+export type ModalSubmitInteraction = InteractionBase & (InteractionLocationGuild | InteractionLocationDM) & InteractionTypeModalSubmit;
+export type SlotedContext = {
     params: Record<string, string>;
 };
-export declare type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
+export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
     defer(privately?: boolean): Promise<InteractionCallbackFollowup>;
     reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
@@ -259,7 +259,7 @@ export declare type ReplyableCommandInteraction = CommandInteraction & Partial<S
     openModal(data: InteractionOpenModalData): void;
     state(state?: string, ...args: any): void;
 };
-export declare type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
+export type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
     ack(): void;
     reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>;
     replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo;
@@ -270,11 +270,11 @@ export declare type ReplyableComponentInteraction = ComponentInteraction & Parti
     removeComponents(): void;
     state(state?: string, ...args: any): void;
 };
-export declare type ReplyableCommandAutocompleteInteraction = CommandAutocompleteInteraction & {
+export type ReplyableCommandAutocompleteInteraction = CommandAutocompleteInteraction & {
     ack(): void;
     show(choices: CommandArgumentChoice[]): void;
 };
-export declare type InteractionJanitor = {
+export type InteractionJanitor = {
     edit(data: InteractionApplicationCommandCallbackData): void;
     disableComponents(): void;
     removeComponents(): void;

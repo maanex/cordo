@@ -6,7 +6,7 @@ import { AutocompleteInteractionData, AutocompleteInteractionReplyFunctions } fr
 import { CommandInteractionData, CommandInteractionReplyFunctions } from "./command-interaction";
 import { ComponentInteractionData, ComponentInteractionReplyFunctions } from "./component-interaction";
 import { ModalSubmitInteractionData, ModalSubmitInteractionReplyFunctions } from "./modal-submit-interaction";
-export declare type RawInteraction<Type extends Const.InteractionTypeNames> = {
+export type RawInteraction<Type extends Const.InteractionTypeNames> = {
     type: Const.InteractionTypeMapping[Type];
     data: any;
     id: Snowflake;
@@ -18,22 +18,22 @@ export declare type RawInteraction<Type extends Const.InteractionTypeNames> = {
     locale?: string;
     guild_locale?: string;
 };
-export declare type RawGenericInteraction = RawInteraction<Const.InteractionTypeNames>;
-declare type InteractionDataMap = {
+export type RawGenericInteraction = RawInteraction<Const.InteractionTypeNames>;
+type InteractionDataMap = {
     PING: undefined;
     COMMAND: CommandInteractionData;
     COMPONENT: ComponentInteractionData;
     COMMAND_AUTOCOMPLETE: AutocompleteInteractionData;
     MODAL_SUBMIT: ModalSubmitInteractionData;
 };
-declare type InteractionReplyMap = {
+type InteractionReplyMap = {
     PING: {};
     COMMAND: CommandInteractionReplyFunctions;
     COMPONENT: ComponentInteractionReplyFunctions;
     COMMAND_AUTOCOMPLETE: AutocompleteInteractionReplyFunctions;
     MODAL_SUBMIT: ModalSubmitInteractionReplyFunctions;
 };
-export declare type ReadonlyInteraction<Type extends Const.InteractionTypeNames> = {
+export type ReadonlyInteraction<Type extends Const.InteractionTypeNames> = {
     type: Const.InteractionTypeMapping[Type];
     data: InteractionDataMap[Type];
     id: Snowflake;
@@ -48,11 +48,11 @@ export declare type ReadonlyInteraction<Type extends Const.InteractionTypeNames>
     userData?: UserData;
     params: Record<string, string>;
 };
-export declare type Interaction<Type extends Const.InteractionTypeNames> = {
+export type Interaction<Type extends Const.InteractionTypeNames> = {
     _answered: boolean;
     _httpCallback?: (payload: any) => any;
     _answerComponents: GenericMessageComponent[];
 } & ReadonlyInteraction<Type> & InteractionReplyMap[Type];
-export declare type GenericInteraction = Interaction<Const.InteractionTypeNames>;
+export type GenericInteraction = Interaction<Const.InteractionTypeNames>;
 export declare function parseInteraction<T extends Const.InteractionTypeNames>(input: RawInteraction<T>): ReadonlyInteraction<T>;
 export {};

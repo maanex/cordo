@@ -5,7 +5,7 @@ import { Const } from "../types/const";
 import { MessageEmbed } from "../types/discord";
 import { ListOmit } from "../types/helper";
 import { GenericInteraction, Interaction } from "./$interaction";
-export declare type TextBasedInteractionCallbackData<CustomIds extends string> = {
+export type TextBasedInteractionCallbackData<CustomIds extends string> = {
     tts?: boolean;
     content?: string;
     flags?: Const.InteractionResponseFlags;
@@ -20,7 +20,7 @@ export declare type TextBasedInteractionCallbackData<CustomIds extends string> =
     color?: number;
     context?: LocalisationContext;
 };
-export declare type CommandOption = {
+export type CommandOption = {
     name: string;
     type: Const.ApplicationCommandOptionType;
     value?: string | number;

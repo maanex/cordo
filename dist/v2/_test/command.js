@@ -6,11 +6,11 @@ function handle(i) {
         .replyInteractive({
         content: 'gaming',
         components: [
-            button_component_1.button({
+            (0, button_component_1.button)({
                 customId: 'hi',
                 label: 'Gaming'
             }),
-            button_component_1.button({
+            (0, button_component_1.button)({
                 customId: 'hi2',
                 label: 'Gaming'
             })
@@ -20,7 +20,7 @@ function handle(i) {
         .on('hi', (i) => {
         i.edit({
             components: [
-                button_component_1.button('gaming', 'hi'),
+                (0, button_component_1.button)('gaming', 'hi'),
                 button_component_1.button.link('https://gaming', 'Gaming')
             ]
         });

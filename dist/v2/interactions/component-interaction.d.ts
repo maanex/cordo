@@ -1,24 +1,24 @@
 import { Const } from "../types/const";
 import { EditableInteractionMessage, InteractionEmoji } from "../types/discord";
 import { InteractionReplies, TextBasedInteractionCallbackData } from "./$shared-types";
-declare type SelectOptionValue = {
+type SelectOptionValue = {
     label: string;
     value: string;
     description?: string;
     emoji?: Partial<InteractionEmoji>;
     default?: boolean;
 };
-export declare type RawComponentInteractionData = {
+export type RawComponentInteractionData = {
     custom_id: string;
     component_type: Const.ComponentType;
     values: SelectOptionValue[];
 };
-export declare type ComponentInteractionData = {
+export type ComponentInteractionData = {
     customId: string;
     type: Const.ComponentType;
     values: SelectOptionValue[];
 };
-export declare type ComponentInteractionReplyFunctions = {
+export type ComponentInteractionReplyFunctions = {
     ack(): void;
     reply<CustomIds extends string>(data: ComponentInteractionCallbackData<CustomIds>): Promise<EditableInteractionMessage>;
     replyInteractive<CustomIds extends string>(data: ComponentInteractionCallbackData<CustomIds>): InteractionReplies.LevelTwoState<CustomIds>;
@@ -30,6 +30,6 @@ export declare type ComponentInteractionReplyFunctions = {
     removeComponents(): void;
     applyState(state?: string, data?: any): void;
 };
-export declare type ComponentInteractionCallbackData<CustomIds extends string> = TextBasedInteractionCallbackData<CustomIds>;
+export type ComponentInteractionCallbackData<CustomIds extends string> = TextBasedInteractionCallbackData<CustomIds>;
 export declare function parseComponentInteractionData(data: RawComponentInteractionData): ComponentInteractionData;
 export {};

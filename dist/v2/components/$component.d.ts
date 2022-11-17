@@ -1,9 +1,9 @@
 import { ComponentType } from "../../types/const";
-export declare type SerializedMessageComponent<Type extends ComponentType> = {
+export type SerializedMessageComponent<Type extends ComponentType> = {
     type: Type;
     [key: string]: any;
 };
-export declare type SerializionContext = {
+export type SerializionContext = {
     id?: string;
 };
 export declare abstract class MessageComponent<Type extends ComponentType, CustomId extends string> {
@@ -11,4 +11,4 @@ export declare abstract class MessageComponent<Type extends ComponentType, Custo
     abstract get doRender(): boolean;
     abstract get customId(): CustomId;
 }
-export declare type GenericMessageComponent = MessageComponent<ComponentType, string>;
+export type GenericMessageComponent = MessageComponent<ComponentType, string>;

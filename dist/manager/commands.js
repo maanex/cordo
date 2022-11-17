@@ -38,7 +38,7 @@ class CordoCommandsManager {
             __1.default._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`);
         CordoCommandsManager.commandHandlers.set(command, handler);
         if (command.includes('$')) {
-            const regex = new RegExp(command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+'));
+            const regex = new RegExp('^' + command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$');
             this.slottedCommandHandlers.add({ command, regex, handler });
         }
     }
@@ -74,7 +74,7 @@ class CordoCommandsManager {
         const regexSearchResult = [...CordoCommandsManager.slottedCommandHandlers.values()]
             .find(h => h.regex.test(name));
         if (regexSearchResult) {
-            const params = utils_1.parseParams(regexSearchResult.command, name);
+            const params = (0, utils_1.parseParams)(regexSearchResult.command, name);
             regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
             return;
         }

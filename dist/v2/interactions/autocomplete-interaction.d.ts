@@ -1,12 +1,12 @@
 import { InteractionChoice } from "../types/discord";
 import { CommandOption } from "./$shared-types";
-export declare type RawAutocompleteInteractionData = {
+export type RawAutocompleteInteractionData = {
     options: CommandOption[];
 };
-export declare type AutocompleteInteractionData = {
+export type AutocompleteInteractionData = {
     options: CommandOption[];
 };
-export declare type AutocompleteInteractionReplyFunctions = {
+export type AutocompleteInteractionReplyFunctions = {
     noResults(): void;
     show(choices: InteractionChoice[]): void;
 };
