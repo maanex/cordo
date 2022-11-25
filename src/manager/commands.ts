@@ -95,7 +95,7 @@ export default class CordoCommandsManager {
       return
     }
 
-    if (CordoStatesManager.uiStates.has(name + '_main')) {
+    if (CordoStatesManager.getStateById(name + '_main')) {
       CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main')
       return
     }

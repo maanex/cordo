@@ -303,7 +303,7 @@ export type ModalSubmitInteraction
   & InteractionTypeModalSubmit
 export type SlottedContext = { params: Record<string, string> }
 export type SlotableInteraction
-  = InteractionBase
+  = GenericInteraction
   & SlottedContext
 
 export type ReplyableCommandInteraction = CommandInteraction & Partial<SlottedContext> & {

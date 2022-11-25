@@ -78,7 +78,7 @@ class CordoCommandsManager {
             regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
             return;
         }
-        if (states_1.default.uiStates.has(name + '_main')) {
+        if (states_1.default.getStateById(name + '_main')) {
             replies_1.default.buildReplyableCommandInteraction(i).state(name + '_main');
             return;
         }

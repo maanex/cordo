@@ -99,7 +99,7 @@ export default class CordoComponentsManager {
       return
     }
 
-    if (CordoStatesManager.uiStates.has(i.data.custom_id)) {
+    if (CordoStatesManager.getStateById(i.data.custom_id)) {
       CordoReplies.buildReplyableComponentInteraction(i).state()
       return
     }

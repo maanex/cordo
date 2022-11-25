@@ -78,7 +78,7 @@ class CordoComponentsManager {
             regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { params }));
             return;
         }
-        if (states_1.default.uiStates.has(i.data.custom_id)) {
+        if (states_1.default.getStateById(i.data.custom_id)) {
             replies_1.default.buildReplyableComponentInteraction(i).state();
             return;
         }
