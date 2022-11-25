@@ -35,7 +35,7 @@ class CordoComponentsManager {
         CordoComponentsManager.componentHandlers.set(id, handler);
         if (id.includes('$')) {
             const regex = new RegExp('^' + id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$');
-            this.slottedComponentHandlers.add({ id, regex, handler });
+            CordoComponentsManager.slottedComponentHandlers.add({ id, regex, handler });
         }
     }
     //

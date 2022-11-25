@@ -180,6 +180,7 @@ Cordo.__data = {
     componentHandlers: components_1.default.componentHandlers,
     slottedComponentHandlers: components_1.default.slottedComponentHandlers,
     uiStates: states_1.default.uiStates,
+    slottedUiStates: states_1.default.slottedUiStates,
     middlewares: {
         interactionCallback: [],
         fetchGuildData: null,

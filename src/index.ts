@@ -45,6 +45,7 @@ export default class Cordo {
     componentHandlers: CordoComponentsManager.componentHandlers,
     slottedComponentHandlers: CordoComponentsManager.slottedComponentHandlers,
     uiStates: CordoStatesManager.uiStates,
+    slottedUiStates: CordoStatesManager.slottedUiStates,
     middlewares: {
       interactionCallback: [] as InteractionCallbackMiddleware[],
       fetchGuildData: null as GuildDataMiddleware,

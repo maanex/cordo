@@ -1,4 +1,5 @@
 import { button } from "../components/button-component"
+import { select } from "../components/select-component"
 import { Interaction } from "../interactions/$interaction"
 
 
@@ -14,6 +15,17 @@ export default function handle(i: Interaction<'COMMAND'>) {
         button({
           customId: 'hi2',
           label: 'Gaming'
+        }),
+        select({
+          customId: 'pick_channels',
+          options: 'CHANNELS'
+        }),
+        select({
+          customId: 'pick_custom',
+          options: [
+            { label: 'hi', value: 'gaming' },
+            { label: 'pog', value: 'nice' }
+          ]
         })
       ]
     })
@@ -26,7 +38,8 @@ export default function handle(i: Interaction<'COMMAND'>) {
       i.edit({
         components: [
           button('gaming', 'hi'),
-          button.link('https://gaming', 'Gaming')
+          button.link('https://gaming', 'Gaming'),
+          select.users('nice')
         ]
       })
     })

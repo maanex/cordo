@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { InteractionMessage } from '..';
-import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed, ReplyableCommandAutocompleteInteraction, CommandArgumentChoice } from './base';
+import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed, ReplyableCommandAutocompleteInteraction, CommandArgumentChoice, SlotedContext } from './base';
 import { MessageComponent } from './component';
 import { InteractionResponseFlags } from './const';
 export type LocalisationContext = {
@@ -74,4 +74,9 @@ export type InteractionCallbackFollowup = {
     getMessage(): Promise<InteractionMessage>;
     edit(data: InteractionApplicationCommandCallbackData, useRaw?: boolean): void;
 };
-export type InteractionUIState = (i: GenericInteraction, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;
+export type InteractionUIState = (i: GenericInteraction & Partial<SlotedContext>, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;
+export type SlottedUIState = {
+    regex: RegExp;
+    id: string;
+    state: InteractionUIState;
+};

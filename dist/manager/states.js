@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require("fs");
 const path = require("path");
 const __1 = require("..");
+const utils_1 = require("../lib/utils");
 class CordoStatesManager {
     //
     static findUiStates(dir, prefix) {
@@ -27,8 +28,30 @@ class CordoStatesManager {
         if (CordoStatesManager.uiStates.has(id))
             __1.default._data.logger.warn(`UI State for ${id} already exists. Overriding.`);
         CordoStatesManager.uiStates.set(id, state);
+        if (id.includes('$')) {
+            const regex = new RegExp('^' + id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$');
+            CordoStatesManager.slottedUiStates.add({ id, regex, state });
+        }
+    }
+    static getStateById(id) {
+        if (CordoStatesManager.uiStates.has(id)) {
+            return {
+                state: CordoStatesManager.uiStates.get(id),
+                params: {}
+            };
+        }
+        const regexSearchResult = [...CordoStatesManager.slottedUiStates.values()]
+            .find(h => h.regex.test(id));
+        if (regexSearchResult) {
+            return {
+                state: CordoStatesManager.uiStates.get(id),
+                params: (0, utils_1.parseParams)(regexSearchResult.id, id)
+            };
+        }
+        return null;
     }
 }
 exports.default = CordoStatesManager;
 CordoStatesManager.uiStates = new Map();
+CordoStatesManager.slottedUiStates = new Set();
 //# sourceMappingURL=states.js.map

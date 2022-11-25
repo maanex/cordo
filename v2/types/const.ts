@@ -27,14 +27,20 @@ export namespace Const {
   export type InteractionTypeMapping = typeof InteractionType
   export type InteractionTypeNames = keyof InteractionTypeMapping
 
-  export enum ComponentType {
+  export const ComponentType = {
     /** negative number => custom */
-    LINE_BREAK = -5,
-    ROW = 1,
-    BUTTON = 2,
-    SELECT = 3,
-    TEXT = 4
+    LINE_BREAK: -5 as -5,
+    ROW: 1 as 1,
+    BUTTON: 2 as 2,
+    SELECT: 3 as 3,
+    TEXT: 4 as 4,
+    USER_SELECT: 5 as 5,
+    ROLE_SELECT: 6 as 6,
+    MENTIONABLE_SELECT: 7 as 7,
+    CHANNEL_SELECT: 8 as 8
   }
+  export type ComponentTypeMapping = typeof ComponentType
+  export type ComponentTypeNames = keyof ComponentTypeMapping
 
   export enum InteractionCommandType {
     CHAT_INPUT = 1,

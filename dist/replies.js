@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = require("./types/const");
 const api_1 = require("./api");
+const states_1 = require("./manager/states");
 const index_1 = require("./index");
 class CordoReplies {
     //
@@ -45,11 +46,12 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.name;
-                if (!index_1.default._data.uiStates.has(state)) {
+                const stateItem = states_1.default.getStateById(state);
+                if (!stateItem) {
                     index_1.default._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates.get(state)(i, args);
+                let data = stateItem.state({ ...i, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
@@ -105,11 +107,12 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = i.data.custom_id;
-                if (!index_1.default._data.uiStates.has(state)) {
+                const stateItem = states_1.default.getStateById(state);
+                if (!stateItem) {
                     index_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates.get(state)(i, args);
+                let data = stateItem.state({ ...i, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
@@ -151,11 +154,12 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = context.interaction.id;
-                if (!index_1.default._data.uiStates.has(state)) {
-                    index_1.default._data.logger.warn(`Janitor tried to apply non-existent state ${state}`);
+                const stateItem = states_1.default.getStateById(state);
+                if (!stateItem) {
+                    index_1.default._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
                     return;
                 }
-                let data = index_1.default._data.uiStates.get(state)(context.interaction, args);
+                let data = stateItem.state({ ...context.interaction, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
                 api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);

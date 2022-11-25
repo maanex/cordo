@@ -19,6 +19,7 @@ export default class Cordo {
         componentHandlers: Map<string, InteractionComponentHandler>;
         slottedComponentHandlers: Set<import("./types/custom").SlottedComponentHandler>;
         uiStates: Map<string, InteractionUIState>;
+        slottedUiStates: Set<import("./types/custom").SlottedUIState>;
         middlewares: {
             interactionCallback: InteractionCallbackMiddleware[];
             fetchGuildData: GuildDataMiddleware;
