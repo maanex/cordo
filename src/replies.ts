@@ -1,6 +1,6 @@
 import { InteractionApplicationCommandCallbackData, InteractionComponentHandler, InteractionReplyContext, InteractionReplyStateLevelThree, InteractionReplyStateLevelTwo, InteractionReplyTimeoutOptions } from './types/custom'
 import { InteractionCallbackType, InteractionResponseFlags } from './types/const'
-import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlotedContext, ReplyableCommandAutocompleteInteraction, CommandAutocompleteInteraction, CommandArgumentChoice } from './types/base'
+import { CommandInteraction, ComponentInteraction, GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, SlottedContext, ReplyableCommandAutocompleteInteraction, CommandAutocompleteInteraction, CommandArgumentChoice } from './types/base'
 import CordoAPI from './api'
 import CordoStatesManager from './manager/states'
 import Cordo, { InteractionOpenModalData } from './index'
@@ -36,8 +36,8 @@ export default class CordoReplies {
     return context
   }
 
-  public static buildReplyableCommandInteraction(i: CommandInteraction, slotContext?: SlotedContext): ReplyableCommandInteraction {
-    if (slotContext) (i as CommandInteraction & SlotedContext).params = slotContext.params
+  public static buildReplyableCommandInteraction(i: CommandInteraction, slotContext?: SlottedContext): ReplyableCommandInteraction {
+    if (slotContext) (i as CommandInteraction & SlottedContext).params = slotContext.params
     return {
       ...i,
       defer(privately = false) {
@@ -77,8 +77,8 @@ export default class CordoReplies {
     }
   }
 
-  public static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlotedContext): ReplyableComponentInteraction {
-    if (slotContext) (i as ComponentInteraction & SlotedContext).params = slotContext.params
+  public static buildReplyableComponentInteraction(i: ComponentInteraction, slotContext?: SlottedContext): ReplyableComponentInteraction {
+    if (slotContext) (i as ComponentInteraction & SlottedContext).params = slotContext.params
     return {
       ...i,
       ack() {

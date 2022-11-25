@@ -301,9 +301,12 @@ export type ModalSubmitInteraction
   = InteractionBase
   & (InteractionLocationGuild | InteractionLocationDM)
   & InteractionTypeModalSubmit
-export type SlotedContext = { params: Record<string, string> }
+export type SlottedContext = { params: Record<string, string> }
+export type SlotableInteraction
+  = InteractionBase
+  & SlottedContext
 
-export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedContext> & {
+export type ReplyableCommandInteraction = CommandInteraction & Partial<SlottedContext> & {
   defer(privately?: boolean): Promise<InteractionCallbackFollowup>
   reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
@@ -312,7 +315,7 @@ export type ReplyableCommandInteraction = CommandInteraction & Partial<SlotedCon
   state(state?: string, ...args: any): void
 }
 
-export type ReplyableComponentInteraction = ComponentInteraction & Partial<SlotedContext> & {
+export type ReplyableComponentInteraction = ComponentInteraction & Partial<SlottedContext> & {
   ack(): void
   reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
