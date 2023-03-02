@@ -44,7 +44,7 @@ class CordoStatesManager {
             .find(h => h.regex.test(id));
         if (regexSearchResult) {
             return {
-                state: CordoStatesManager.uiStates.get(id),
+                state: regexSearchResult.state,
                 params: (0, utils_1.parseParams)(regexSearchResult.id, id)
             };
         }

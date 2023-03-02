@@ -154,7 +154,7 @@ class CordoAPI {
             footer: data.footer ? { text: data.footer } : undefined,
             image: data.image ? { url: data.image } : undefined,
             thumbnail: data.thumbnail ? { url: data.thumbnail } : undefined,
-            color: data.color || 0x2F3136
+            color: data.color || 0x2b2d31
         });
         delete data.description;
         delete data.title;

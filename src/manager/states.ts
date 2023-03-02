@@ -53,7 +53,7 @@ export default class CordoStatesManager {
 
     if (regexSearchResult) {
       return {
-        state: CordoStatesManager.uiStates.get(id),
+        state: regexSearchResult.state,
         params: parseParams(regexSearchResult.id, id)
       }
     }
