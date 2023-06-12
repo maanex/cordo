@@ -74,7 +74,7 @@ class CordoCommandsManager {
         const regexSearchResult = [...CordoCommandsManager.slottedCommandHandlers.values()]
             .find(h => h.regex.test(name));
         if (regexSearchResult) {
-            const params = (0, utils_1.parseParams)(regexSearchResult.command, name);
+            const params = utils_1.parseParams(regexSearchResult.command, name);
             regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
             return;
         }
