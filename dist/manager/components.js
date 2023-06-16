@@ -62,7 +62,7 @@ class CordoComponentsManager {
                 .find(h => h.regex.test(i.data.custom_id))
             : null;
         if (regexSearchResult) {
-            const params = utils_1.parseParams(regexSearchResult.id, i.data.custom_id);
+            const params = (0, utils_1.parseParams)(regexSearchResult.id, i.data.custom_id);
             regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { params }));
             return;
         }
@@ -74,7 +74,7 @@ class CordoComponentsManager {
         regexSearchResult = [...CordoComponentsManager.slottedComponentHandlers.values()]
             .find(h => h.regex.test(i.data.custom_id));
         if (regexSearchResult) {
-            const params = utils_1.parseParams(regexSearchResult.id, i.data.custom_id);
+            const params = (0, utils_1.parseParams)(regexSearchResult.id, i.data.custom_id);
             regexSearchResult.handler(replies_1.default.buildReplyableComponentInteraction(i, { params }));
             return;
         }

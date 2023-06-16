@@ -45,7 +45,7 @@ class CordoStatesManager {
         if (regexSearchResult) {
             return {
                 state: regexSearchResult.state,
-                params: utils_1.parseParams(regexSearchResult.id, id)
+                params: (0, utils_1.parseParams)(regexSearchResult.id, id)
             };
         }
         return null;

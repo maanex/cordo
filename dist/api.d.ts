@@ -14,7 +14,7 @@ export default class CordoAPI {
     /**
      * Transforms the shorthand way of writing into proper discord api compatible objects
      */
-    static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string, type?: InteractionCallbackType): void;
+    static normaliseData(data: InteractionApplicationCommandCallbackData, i?: GenericInteraction, contextId?: string, type?: InteractionCallbackType): void;
     private static normalizeFindAndResolveSmartEmbed;
     private static normalizeApplyFlags;
     static compileCustomId(customId: string, flags?: InteractionComponentFlag[], contextId?: string): string;

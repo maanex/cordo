@@ -71,7 +71,8 @@ class CordoAPI {
         if (!data)
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
-        index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i));
+        if (i)
+            index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i));
         CordoAPI.normalizeFindAndResolveSmartEmbed(data, type);
         const isEmphemeral = (data.flags & const_1.InteractionResponseFlags.EPHEMERAL) !== 0;
         if (data.components?.length && data.components[0].type !== const_2.ComponentType.ROW) {
@@ -80,7 +81,7 @@ class CordoAPI {
             for (const comp of data.components) {
                 if (comp.visible === false)
                     continue; // === false to not catch any null or undefined
-                CordoAPI.normalizeApplyFlags(comp, i, contextId, isEmphemeral);
+                CordoAPI.normalizeApplyFlags(comp, i ?? null, contextId, isEmphemeral);
                 switch (comp.type) {
                     case const_2.ComponentType.LINE_BREAK: {
                         if (rows[rows.length - 1].length)
@@ -174,7 +175,7 @@ class CordoAPI {
         }
         ;
         comp.custom_id = CordoAPI.compileCustomId(comp.custom_id, comp.flags, contextId);
-        if (comp.flags?.length && !!i.member && !hasAccessEveryoneFlag) {
+        if (comp.flags?.length && i && !!i.member && !hasAccessEveryoneFlag) {
             const perms = BigInt(i.member.permissions);
             if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(perms)) {
                 if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))

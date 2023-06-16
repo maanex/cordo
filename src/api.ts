@@ -78,10 +78,10 @@ export default class CordoAPI {
   /**
    * Transforms the shorthand way of writing into proper discord api compatible objects
    */
-  public static normaliseData(data: InteractionApplicationCommandCallbackData, i: GenericInteraction, contextId?: string, type?: InteractionCallbackType) {
+  public static normaliseData(data: InteractionApplicationCommandCallbackData, i?: GenericInteraction, contextId?: string, type?: InteractionCallbackType) {
     if (!data) return
     // explicitly not using this. in this function due to unwanted side-effects in lambda functions
-    Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i))
+    if (i) Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i))
     
     CordoAPI.normalizeFindAndResolveSmartEmbed(data, type)
 
@@ -93,7 +93,7 @@ export default class CordoAPI {
       for (const comp of data.components) {
         if (comp.visible === false) continue // === false to not catch any null or undefined
 
-        CordoAPI.normalizeApplyFlags(comp, i, contextId, isEmphemeral)
+        CordoAPI.normalizeApplyFlags(comp, i ?? null, contextId, isEmphemeral)
 
         switch (comp.type) {
           case ComponentType.LINE_BREAK: {
@@ -176,7 +176,7 @@ export default class CordoAPI {
     delete data.title
   }
 
-  private static normalizeApplyFlags(comp: MessageComponent, i: GenericInteraction, contextId: string, isEmphemeral: boolean) {
+  private static normalizeApplyFlags(comp: MessageComponent, i: GenericInteraction | null, contextId: string, isEmphemeral: boolean) {
     if (comp.type === ComponentType.LINE_BREAK) return
     if (comp.type === ComponentType.TEXT) return
     if (!(comp as any).custom_id) return
@@ -188,7 +188,7 @@ export default class CordoAPI {
     }
     ;(comp as any).custom_id = CordoAPI.compileCustomId((comp as any).custom_id, comp.flags, contextId)
 
-    if (comp.flags?.length && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
+    if (comp.flags?.length && i && !!(i as InteractionLocationGuild).member && !hasAccessEveryoneFlag) {
       const perms = BigInt((i as InteractionLocationGuild).member.permissions)
       if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
         if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED)) comp.type = null

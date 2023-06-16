@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { GenericInteraction } from '..';
 import { InteractionApplicationCommandCallbackData } from './custom';
-export declare type CordoConfig = {
+export type CordoConfig = {
     botId: string;
     commandHandlerPath?: string | string[];
     componentHandlerPath?: string | string[];
@@ -24,11 +24,11 @@ export declare type CordoConfig = {
         interaction_invalid_description: string;
     };
 };
-export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
-export declare type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
-export declare type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
-export declare type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
-export declare type CustomLogger = {
+export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
+export type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
+export type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
+export type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
+export type CustomLogger = {
     log(content: any): any;
     warn(content: any): any;
     error(content: any): any;
