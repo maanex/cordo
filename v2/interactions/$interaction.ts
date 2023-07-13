@@ -22,6 +22,8 @@ export type RawInteraction<Type extends Const.InteractionTypeNames> = {
   member?: InteractionMember
   locale?: string
   guild_locale?: string
+  // entitlement_sku_ids?: string[]
+  // entitlements?: TODO[]
 }
 
 export type RawGenericInteraction = RawInteraction<Const.InteractionTypeNames>

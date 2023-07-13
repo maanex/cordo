@@ -123,14 +123,14 @@ class Cordo {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
         if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
-            i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id);
+            i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id, i);
             if (!!i.guildData.then)
                 i.guildData = await i.guildData;
         }
         if (!i.user)
             i.user = i.member.user;
         if (i.user.id && !!Cordo._data.middlewares.fetchUserData && typeof Cordo._data.middlewares.fetchUserData === 'function') {
-            i.userData = Cordo._data.middlewares.fetchUserData(i.user.id);
+            i.userData = Cordo._data.middlewares.fetchUserData(i.user.id, i);
             if (!!i.userData.then)
                 i.userData = await i.userData;
         }

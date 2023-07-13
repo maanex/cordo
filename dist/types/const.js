@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.TextInputStyle = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
+exports.EntitlementType = exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.TextInputStyle = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
 var InteractionCallbackType;
 (function (InteractionCallbackType) {
     InteractionCallbackType[InteractionCallbackType["PONG"] = 1] = "PONG";
@@ -10,6 +10,7 @@ var InteractionCallbackType;
     InteractionCallbackType[InteractionCallbackType["UPDATE_MESSAGE"] = 7] = "UPDATE_MESSAGE";
     InteractionCallbackType[InteractionCallbackType["APPLICATION_COMMAND_AUTOCOMPLETE_RESULT"] = 8] = "APPLICATION_COMMAND_AUTOCOMPLETE_RESULT";
     InteractionCallbackType[InteractionCallbackType["MODAL"] = 9] = "MODAL";
+    InteractionCallbackType[InteractionCallbackType["PREMIUM_REQUIRED"] = 10] = "PREMIUM_REQUIRED";
 })(InteractionCallbackType = exports.InteractionCallbackType || (exports.InteractionCallbackType = {}));
 var InteractionResponseFlags;
 (function (InteractionResponseFlags) {
@@ -95,4 +96,9 @@ var ApplicationCommandOptionType;
     ApplicationCommandOptionType[ApplicationCommandOptionType["NUMBER"] = 10] = "NUMBER";
     ApplicationCommandOptionType[ApplicationCommandOptionType["ATTACHMENT"] = 11] = "ATTACHMENT";
 })(ApplicationCommandOptionType = exports.ApplicationCommandOptionType || (exports.ApplicationCommandOptionType = {}));
+var EntitlementType;
+(function (EntitlementType) {
+    EntitlementType[EntitlementType["TEST"] = 5] = "TEST";
+    EntitlementType[EntitlementType["UNNAMED"] = 8] = "UNNAMED";
+})(EntitlementType = exports.EntitlementType || (exports.EntitlementType = {}));
 //# sourceMappingURL=const.js.map

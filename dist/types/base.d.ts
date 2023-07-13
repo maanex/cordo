@@ -1,6 +1,6 @@
 import { InteractionCallbackFollowup, InteractionOpenModalData } from '..';
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom';
-import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType } from './const';
+import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType, EntitlementType } from './const';
 import { GuildData, UserData } from './middleware';
 import { MessageComponent } from './component';
 export type Snowflake = string;
@@ -159,6 +159,18 @@ export type InteractionTypeCommandOptionsSubCommand = {
     options: InteractionTypeCommandOptions[];
 };
 export type InteractionTypeCommandOptions = InteractionTypeCommandOptionsRegular | InteractionTypeCommandOptionsSubCommand;
+export type Entitlement = {
+    application_id: string;
+    consumed: boolean;
+    deleted: boolean;
+    gift_code_flags: number;
+    guild_id: string;
+    id: string;
+    promotion_id: string | null;
+    sku_id: string;
+    type: EntitlementType;
+    user_id: string;
+};
 export type InteractionLocationGuild = {
     member: InteractionMember;
     user?: InteractionUser;
@@ -237,6 +249,8 @@ export type InteractionBase = {
     application_id?: Snowflake;
     locale?: string;
     guild_locale?: string;
+    entitlement_sku_ids?: string[];
+    entitlements?: Entitlement[];
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;

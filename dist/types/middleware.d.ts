@@ -25,8 +25,8 @@ export type CordoConfig = {
     };
 };
 export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
-export type GuildDataMiddleware = (guildid: string) => GuildData | Promise<GuildData>;
-export type UserDataMiddleware = (userid: string) => UserData | Promise<UserData>;
+export type GuildDataMiddleware = (guildid: string, i: GenericInteraction) => GuildData | Promise<GuildData>;
+export type UserDataMiddleware = (userid: string, i: GenericInteraction) => UserData | Promise<UserData>;
 export type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
 export type CustomLogger = {
     log(content: any): any;
