@@ -10,7 +10,8 @@ export namespace Const {
     DEFERRED_UPDATE_MESSAGE = 6,
     UPDATE_MESSAGE = 7,
     APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
-    MODAL = 9
+    MODAL = 9,
+    PREMIUM_REQUIRED = 10
   }
 
   export enum InteractionResponseFlags {

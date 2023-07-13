@@ -7,7 +7,8 @@ export enum InteractionCallbackType {
   DEFERRED_UPDATE_MESSAGE = 6,
   UPDATE_MESSAGE = 7,
   APPLICATION_COMMAND_AUTOCOMPLETE_RESULT = 8,
-  MODAL = 9
+  MODAL = 9,
+  PREMIUM_REQUIRED = 10
 }
 
 export enum InteractionResponseFlags {
@@ -92,4 +93,9 @@ export enum ApplicationCommandOptionType {
   MENTIONABLE = 9,
   NUMBER = 10,
   ATTACHMENT = 11
+}
+
+export enum EntitlementType {
+  TEST = 5,
+  UNNAMED = 8
 }
