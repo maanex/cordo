@@ -195,6 +195,8 @@ export type Entitlement = {
   sku_id: string
   type: EntitlementType
   user_id: string
+  starts_at?: string
+  ends_at?: string
 }
 
 //
