@@ -40,6 +40,9 @@ class CordoReplies {
             replyPrivately(data) {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: const_1.InteractionResponseFlags.EPHEMERAL });
             },
+            sendRawResponse(type, data) {
+                return api_1.default.interactionCallback(i, type, data, '', true);
+            },
             openModal(data) {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.MODAL, data);
             },
@@ -92,6 +95,9 @@ class CordoReplies {
                     api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
                     return CordoReplies.getLevelTwoReplyState(context);
                 }
+            },
+            sendRawResponse(type, data) {
+                return api_1.default.interactionCallback(i, type, data, '', true);
             },
             openModal(data) {
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.MODAL, data);

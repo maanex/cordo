@@ -3,7 +3,7 @@
 
 import { InteractionCallbackFollowup, InteractionOpenModalData } from '..'
 import { InteractionApplicationCommandCallbackData, InteractionReplyStateLevelTwo } from './custom'
-import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType, EntitlementType } from './const'
+import { InteractionCommandType, ComponentType, ChannelType, InteractionComponentFlag, InteractionType, ApplicationCommandOptionType, EntitlementType, InteractionCallbackType } from './const'
 import { GuildData, UserData } from './middleware'
 import { MessageComponent } from './component'
 
@@ -329,6 +329,7 @@ export type ReplyableCommandInteraction = CommandInteraction & Partial<SlottedCo
   reply(data: InteractionApplicationCommandCallbackData): Promise<InteractionCallbackFollowup>
   replyInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
+  sendRawResponse(type: InteractionCallbackType, data: any): Promise<InteractionCallbackFollowup>
   openModal(data: InteractionOpenModalData): void
   state(state?: string, ...args: any): void
 }
@@ -340,6 +341,7 @@ export type ReplyableComponentInteraction = ComponentInteraction & Partial<Slott
   replyPrivately(data: InteractionApplicationCommandCallbackData): void
   edit(data: InteractionApplicationCommandCallbackData): void
   editInteractive(data: InteractionApplicationCommandCallbackData): InteractionReplyStateLevelTwo
+  sendRawResponse(type: InteractionCallbackType, data: any): Promise<InteractionCallbackFollowup>
   openModal(data: InteractionOpenModalData): void
   // disableComponents(): void
   removeComponents(): void

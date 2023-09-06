@@ -58,6 +58,9 @@ export default class CordoReplies {
       replyPrivately(data: InteractionApplicationCommandCallbackData) {
         CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL })
       },
+      sendRawResponse(type: InteractionCallbackType, data: any) {
+        return CordoAPI.interactionCallback(i, type as any, data, '', true)
+      },
       openModal(data: InteractionOpenModalData) {
         CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data)
       },
@@ -110,6 +113,9 @@ export default class CordoReplies {
           CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id)
           return CordoReplies.getLevelTwoReplyState(context)
         }
+      },
+      sendRawResponse(type: InteractionCallbackType, data: any) {
+        return CordoAPI.interactionCallback(i, type as any, data, '', true)
       },
       openModal(data: InteractionOpenModalData) {
         CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data)

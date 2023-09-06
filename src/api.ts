@@ -34,9 +34,6 @@ export default class CordoAPI {
       }
     } else {
       switch (type) {
-        case InteractionCallbackType.PONG: break
-        case InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE: break
-        case InteractionCallbackType.DEFERRED_UPDATE_MESSAGE: break
         case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
           const res = await axios.post(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null })
           CordoAPI.handleCallbackResponse(res, type, data)
@@ -47,8 +44,6 @@ export default class CordoAPI {
           CordoAPI.handleCallbackResponse(res, type, data)
           break
         }
-        case InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT: break
-        case InteractionCallbackType.MODAL: break
       }
     }
 
