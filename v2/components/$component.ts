@@ -1,7 +1,7 @@
-import { ComponentType } from "../../types/const"
+import { Const } from "../types/const"
 
 
-export type SerializedMessageComponent<Type extends ComponentType> = {
+export type SerializedMessageComponent<Type extends Const.ComponentTypeValues> = {
   type: Type
   [key: string]: any
 }
@@ -10,7 +10,7 @@ export type SerializionContext = {
   id?: string
 }
 
-export abstract class MessageComponent<Type extends ComponentType, CustomId extends string> {
+export abstract class MessageComponent<Type extends Const.ComponentTypeValues, CustomId extends string | undefined> {
 
   abstract serialize(context?: SerializionContext): SerializedMessageComponent<Type>
 
@@ -20,4 +20,4 @@ export abstract class MessageComponent<Type extends ComponentType, CustomId exte
 
 }
 
-export type GenericMessageComponent = MessageComponent<ComponentType, string>
+export type GenericMessageComponent = MessageComponent<Const.ComponentTypeValues, string>

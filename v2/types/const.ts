@@ -27,6 +27,7 @@ export namespace Const {
   }
   export type InteractionTypeMapping = typeof InteractionType
   export type InteractionTypeNames = keyof InteractionTypeMapping
+  export type InteractionTypeValues = InteractionTypeMapping[InteractionTypeNames]
 
   export const ComponentType = {
     /** negative number => custom */
@@ -42,6 +43,7 @@ export namespace Const {
   }
   export type ComponentTypeMapping = typeof ComponentType
   export type ComponentTypeNames = keyof ComponentTypeMapping
+  export type ComponentTypeValues = ComponentTypeMapping[ComponentTypeNames]
 
   export enum InteractionCommandType {
     CHAT_INPUT = 1,

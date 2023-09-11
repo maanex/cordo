@@ -15,7 +15,7 @@ type SelectOptionValue = {
 
 export type RawComponentInteractionData = {
   custom_id: string
-  component_type: Const.ComponentType
+  component_type: Const.ComponentTypeValues
   values: SelectOptionValue[]
 }
 

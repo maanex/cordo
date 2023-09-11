@@ -21,14 +21,14 @@ import { Interaction } from "../interactions/$interaction"
 // interaction.data.
 
 
-const i1: Interaction<'COMMAND'> = null
+const i1: Interaction<'COMMAND'> = null as any
 i1.defer(true)
 
-const i2: Interaction<'COMPONENT'> = null
+const i2: Interaction<'COMPONENT'> = null as any
 i2.applyState('pog', { gaming: true })
 
-const i3: Interaction<'COMMAND_AUTOCOMPLETE'> = null
+const i3: Interaction<'COMMAND_AUTOCOMPLETE'> = null as any
 i3.show([ { name: 'hi', value: 'pog' } ])
 
-const i4: Interaction<'MODAL_SUBMIT'> = null
+const i4: Interaction<'MODAL_SUBMIT'> = null as any
 i4.reply({ content: 'nice' })

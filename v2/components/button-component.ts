@@ -63,7 +63,7 @@ function withOptions([ options ]: any[]): MessageComponent<ComponentType.BUTTON,
   }
 }
 
-function withUrl([ url, rawLabel, disabled ]: any[]): MessageComponent<ComponentType.BUTTON, string> {
+function withUrl([ url, rawLabel, disabled ]: any[]): MessageComponent<ComponentType.BUTTON, undefined> {
   const [ emoji, label ] = parseInlineLabel(rawLabel)
   return {
     customId: undefined,
@@ -111,8 +111,8 @@ export function button<ID extends string>(...args: any[]): MessageComponent<Comp
 
   return withCustomId(args) as MessageComponent<ComponentType.BUTTON, ID>
 }
-button.link = function (url: `${ValidUrlPrefixType}${string}`, label: CreateButtonInlineLabel, disabled?: boolean): MessageComponent<ComponentType.BUTTON, null> {
-  return withUrl([ url, label, disabled ]) as MessageComponent<ComponentType.BUTTON, null>
+button.link = function (url: `${ValidUrlPrefixType}${string}`, label: CreateButtonInlineLabel, disabled?: boolean): MessageComponent<ComponentType.BUTTON, undefined> {
+  return withUrl([ url, label, disabled ])
 }
 
 //
