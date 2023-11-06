@@ -48,8 +48,8 @@ class CordoCommandsManager {
         let type = i.data.options?.[0]?.type;
         while (type === const_1.ApplicationCommandOptionType.SUB_COMMAND || type === const_1.ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
             name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
-            i.data.options = i.data.options[0].options;
             type = i.data.options[0].type;
+            i.data.options = i.data.options[0].options;
         }
         try {
             i.data.option = {};
