@@ -57,8 +57,8 @@ export default class CordoCommandsManager {
     let type = i.data.options?.[0]?.type
     while (type === ApplicationCommandOptionType.SUB_COMMAND || type === ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
       name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '')
-      type = i.data.options[0].type
       i.data.options = i.data.options[0].options
+      type = i.data.options[0]?.type
     }
 
     try {
