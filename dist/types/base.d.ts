@@ -30,6 +30,26 @@ export type InteractionMember = {
     deaf: boolean;
 };
 export type PartialInteractionMember = Omit<InteractionMember, 'user' | 'mute' | 'deaf'>;
+export type InteractionGuild = {
+    id: Snowflake;
+    locale: string;
+    features: string[];
+};
+export type InteractionChannel = {
+    id: Snowflake;
+    guild_id?: Snowflake;
+    flags: number;
+    last_message_id: string;
+    past_pin_timestamp: string;
+    name: string;
+    nsfw: boolean;
+    parent_id: string;
+    permissions: string;
+    position: number;
+    rate_limit_per_user: number;
+    topic: string;
+    type: ChannelType;
+};
 export type PartialInteractionChannel = {
     id: Snowflake;
     name: string;
@@ -176,12 +196,14 @@ export type Entitlement = {
 export type InteractionLocationGuild = {
     member: InteractionMember;
     user?: InteractionUser;
+    guild: InteractionGuild;
     guild_id: Snowflake;
     channel_id: Snowflake;
 };
 export type InteractionLocationDM = {
     member?: undefined;
     user: InteractionUser;
+    guild?: undefined;
     guild_id?: undefined;
     channel_id?: undefined;
 };
@@ -250,9 +272,13 @@ export type InteractionBase = {
     user: InteractionUser;
     application_id?: Snowflake;
     locale?: string;
+    guild?: InteractionGuild;
     guild_locale?: string;
+    channel: InteractionChannel;
     entitlement_sku_ids?: string[];
     entitlements?: Entitlement[];
+    app_permissions: string;
+    authorizing_integration_owners: Record<string, string>;
     guildData?: GuildData;
     userData?: UserData;
     _answered: boolean;
