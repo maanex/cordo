@@ -22,7 +22,7 @@ export default class Cordo {
         slottedUiStates: Set<import("./types/custom").SlottedUIState>;
         middlewares: {
             interactionCallback: InteractionCallbackMiddleware[];
-            interactionPreprocessor: InteractionPreprocessorMiddleware<any>[];
+            interactionPreprocessor: InteractionPreprocessorMiddleware<GenericInteraction>[];
             fetchGuildData: GuildDataMiddleware;
             fetchUserData: UserDataMiddleware;
             apiResponseHandler: ApiResponseHandlerMiddleware;
@@ -41,7 +41,7 @@ export default class Cordo {
     static findAutocompleteHandlers(dir: string | string[], prefix?: string): void;
     static registerAutocompleteHandler(id: string, handler: InteractionCommandAutocompleteHandler): void;
     static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware): void;
-    static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<any>): void;
+    static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<GenericInteraction>): void;
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static setMiddlewareApiResponseHandler(fun: ApiResponseHandlerMiddleware): void;

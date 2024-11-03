@@ -48,7 +48,7 @@ export default class Cordo {
     slottedUiStates: CordoStatesManager.slottedUiStates,
     middlewares: {
       interactionCallback: [] as InteractionCallbackMiddleware[],
-      interactionPreprocessor: [] as InteractionPreprocessorMiddleware<any>[],
+      interactionPreprocessor: [] as InteractionPreprocessorMiddleware<GenericInteraction>[],
       fetchGuildData: null as GuildDataMiddleware,
       fetchUserData: null as UserDataMiddleware,
       apiResponseHandler: null as ApiResponseHandlerMiddleware
@@ -141,7 +141,7 @@ export default class Cordo {
     Cordo._data.middlewares.interactionCallback.push(fun)
   }
 
-  public static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<any>) {
+  public static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<GenericInteraction>) {
     Cordo._data.middlewares.interactionPreprocessor.push(fun)
   }
 
