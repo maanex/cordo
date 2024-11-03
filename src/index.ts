@@ -1,7 +1,7 @@
 import { verifyKeyMiddleware } from "discord-interactions"
 import { Request, Response } from "express"
 import { InteractionCallbackType, InteractionType } from './types/const'
-import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware'
+import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware, InteractionPreprocessorMiddleware } from './types/middleware'
 import { GenericInteraction } from './types/base'
 import CordoAPI from './api'
 import DefaultLogger from './lib/default-logger'
@@ -48,6 +48,7 @@ export default class Cordo {
     slottedUiStates: CordoStatesManager.slottedUiStates,
     middlewares: {
       interactionCallback: [] as InteractionCallbackMiddleware[],
+      interactionPreprocessor: [] as InteractionPreprocessorMiddleware<any>[],
       fetchGuildData: null as GuildDataMiddleware,
       fetchUserData: null as UserDataMiddleware,
       apiResponseHandler: null as ApiResponseHandlerMiddleware
@@ -140,6 +141,10 @@ export default class Cordo {
     Cordo._data.middlewares.interactionCallback.push(fun)
   }
 
+  public static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<any>) {
+    Cordo._data.middlewares.interactionPreprocessor.push(fun)
+  }
+
   public static setMiddlewareGuildData(fun: GuildDataMiddleware) {
     Cordo._data.middlewares.fetchGuildData = fun
   }
@@ -163,6 +168,9 @@ export default class Cordo {
       else if (i.type === InteractionType.COMPONENT)
         CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE)
     }
+
+    for (const preprocessor of Cordo._data.middlewares.interactionPreprocessor)
+      i = preprocessor(i)
 
     if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
       i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id, i)

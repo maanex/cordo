@@ -50,6 +50,7 @@ var ButtonStyle;
     ButtonStyle[ButtonStyle["SUCCESS"] = 3] = "SUCCESS";
     ButtonStyle[ButtonStyle["DANGER"] = 4] = "DANGER";
     ButtonStyle[ButtonStyle["LINK"] = 5] = "LINK";
+    ButtonStyle[ButtonStyle["PREMIUM"] = 6] = "PREMIUM";
 })(ButtonStyle = exports.ButtonStyle || (exports.ButtonStyle = {}));
 var TextInputStyle;
 (function (TextInputStyle) {

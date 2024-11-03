@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware } from './types/middleware';
+import { CordoConfig, CustomLogger, GuildDataMiddleware, InteractionCallbackMiddleware, UserDataMiddleware, ApiResponseHandlerMiddleware, InteractionPreprocessorMiddleware } from './types/middleware';
 import { GenericInteraction } from './types/base';
 import { InteractionCommandAutocompleteHandler, InteractionCommandHandler, InteractionComponentHandler, InteractionUIState } from "./types/custom";
 export * from './api';
@@ -22,6 +22,7 @@ export default class Cordo {
         slottedUiStates: Set<import("./types/custom").SlottedUIState>;
         middlewares: {
             interactionCallback: InteractionCallbackMiddleware[];
+            interactionPreprocessor: InteractionPreprocessorMiddleware<any>[];
             fetchGuildData: GuildDataMiddleware;
             fetchUserData: UserDataMiddleware;
             apiResponseHandler: ApiResponseHandlerMiddleware;
@@ -40,6 +41,7 @@ export default class Cordo {
     static findAutocompleteHandlers(dir: string | string[], prefix?: string): void;
     static registerAutocompleteHandler(id: string, handler: InteractionCommandAutocompleteHandler): void;
     static addMiddlewareInteractionCallback(fun: InteractionCallbackMiddleware): void;
+    static addMiddlewareInteractionPreprocessor(fun: InteractionPreprocessorMiddleware<any>): void;
     static setMiddlewareGuildData(fun: GuildDataMiddleware): void;
     static setMiddlewareUserData(fun: UserDataMiddleware): void;
     static setMiddlewareApiResponseHandler(fun: ApiResponseHandlerMiddleware): void;

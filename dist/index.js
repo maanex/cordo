@@ -104,6 +104,9 @@ class Cordo {
     static addMiddlewareInteractionCallback(fun) {
         Cordo._data.middlewares.interactionCallback.push(fun);
     }
+    static addMiddlewareInteractionPreprocessor(fun) {
+        Cordo._data.middlewares.interactionPreprocessor.push(fun);
+    }
     static setMiddlewareGuildData(fun) {
         Cordo._data.middlewares.fetchGuildData = fun;
     }
@@ -122,6 +125,8 @@ class Cordo {
             else if (i.type === const_1.InteractionType.COMPONENT)
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
+        for (const preprocessor of Cordo._data.middlewares.interactionPreprocessor)
+            i = preprocessor(i);
         if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
             i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id, i);
             if (!!i.guildData.then)
@@ -183,6 +188,7 @@ Cordo.__data = {
     slottedUiStates: states_1.default.slottedUiStates,
     middlewares: {
         interactionCallback: [],
+        interactionPreprocessor: [],
         fetchGuildData: null,
         fetchUserData: null,
         apiResponseHandler: null

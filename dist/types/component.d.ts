@@ -13,6 +13,9 @@ export type MessageComponentButton = {
 } | {
     style: ButtonStyle.LINK;
     url: string;
+} | {
+    style: ButtonStyle.PREMIUM;
+    sku_id: string;
 });
 export type MessageComponentSelectOption = {
     label: string;

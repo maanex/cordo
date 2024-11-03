@@ -40,7 +40,8 @@ export declare enum ButtonStyle {
     SECONDARY = 2,
     SUCCESS = 3,
     DANGER = 4,
-    LINK = 5
+    LINK = 5,
+    PREMIUM = 6
 }
 export declare enum TextInputStyle {
     SHORT = 1,
