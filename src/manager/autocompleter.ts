@@ -22,7 +22,7 @@ export default class CordoAutocompleterManager {
       while (fullName.endsWith('_')) fullName = fullName.substring(0, fullName.length - 1)
 
       if (file.includes('.')) {
-        if (!file.endsWith('.js')) continue
+        if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         try {
           CordoAutocompleterManager.registerAutocompleteHandler(fullName, require(fullPath).default)
         } catch (ex) {

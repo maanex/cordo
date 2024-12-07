@@ -26,7 +26,7 @@ export default class CordoComponentsManager {
       while (fullName.endsWith('_')) fullName = fullName.substring(0, fullName.length - 1)
 
       if (file.includes('.')) {
-        if (!file.endsWith('.js')) continue
+        if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         CordoComponentsManager.registerComponentHandler(fullName, require(fullPath).default)
       } else {
         CordoComponentsManager.findComponentHandlers(fullPath, fullName)

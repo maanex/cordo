@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { GenericInteraction } from '..';
 import { InteractionApplicationCommandCallbackData } from './custom';
-export type CordoConfig = {
+export declare type CordoConfig = {
     botId: string;
     commandHandlerPath?: string | string[];
     componentHandlerPath?: string | string[];
@@ -24,12 +24,12 @@ export type CordoConfig = {
         interaction_invalid_description: string;
     };
 };
-export type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
-export type InteractionPreprocessorMiddleware<T extends GenericInteraction> = (i: T) => T;
-export type GuildDataMiddleware = (guildid: string, i: GenericInteraction) => GuildData | Promise<GuildData>;
-export type UserDataMiddleware = (userid: string, i: GenericInteraction) => UserData | Promise<UserData>;
-export type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
-export type CustomLogger = {
+export declare type InteractionCallbackMiddleware = (data?: InteractionApplicationCommandCallbackData, i?: GenericInteraction) => any;
+export declare type InteractionPreprocessorMiddleware<T extends GenericInteraction> = (i: T) => T;
+export declare type GuildDataMiddleware = (guildid: string, i: GenericInteraction) => GuildData | Promise<GuildData>;
+export declare type UserDataMiddleware = (userid: string, i: GenericInteraction) => UserData | Promise<UserData>;
+export declare type ApiResponseHandlerMiddleware = (res: AxiosResponse) => any;
+export declare type CustomLogger = {
     log(content: any): any;
     warn(content: any): any;
     error(content: any): any;

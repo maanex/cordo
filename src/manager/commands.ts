@@ -25,7 +25,7 @@ export default class CordoCommandsManager {
       while (fullName.endsWith('_')) fullName = fullName.substring(0, fullName.length - 1)
 
       if (file.includes('.')) {
-        if (!file.endsWith('.js')) continue
+        if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         try {
           CordoCommandsManager.registerCommandHandler(fullName, require(fullPath).default)
         } catch (ex) {

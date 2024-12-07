@@ -15,7 +15,7 @@ class CordoStatesManager {
             while (fullName.endsWith('_'))
                 fullName = fullName.substring(0, fullName.length - 1);
             if (file.includes('.')) {
-                if (!file.endsWith('.js'))
+                if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 CordoStatesManager.registerUiState(fullName, require(fullPath).default);
             }
@@ -45,7 +45,7 @@ class CordoStatesManager {
         if (regexSearchResult) {
             return {
                 state: regexSearchResult.state,
-                params: (0, utils_1.parseParams)(regexSearchResult.id, id)
+                params: utils_1.parseParams(regexSearchResult.id, id)
             };
         }
         return null;

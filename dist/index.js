@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -153,7 +149,7 @@ class Cordo {
     static useWithExpress(clientPublicKey) {
         if (!clientPublicKey)
             throw new Error('You must specify a Discord client public key');
-        const checkKey = (0, discord_interactions_1.verifyKeyMiddleware)(clientPublicKey);
+        const checkKey = discord_interactions_1.verifyKeyMiddleware(clientPublicKey);
         return (req, res) => {
             checkKey(req, res, () => {
                 const interaction = req.body;

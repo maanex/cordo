@@ -1,6 +1,6 @@
 import { InteractionEmoji } from './base';
 import { ButtonStyle, ChannelType, ComponentType, InteractionComponentFlag, TextInputStyle } from './const';
-export type MessageComponentButton = {
+export declare type MessageComponentButton = {
     type: ComponentType.BUTTON;
     visible?: boolean;
     label?: string;
@@ -17,14 +17,14 @@ export type MessageComponentButton = {
     style: ButtonStyle.PREMIUM;
     sku_id: string;
 });
-export type MessageComponentSelectOption = {
+export declare type MessageComponentSelectOption = {
     label: string;
     value: string;
     description?: string;
     emoji?: Partial<InteractionEmoji>;
     default?: boolean;
 };
-export type MessageComponentSelectMenu = {
+export declare type MessageComponentSelectMenu = {
     type: ComponentType.SELECT;
     visible?: boolean;
     custom_id: string;
@@ -35,7 +35,7 @@ export type MessageComponentSelectMenu = {
     disabled?: boolean;
     flags?: InteractionComponentFlag[];
 };
-export type MessageComponentTextInput = {
+export declare type MessageComponentTextInput = {
     type: ComponentType.TEXT;
     visible?: boolean;
     custom_id: string;
@@ -47,7 +47,7 @@ export type MessageComponentTextInput = {
     value?: string;
     placeholder?: string;
 };
-export type MessageComponentContentSelectMenu = {
+export declare type MessageComponentContentSelectMenu = {
     type: ComponentType.USER_SELECT | ComponentType.ROLE_SELECT | ComponentType.MENTIONABLE_SELECT | ComponentType.CHANNEL_SELECT;
     visible?: boolean;
     custom_id: string;
@@ -58,12 +58,12 @@ export type MessageComponentContentSelectMenu = {
     channel_types?: ChannelType[];
     flags?: InteractionComponentFlag[];
 };
-export type LineBreak = {
+export declare type LineBreak = {
     type: ComponentType.LINE_BREAK;
     visible?: boolean;
 };
-export type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput | MessageComponentContentSelectMenu;
-export type ActionRow = {
+export declare type MessageComponent = MessageComponentButton | MessageComponentSelectMenu | LineBreak | MessageComponentTextInput | MessageComponentContentSelectMenu;
+export declare type ActionRow = {
     type: ComponentType.ROW;
     components: MessageComponent[];
 };

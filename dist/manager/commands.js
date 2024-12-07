@@ -19,7 +19,7 @@ class CordoCommandsManager {
             while (fullName.endsWith('_'))
                 fullName = fullName.substring(0, fullName.length - 1);
             if (file.includes('.')) {
-                if (!file.endsWith('.js'))
+                if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 try {
                     CordoCommandsManager.registerCommandHandler(fullName, require(fullPath).default);
@@ -76,7 +76,7 @@ class CordoCommandsManager {
         const regexSearchResult = [...CordoCommandsManager.slottedCommandHandlers.values()]
             .find(h => h.regex.test(name));
         if (regexSearchResult) {
-            const params = (0, utils_1.parseParams)(regexSearchResult.command, name);
+            const params = utils_1.parseParams(regexSearchResult.command, name);
             regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
             return;
         }

@@ -20,7 +20,7 @@ export default class CordoStatesManager {
       while (fullName.endsWith('_')) fullName = fullName.substring(0, fullName.length - 1)
 
       if (file.includes('.')) {
-        if (!file.endsWith('.js')) continue
+        if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         CordoStatesManager.registerUiState(fullName, require(fullPath).default)
       } else {
         CordoStatesManager.findUiStates(fullPath, fullName)
