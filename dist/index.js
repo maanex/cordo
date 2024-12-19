@@ -121,8 +121,11 @@ class Cordo {
             else if (i.type === const_1.InteractionType.COMPONENT)
                 api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
         }
-        for (const preprocessor of Cordo._data.middlewares.interactionPreprocessor)
+        for (const preprocessor of Cordo._data.middlewares.interactionPreprocessor) {
             i = preprocessor(i);
+            if (i === null)
+                return; // preprocessor already handled this
+        }
         if (i.guild_id && !!Cordo._data.middlewares.fetchGuildData && typeof Cordo._data.middlewares.fetchGuildData === 'function') {
             i.guildData = Cordo._data.middlewares.fetchGuildData(i.guild_id, i);
             if (!!i.guildData.then)
