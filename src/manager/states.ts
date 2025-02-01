@@ -14,6 +14,7 @@ export default class CordoStatesManager {
 
   public static async findUiStates(dir: string | string[], prefix?: string) {
     if (typeof dir !== 'string') dir = path.join(...dir)
+    if (!fs.existsSync(dir)) return
     for (const file of fs.readdirSync(dir)) {
       const fullPath = path.join(dir, file)
       let fullName = (prefix ? prefix + '_' : '') + file.split('.')[0]
