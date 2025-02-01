@@ -1,5 +1,4 @@
-"use strict";
 /* eslint-disable camelcase */
 // INTERACTION BASE TYPES
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=base.js.map

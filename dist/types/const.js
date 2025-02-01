@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EntitlementType = exports.ApplicationCommandOptionType = exports.ChannelType = exports.InteractionComponentFlag = exports.TextInputStyle = exports.ButtonStyle = exports.InteractionCommandType = exports.ComponentType = exports.InteractionType = exports.InteractionResponseFlags = exports.InteractionCallbackType = void 0;
-var InteractionCallbackType;
+export var InteractionCallbackType;
 (function (InteractionCallbackType) {
     InteractionCallbackType[InteractionCallbackType["PONG"] = 1] = "PONG";
     InteractionCallbackType[InteractionCallbackType["CHANNEL_MESSAGE_WITH_SOURCE"] = 4] = "CHANNEL_MESSAGE_WITH_SOURCE";
@@ -11,20 +8,20 @@ var InteractionCallbackType;
     InteractionCallbackType[InteractionCallbackType["APPLICATION_COMMAND_AUTOCOMPLETE_RESULT"] = 8] = "APPLICATION_COMMAND_AUTOCOMPLETE_RESULT";
     InteractionCallbackType[InteractionCallbackType["MODAL"] = 9] = "MODAL";
     InteractionCallbackType[InteractionCallbackType["PREMIUM_REQUIRED"] = 10] = "PREMIUM_REQUIRED";
-})(InteractionCallbackType = exports.InteractionCallbackType || (exports.InteractionCallbackType = {}));
-var InteractionResponseFlags;
+})(InteractionCallbackType || (InteractionCallbackType = {}));
+export var InteractionResponseFlags;
 (function (InteractionResponseFlags) {
     InteractionResponseFlags[InteractionResponseFlags["EPHEMERAL"] = 64] = "EPHEMERAL";
-})(InteractionResponseFlags = exports.InteractionResponseFlags || (exports.InteractionResponseFlags = {}));
-var InteractionType;
+})(InteractionResponseFlags || (InteractionResponseFlags = {}));
+export var InteractionType;
 (function (InteractionType) {
     InteractionType[InteractionType["PING"] = 1] = "PING";
     InteractionType[InteractionType["COMMAND"] = 2] = "COMMAND";
     InteractionType[InteractionType["COMPONENT"] = 3] = "COMPONENT";
     InteractionType[InteractionType["COMMAND_AUTOCOMPLETE"] = 4] = "COMMAND_AUTOCOMPLETE";
     InteractionType[InteractionType["MODAL_SUBMIT"] = 5] = "MODAL_SUBMIT";
-})(InteractionType = exports.InteractionType || (exports.InteractionType = {}));
-var ComponentType;
+})(InteractionType || (InteractionType = {}));
+export var ComponentType;
 (function (ComponentType) {
     /** negative number => custom */
     ComponentType[ComponentType["LINE_BREAK"] = -5] = "LINE_BREAK";
@@ -36,14 +33,14 @@ var ComponentType;
     ComponentType[ComponentType["ROLE_SELECT"] = 6] = "ROLE_SELECT";
     ComponentType[ComponentType["MENTIONABLE_SELECT"] = 7] = "MENTIONABLE_SELECT";
     ComponentType[ComponentType["CHANNEL_SELECT"] = 8] = "CHANNEL_SELECT";
-})(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
-var InteractionCommandType;
+})(ComponentType || (ComponentType = {}));
+export var InteractionCommandType;
 (function (InteractionCommandType) {
     InteractionCommandType[InteractionCommandType["CHAT_INPUT"] = 1] = "CHAT_INPUT";
     InteractionCommandType[InteractionCommandType["USER"] = 2] = "USER";
     InteractionCommandType[InteractionCommandType["MESSAGE"] = 3] = "MESSAGE";
-})(InteractionCommandType = exports.InteractionCommandType || (exports.InteractionCommandType = {}));
-var ButtonStyle;
+})(InteractionCommandType || (InteractionCommandType = {}));
+export var ButtonStyle;
 (function (ButtonStyle) {
     ButtonStyle[ButtonStyle["PRIMARY"] = 1] = "PRIMARY";
     ButtonStyle[ButtonStyle["SECONDARY"] = 2] = "SECONDARY";
@@ -51,13 +48,13 @@ var ButtonStyle;
     ButtonStyle[ButtonStyle["DANGER"] = 4] = "DANGER";
     ButtonStyle[ButtonStyle["LINK"] = 5] = "LINK";
     ButtonStyle[ButtonStyle["PREMIUM"] = 6] = "PREMIUM";
-})(ButtonStyle = exports.ButtonStyle || (exports.ButtonStyle = {}));
-var TextInputStyle;
+})(ButtonStyle || (ButtonStyle = {}));
+export var TextInputStyle;
 (function (TextInputStyle) {
     TextInputStyle[TextInputStyle["SHORT"] = 1] = "SHORT";
     TextInputStyle[TextInputStyle["PARAGRAPH"] = 2] = "PARAGRAPH";
-})(TextInputStyle = exports.TextInputStyle || (exports.TextInputStyle = {}));
-var InteractionComponentFlag;
+})(TextInputStyle || (TextInputStyle = {}));
+export var InteractionComponentFlag;
 (function (InteractionComponentFlag) {
     InteractionComponentFlag["ACCESS_EVERYONE"] = "e";
     InteractionComponentFlag["ACCESS_PRIVATE"] = "p";
@@ -66,8 +63,8 @@ var InteractionComponentFlag;
     InteractionComponentFlag["ACCESS_MANAGE_MESSAGES"] = "m";
     InteractionComponentFlag["ACCESS_BOT_ADMIN"] = "x";
     InteractionComponentFlag["HIDE_IF_NOT_ALLOWED"] = "h";
-})(InteractionComponentFlag = exports.InteractionComponentFlag || (exports.InteractionComponentFlag = {}));
-var ChannelType;
+})(InteractionComponentFlag || (InteractionComponentFlag = {}));
+export var ChannelType;
 (function (ChannelType) {
     ChannelType[ChannelType["GUILD_TEXT"] = 0] = "GUILD_TEXT";
     ChannelType[ChannelType["DM"] = 1] = "DM";
@@ -82,8 +79,8 @@ var ChannelType;
     ChannelType[ChannelType["GUILD_STAGE_VOICE"] = 13] = "GUILD_STAGE_VOICE";
     ChannelType[ChannelType["GUILD_DIRECTORY"] = 14] = "GUILD_DIRECTORY";
     ChannelType[ChannelType["GUILD_FORUM"] = 15] = "GUILD_FORUM";
-})(ChannelType = exports.ChannelType || (exports.ChannelType = {}));
-var ApplicationCommandOptionType;
+})(ChannelType || (ChannelType = {}));
+export var ApplicationCommandOptionType;
 (function (ApplicationCommandOptionType) {
     ApplicationCommandOptionType[ApplicationCommandOptionType["SUB_COMMAND"] = 1] = "SUB_COMMAND";
     ApplicationCommandOptionType[ApplicationCommandOptionType["SUB_COMMAND_GROUP"] = 2] = "SUB_COMMAND_GROUP";
@@ -96,10 +93,10 @@ var ApplicationCommandOptionType;
     ApplicationCommandOptionType[ApplicationCommandOptionType["MENTIONABLE"] = 9] = "MENTIONABLE";
     ApplicationCommandOptionType[ApplicationCommandOptionType["NUMBER"] = 10] = "NUMBER";
     ApplicationCommandOptionType[ApplicationCommandOptionType["ATTACHMENT"] = 11] = "ATTACHMENT";
-})(ApplicationCommandOptionType = exports.ApplicationCommandOptionType || (exports.ApplicationCommandOptionType = {}));
-var EntitlementType;
+})(ApplicationCommandOptionType || (ApplicationCommandOptionType = {}));
+export var EntitlementType;
 (function (EntitlementType) {
     EntitlementType[EntitlementType["TEST"] = 5] = "TEST";
     EntitlementType[EntitlementType["UNNAMED"] = 8] = "UNNAMED";
-})(EntitlementType = exports.EntitlementType || (exports.EntitlementType = {}));
+})(EntitlementType || (EntitlementType = {}));
 //# sourceMappingURL=const.js.map

@@ -17,9 +17,9 @@ export default class Cordo {
         config: CordoConfig;
         commandHandlers: Map<string, InteractionCommandHandler>;
         componentHandlers: Map<string, InteractionComponentHandler>;
-        slottedComponentHandlers: Set<import("./types/custom").SlottedComponentHandler>;
+        slottedComponentHandlers: Set<import(".").SlottedComponentHandler>;
         uiStates: Map<string, InteractionUIState>;
-        slottedUiStates: Set<import("./types/custom").SlottedUIState>;
+        slottedUiStates: Set<import(".").SlottedUIState>;
         middlewares: {
             interactionCallback: InteractionCallbackMiddleware[];
             interactionPreprocessor: InteractionPreprocessorMiddleware<GenericInteraction>[];

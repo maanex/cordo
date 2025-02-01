@@ -1,12 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-const path = require("path");
-const __1 = require("..");
-const replies_1 = require("../replies");
-const api_1 = require("../api");
-const const_1 = require("../types/const");
-class CordoAutocompleterManager {
+import * as fs from 'fs';
+import * as path from 'path';
+import Cordo from '..';
+import CordoReplies from '../replies';
+import CordoAPI from '../api';
+import { InteractionCallbackType } from '../types/const';
+export default class CordoAutocompleterManager {
+    static autocompleteHandlers = new Map();
     //
     static async findAutocompleteHandlers(dir, prefix) {
         if (typeof dir !== 'string')
@@ -20,7 +19,7 @@ class CordoAutocompleterManager {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 try {
-                    CordoAutocompleterManager.registerAutocompleteHandler(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
+                    CordoAutocompleterManager.registerAutocompleteHandler(fullName, (await import(fullPath)).default);
                 }
                 catch (ex) {
                     console.error(ex);
@@ -33,7 +32,7 @@ class CordoAutocompleterManager {
     }
     static registerAutocompleteHandler(id, handler) {
         if (CordoAutocompleterManager.autocompleteHandlers.has(id))
-            __1.default._data.logger.warn(`Autocompleter for ${id} got assigned twice. Overriding.`);
+            Cordo._data.logger.warn(`Autocompleter for ${id} got assigned twice. Overriding.`);
         CordoAutocompleterManager.autocompleteHandlers.set(id, handler);
     }
     //
@@ -47,13 +46,11 @@ class CordoAutocompleterManager {
         //
         if (CordoAutocompleterManager.autocompleteHandlers.has(name)) {
             const handler = CordoAutocompleterManager.autocompleteHandlers.get(name);
-            handler(replies_1.default.buildReplyableCommandAutocompleteInteraction(i));
+            handler(CordoReplies.buildReplyableCommandAutocompleteInteraction(i));
             return;
         }
-        __1.default._data.logger.warn(`Missing autocompleter for command "${name}"`);
-        api_1.default.interactionCallback(i, const_1.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices: [] });
+        Cordo._data.logger.warn(`Missing autocompleter for command "${name}"`);
+        CordoAPI.interactionCallback(i, InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices: [] });
     }
 }
-exports.default = CordoAutocompleterManager;
-CordoAutocompleterManager.autocompleteHandlers = new Map();
 //# sourceMappingURL=autocompleter.js.map

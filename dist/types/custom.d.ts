@@ -1,16 +1,15 @@
-/// <reference types="node" />
 import { InteractionMessage } from '..';
 import { GenericInteraction, InteractionJanitor, ReplyableCommandInteraction, ReplyableComponentInteraction, MessageEmbed, ReplyableCommandAutocompleteInteraction, CommandArgumentChoice, SlotableInteraction } from './base';
 import { MessageComponent } from './component';
 import { InteractionResponseFlags } from './const';
-export declare type LocalisationContext = {
+export type LocalisationContext = {
     [key: string]: string;
 };
-export declare type HandlerSuccess = boolean | Promise<boolean> | any;
-export declare type InteractionDefferedCallbackData = {
+export type HandlerSuccess = boolean | Promise<boolean> | any;
+export type InteractionDefferedCallbackData = {
     flags?: InteractionResponseFlags;
 };
-export declare type InteractionApplicationCommandCallbackData = {
+export type InteractionApplicationCommandCallbackData = {
     tts?: boolean;
     content?: string;
     flags?: InteractionResponseFlags;
@@ -25,28 +24,28 @@ export declare type InteractionApplicationCommandCallbackData = {
     color?: number;
     _context?: LocalisationContext;
 };
-export declare type InteractionApplicationCommandAutocompleteCallbackData = {
+export type InteractionApplicationCommandAutocompleteCallbackData = {
     choices: CommandArgumentChoice[];
 };
-export declare type InteractionOpenModalData = {
+export type InteractionOpenModalData = {
     custom_id: string;
     title: string;
     components: MessageComponent[];
 };
-export declare type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
-export declare type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
-export declare type InteractionCommandAutocompleteHandler = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess);
-export declare type SlottedCommandHandler = {
+export type InteractionCommandHandler = ((i: ReplyableCommandInteraction) => HandlerSuccess);
+export type InteractionComponentHandler = ((i: ReplyableComponentInteraction) => HandlerSuccess);
+export type InteractionCommandAutocompleteHandler = ((i: ReplyableCommandAutocompleteInteraction) => HandlerSuccess);
+export type SlottedCommandHandler = {
     regex: RegExp;
     command: string;
     handler: InteractionCommandHandler;
 };
-export declare type SlottedComponentHandler = {
+export type SlottedComponentHandler = {
     regex: RegExp;
     id: string;
     handler: InteractionComponentHandler;
 };
-export declare type InteractionReplyContext = {
+export type InteractionReplyContext = {
     id: string;
     interaction: GenericInteraction;
     timeout: number;
@@ -56,26 +55,26 @@ export declare type InteractionReplyContext = {
     handlers: Map<string, InteractionComponentHandler>;
     slottedHandlers: Set<SlottedComponentHandler>;
 };
-export declare type InteractionReplyStateLevelThree = {
+export type InteractionReplyStateLevelThree = {
     _context: InteractionReplyContext;
     on(customId: string, handler: InteractionComponentHandler): InteractionReplyStateLevelThree;
     edit(data: InteractionApplicationCommandCallbackData): void;
     followUp(data: InteractionApplicationCommandCallbackData): void;
     triggerJanitor(): void;
 };
-export declare type InteractionReplyTimeoutOptions = {
+export type InteractionReplyTimeoutOptions = {
     onInteraction?: 'restartTimeout' | 'removeTimeout' | 'triggerTimeout' | 'doNothing';
 };
-export declare type InteractionReplyStateLevelTwo = {
+export type InteractionReplyStateLevelTwo = {
     _context: InteractionReplyContext;
     withTimeout(millis: number, janitor: (edit: InteractionJanitor) => any, options?: InteractionReplyTimeoutOptions): InteractionReplyStateLevelThree;
 };
-export declare type InteractionCallbackFollowup = {
+export type InteractionCallbackFollowup = {
     getMessage(): Promise<InteractionMessage>;
     edit(data: InteractionApplicationCommandCallbackData, useRaw?: boolean): void;
 };
-export declare type InteractionUIState = (i: SlotableInteraction, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;
-export declare type SlottedUIState = {
+export type InteractionUIState = (i: SlotableInteraction, ...args: any) => InteractionApplicationCommandCallbackData | Promise<InteractionApplicationCommandCallbackData>;
+export type SlottedUIState = {
     regex: RegExp;
     id: string;
     state: InteractionUIState;

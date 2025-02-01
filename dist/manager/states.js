@@ -1,10 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-const path = require("path");
-const __1 = require("..");
-const utils_1 = require("../lib/utils");
-class CordoStatesManager {
+import * as fs from 'fs';
+import * as path from 'path';
+import Cordo from '..';
+import { parseParams } from '../lib/utils';
+export default class CordoStatesManager {
+    static uiStates = new Map();
+    static slottedUiStates = new Set();
     //
     static async findUiStates(dir, prefix) {
         if (typeof dir !== 'string')
@@ -17,7 +17,7 @@ class CordoStatesManager {
             if (file.includes('.')) {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
-                CordoStatesManager.registerUiState(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
+                CordoStatesManager.registerUiState(fullName, (await import(fullPath)).default);
             }
             else {
                 CordoStatesManager.findUiStates(fullPath, fullName);
@@ -26,7 +26,7 @@ class CordoStatesManager {
     }
     static registerUiState(id, state) {
         if (CordoStatesManager.uiStates.has(id))
-            __1.default._data.logger.warn(`UI State for ${id} already exists. Overriding.`);
+            Cordo._data.logger.warn(`UI State for ${id} already exists. Overriding.`);
         CordoStatesManager.uiStates.set(id, state);
         if (id.includes('$')) {
             const regex = new RegExp('^' + id.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$');
@@ -45,13 +45,10 @@ class CordoStatesManager {
         if (regexSearchResult) {
             return {
                 state: regexSearchResult.state,
-                params: utils_1.parseParams(regexSearchResult.id, id)
+                params: parseParams(regexSearchResult.id, id)
             };
         }
         return null;
     }
 }
-exports.default = CordoStatesManager;
-CordoStatesManager.uiStates = new Map();
-CordoStatesManager.slottedUiStates = new Set();
 //# sourceMappingURL=states.js.map

@@ -1,12 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = require("axios");
-const permission_strings_1 = require("./lib/permission-strings");
-const const_1 = require("./types/const");
-const const_2 = require("./types/const");
-const permission_checks_1 = require("./lib/permission-checks");
-const index_1 = require("./index");
-class CordoAPI {
+import axios from 'axios';
+import PermissionStrings from './lib/permission-strings';
+import { InteractionResponseFlags } from './types/const';
+import { ComponentType, InteractionCallbackType, InteractionComponentFlag } from './types/const';
+import PermissionChecks from './lib/permission-checks';
+import Cordo from './index';
+export default class CordoAPI {
     static async interactionCallback(i, type, data, contextId, useRaw) {
         if (!useRaw)
             CordoAPI.normaliseData(data, i, contextId, type);
@@ -18,19 +16,19 @@ class CordoAPI {
                 i._httpCallback({ type, data });
             }
             else {
-                const res = await axios_1.default.post(`https://discord.com/api/v9/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null });
+                const res = await axios.post(`https://discord.com/api/v9/interactions/${i.id}/${i.token}/callback`, { type, data }, { validateStatus: null });
                 CordoAPI.handleCallbackResponse(res, type, data);
             }
         }
         else {
             switch (type) {
-                case const_2.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
-                    const res = await axios_1.default.post(`https://discord.com/api/v9/webhooks/${index_1.default._data.config.botId}/${i.token}`, data, { validateStatus: null });
+                case InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE: {
+                    const res = await axios.post(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}`, data, { validateStatus: null });
                     CordoAPI.handleCallbackResponse(res, type, data);
                     break;
                 }
-                case const_2.InteractionCallbackType.UPDATE_MESSAGE: {
-                    const res = await axios_1.default.patch(`https://discord.com/api/v9/webhooks/${index_1.default._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null });
+                case InteractionCallbackType.UPDATE_MESSAGE: {
+                    const res = await axios.patch(`https://discord.com/api/v9/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, data, { validateStatus: null });
                     CordoAPI.handleCallbackResponse(res, type, data);
                     break;
                 }
@@ -38,25 +36,25 @@ class CordoAPI {
         }
         return {
             async getMessage() {
-                const res = await axios_1.default.get(`https://discord.com/api/v8/webhooks/${index_1.default._data.config.botId}/${i.token}/messages/@original`, { validateStatus: null });
+                const res = await axios.get(`https://discord.com/api/v8/webhooks/${Cordo._data.config.botId}/${i.token}/messages/@original`, { validateStatus: null });
                 if (res.status !== 200)
                     return null;
                 return res.data;
             },
             edit(editData, editUseRaw = useRaw) {
-                CordoAPI.interactionCallback(i, const_2.InteractionCallbackType.UPDATE_MESSAGE, editData, contextId, editUseRaw);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, editData, contextId, editUseRaw);
             }
         };
     }
     static handleCallbackResponse(res, type, data) {
-        if (index_1.default._data.middlewares.apiResponseHandler) {
-            index_1.default._data.middlewares.apiResponseHandler(res);
+        if (Cordo._data.middlewares.apiResponseHandler) {
+            Cordo._data.middlewares.apiResponseHandler(res);
         }
         else if (res.status >= 300) {
-            index_1.default._data.logger.warn('Interaction callback failed with error:');
-            index_1.default._data.logger.warn(JSON.stringify(res.data, null, 2));
-            index_1.default._data.logger.warn('Request payload:');
-            index_1.default._data.logger.warn(JSON.stringify({ type, data }, null, 2));
+            Cordo._data.logger.warn('Interaction callback failed with error:');
+            Cordo._data.logger.warn(JSON.stringify(res.data, null, 2));
+            Cordo._data.logger.warn('Request payload:');
+            Cordo._data.logger.warn(JSON.stringify({ type, data }, null, 2));
         }
     }
     /**
@@ -67,10 +65,10 @@ class CordoAPI {
             return;
         // explicitly not using this. in this function due to unwanted side-effects in lambda functions
         if (i)
-            index_1.default._data.middlewares.interactionCallback.forEach(f => f(data, i));
+            Cordo._data.middlewares.interactionCallback.forEach(f => f(data, i));
         CordoAPI.normalizeFindAndResolveSmartEmbed(data, type);
-        const isEmphemeral = (data.flags & const_1.InteractionResponseFlags.EPHEMERAL) !== 0;
-        if (data.components?.length && data.components[0].type !== const_2.ComponentType.ROW) {
+        const isEmphemeral = (data.flags & InteractionResponseFlags.EPHEMERAL) !== 0;
+        if (data.components?.length && data.components[0].type !== ComponentType.ROW) {
             const rows = [];
             let newlineFlag = true;
             for (const comp of data.components) {
@@ -78,12 +76,12 @@ class CordoAPI {
                     continue; // === false to not catch any null or undefined
                 CordoAPI.normalizeApplyFlags(comp, i ?? null, contextId, isEmphemeral);
                 switch (comp.type) {
-                    case const_2.ComponentType.LINE_BREAK: {
+                    case ComponentType.LINE_BREAK: {
                         if (rows[rows.length - 1].length)
                             newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.BUTTON: {
+                    case ComponentType.BUTTON: {
                         if (newlineFlag)
                             rows.push([]);
                         newlineFlag = false;
@@ -94,49 +92,49 @@ class CordoAPI {
                             newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.SELECT: {
+                    case ComponentType.SELECT: {
                         if (comp.options?.length > 50)
                             comp.options.length = 50;
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.TEXT: {
+                    case ComponentType.TEXT: {
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.USER_SELECT: {
+                    case ComponentType.USER_SELECT: {
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.ROLE_SELECT: {
+                    case ComponentType.ROLE_SELECT: {
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.MENTIONABLE_SELECT: {
+                    case ComponentType.MENTIONABLE_SELECT: {
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
-                    case const_2.ComponentType.CHANNEL_SELECT: {
+                    case ComponentType.CHANNEL_SELECT: {
                         rows.push([comp]);
                         newlineFlag = true;
                         break;
                     }
                 }
             }
-            data.components = rows.map(c => ({ type: const_2.ComponentType.ROW, components: c }));
+            data.components = rows.map(c => ({ type: ComponentType.ROW, components: c }));
         }
     }
     static normalizeFindAndResolveSmartEmbed(data, type) {
-        if (type === const_2.InteractionCallbackType.PONG)
+        if (type === InteractionCallbackType.PONG)
             return;
-        if (type === const_2.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
+        if (type === InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT)
             return;
-        if (type === const_2.InteractionCallbackType.MODAL)
+        if (type === InteractionCallbackType.MODAL)
             return;
         if (!data.content)
             data.content = '';
@@ -156,42 +154,42 @@ class CordoAPI {
         delete data.title;
     }
     static normalizeApplyFlags(comp, i, contextId, isEmphemeral) {
-        if (comp.type === const_2.ComponentType.LINE_BREAK)
+        if (comp.type === ComponentType.LINE_BREAK)
             return;
-        if (comp.type === const_2.ComponentType.TEXT)
+        if (comp.type === ComponentType.TEXT)
             return;
         if (!comp.custom_id)
             return;
-        const hasAccessEveryoneFlag = comp.flags?.includes(const_2.InteractionComponentFlag.ACCESS_EVERYONE);
+        const hasAccessEveryoneFlag = comp.flags?.includes(InteractionComponentFlag.ACCESS_EVERYONE);
         if (isEmphemeral && !hasAccessEveryoneFlag) {
             if (!comp.flags)
                 comp.flags = [];
-            comp.flags.push(const_2.InteractionComponentFlag.ACCESS_EVERYONE);
+            comp.flags.push(InteractionComponentFlag.ACCESS_EVERYONE);
         }
         ;
         comp.custom_id = CordoAPI.compileCustomId(comp.custom_id, comp.flags, contextId);
         if (comp.flags?.length && i && !!i.member && !hasAccessEveryoneFlag) {
             const perms = BigInt(i.member.permissions);
-            if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_ADMIN) && !permission_strings_1.default.containsAdmin(perms)) {
-                if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
+            if (comp.flags.includes(InteractionComponentFlag.ACCESS_ADMIN) && !PermissionStrings.containsAdmin(perms)) {
+                if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                     comp.type = null;
                 else
                     comp.disabled = true;
             }
-            else if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_MANAGE_SERVER) && !permission_strings_1.default.containsManageServer(perms)) {
-                if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
+            else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_SERVER) && !PermissionStrings.containsManageServer(perms)) {
+                if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                     comp.type = null;
                 else
                     comp.disabled = true;
             }
-            else if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !permission_strings_1.default.containsManageMessages(perms)) {
-                if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
+            else if (comp.flags.includes(InteractionComponentFlag.ACCESS_MANAGE_MESSAGES) && !PermissionStrings.containsManageMessages(perms)) {
+                if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                     comp.type = null;
                 else
                     comp.disabled = true;
             }
-            else if (comp.flags.includes(const_2.InteractionComponentFlag.ACCESS_BOT_ADMIN) && !permission_checks_1.default.isBotOwner(i.user.id)) {
-                if (comp.flags.includes(const_2.InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
+            else if (comp.flags.includes(InteractionComponentFlag.ACCESS_BOT_ADMIN) && !PermissionChecks.isBotOwner(i.user.id)) {
+                if (comp.flags.includes(InteractionComponentFlag.HIDE_IF_NOT_ALLOWED))
                     comp.type = null;
                 else
                     comp.disabled = true;
@@ -208,5 +206,4 @@ class CordoAPI {
         return { contextId, _reserved, customId, flagsRaw };
     }
 }
-exports.default = CordoAPI;
 //# sourceMappingURL=api.js.map

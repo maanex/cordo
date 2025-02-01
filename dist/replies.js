@@ -1,10 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const const_1 = require("./types/const");
-const api_1 = require("./api");
-const states_1 = require("./manager/states");
-const index_1 = require("./index");
-class CordoReplies {
+import { InteractionCallbackType, InteractionResponseFlags } from './types/const';
+import CordoAPI from './api';
+import CordoStatesManager from './manager/states';
+import Cordo from './index';
+export default class CordoReplies {
+    /* TODO @metrics */
+    // public static readonly activeInteractionReplyContexts: InteractionReplyContext[] = []
+    static activeInteractionReplyContexts = new Map();
     //
     static newInteractionReplyContext(i, customId) {
         const context = {
@@ -27,37 +28,37 @@ class CordoReplies {
         return {
             ...i,
             defer(privately = false) {
-                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, privately ? { flags: const_1.InteractionResponseFlags.EPHEMERAL } : null);
+                return CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, privately ? { flags: InteractionResponseFlags.EPHEMERAL } : null);
             },
             reply(data) {
-                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: const_1.InteractionResponseFlags.EPHEMERAL });
+                CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL });
             },
             sendRawResponse(type, data) {
-                return api_1.default.interactionCallback(i, type, data, '', true);
+                return CordoAPI.interactionCallback(i, type, data, '', true);
             },
             openModal(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.MODAL, data);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data);
             },
             async state(state, ...args) {
                 if (!state)
                     state = i.data.name;
-                const stateItem = states_1.default.getStateById(state);
+                const stateItem = CordoStatesManager.getStateById(state);
                 if (!stateItem) {
-                    index_1.default._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`);
+                    Cordo._data.logger.warn(`Command ${i.data.name} tried to apply state non-existent ${state}`);
                     return;
                 }
                 let data = stateItem.state({ ...i, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             }
         };
     }
@@ -67,40 +68,40 @@ class CordoReplies {
         return {
             ...i,
             ack() {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.DEFERRED_UPDATE_MESSAGE);
             },
             reply(data) {
-                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                return CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             replyInteractive(data) {
                 const context = CordoReplies.newInteractionReplyContext(i);
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data, context.id);
                 return CordoReplies.getLevelTwoReplyState(context);
             },
             replyPrivately(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: const_1.InteractionResponseFlags.EPHEMERAL });
+                CordoAPI.interactionCallback(i, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, { ...data, flags: InteractionResponseFlags.EPHEMERAL });
             },
             edit(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.activeInteractionReplyContexts.get(i.message.interaction?.id)?.id);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, CordoReplies.activeInteractionReplyContexts.get(i.message.interaction?.id)?.id);
             },
             editInteractive(data) {
                 const isAlreadyInteractive = CordoReplies.activeInteractionReplyContexts.has(i.message?.interaction?.id);
                 if (isAlreadyInteractive) {
                     const context = CordoReplies.activeInteractionReplyContexts.get(i.message?.interaction?.id);
-                    api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
+                    CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
                     return CordoReplies.getLevelTwoReplyState(context);
                 }
                 else {
                     const context = CordoReplies.newInteractionReplyContext(i);
-                    api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
+                    CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data, context.id);
                     return CordoReplies.getLevelTwoReplyState(context);
                 }
             },
             sendRawResponse(type, data) {
-                return api_1.default.interactionCallback(i, type, data, '', true);
+                return CordoAPI.interactionCallback(i, type, data, '', true);
             },
             openModal(data) {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.MODAL, data);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.MODAL, data);
             },
             // disableComponents() { TODO
             //   API.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, {
@@ -108,20 +109,20 @@ class CordoReplies {
             //   })
             // },
             removeComponents() {
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
+                CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
             },
             async state(state, ...args) {
                 if (!state)
                     state = i.data.custom_id;
-                const stateItem = states_1.default.getStateById(state);
+                const stateItem = CordoStatesManager.getStateById(state);
                 if (!stateItem) {
-                    index_1.default._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
+                    Cordo._data.logger.warn(`Component ${i.data.custom_id} tried to apply state non-existent ${state}`);
                     return;
                 }
                 let data = stateItem.state({ ...i, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
-                api_1.default.interactionCallback(i, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+                CordoAPI.interactionCallback(i, InteractionCallbackType.UPDATE_MESSAGE, data);
             }
         };
     }
@@ -129,10 +130,10 @@ class CordoReplies {
         return {
             ...i,
             ack() {
-                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices: [] });
+                return CordoAPI.interactionCallback(i, InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices: [] });
             },
             show(choices) {
-                return api_1.default.interactionCallback(i, const_1.InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices });
+                return CordoAPI.interactionCallback(i, InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT, { choices });
             }
         };
     }
@@ -140,13 +141,13 @@ class CordoReplies {
     static getJanitor(context) {
         return {
             edit(data) {
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, data);
             },
             removeComponents() {
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, { components: [] });
             },
             disableComponents() {
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, {
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, {
                     components: (context.interaction._answerComponents || [])
                         .map(row => ({
                         ...row,
@@ -160,15 +161,15 @@ class CordoReplies {
             async state(state, ...args) {
                 if (!state)
                     state = context.interaction.id;
-                const stateItem = states_1.default.getStateById(state);
+                const stateItem = CordoStatesManager.getStateById(state);
                 if (!stateItem) {
-                    index_1.default._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
+                    Cordo._data.logger.warn(`Janitor tried to apply state non-existent ${state}`);
                     return;
                 }
                 let data = stateItem.state({ ...context.interaction, params: stateItem.params }, args);
                 if (data.then)
                     data = await data;
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, data);
             }
         };
     }
@@ -180,7 +181,7 @@ class CordoReplies {
             _context: context,
             withTimeout(timeout, janitor, options) {
                 if (timeout > 15 * 60 * 1000) {
-                    index_1.default._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
+                    Cordo._data.logger.error('Interactions timeout cannot be bigger than 15 minutes');
                     timeout = 15 * 60 * 1000;
                 }
                 context.timeout = timeout;
@@ -219,10 +220,10 @@ class CordoReplies {
                 return state;
             },
             edit(data) {
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.UPDATE_MESSAGE, data);
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.UPDATE_MESSAGE, data);
             },
             followUp(data) {
-                api_1.default.interactionCallback(context.interaction, const_1.InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
+                CordoAPI.interactionCallback(context.interaction, InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE, data);
             },
             triggerJanitor() {
                 clearTimeout(context.timeoutRunner);
@@ -232,8 +233,4 @@ class CordoReplies {
         return state;
     }
 }
-exports.default = CordoReplies;
-/* TODO @metrics */
-// public static readonly activeInteractionReplyContexts: InteractionReplyContext[] = []
-CordoReplies.activeInteractionReplyContexts = new Map();
 //# sourceMappingURL=replies.js.map

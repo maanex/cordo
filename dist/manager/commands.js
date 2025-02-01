@@ -1,14 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
-const path = require("path");
-const __1 = require("..");
-const replies_1 = require("../replies");
-const const_1 = require("../types/const");
-const user_error_messages_1 = require("../lib/user-error-messages");
-const utils_1 = require("../lib/utils");
-const states_1 = require("./states");
-class CordoCommandsManager {
+import * as fs from 'fs';
+import * as path from 'path';
+import Cordo from '..';
+import CordoReplies from '../replies';
+import { ApplicationCommandOptionType, InteractionCommandType } from '../types/const';
+import UserErrorMessages from '../lib/user-error-messages';
+import { parseParams } from '../lib/utils';
+import CordoStatesManager from './states';
+export default class CordoCommandsManager {
+    static commandHandlers = new Map();
+    static slottedCommandHandlers = new Set();
     //
     static async findCommandHandlers(dir, prefix) {
         if (typeof dir !== 'string')
@@ -22,7 +22,7 @@ class CordoCommandsManager {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 try {
-                    CordoCommandsManager.registerCommandHandler(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
+                    CordoCommandsManager.registerCommandHandler(fullName, (await import(fullPath)).default);
                 }
                 catch (ex) {
                     console.error(ex);
@@ -35,7 +35,7 @@ class CordoCommandsManager {
     }
     static registerCommandHandler(command, handler) {
         if (CordoCommandsManager.commandHandlers.has(command))
-            __1.default._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`);
+            Cordo._data.logger.warn(`Command handler for ${command} got assigned twice. Overriding.`);
         CordoCommandsManager.commandHandlers.set(command, handler);
         if (command.includes('$')) {
             const regex = new RegExp('^' + command.replace(/\$[a-zA-Z0-9]+/g, '[a-zA-Z0-9]+') + '$');
@@ -46,7 +46,7 @@ class CordoCommandsManager {
     static onCommand(i) {
         let name = i.data.name?.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
         let type = i.data.options?.[0]?.type;
-        while (type === const_1.ApplicationCommandOptionType.SUB_COMMAND || type === const_1.ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
+        while (type === ApplicationCommandOptionType.SUB_COMMAND || type === ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
             name += '_' + i.data.options[0].name.toLowerCase().replace(/ /g, '_').replace(/\W/g, '');
             i.data.options = i.data.options[0].options;
             type = i.data.options[0]?.type;
@@ -56,9 +56,9 @@ class CordoCommandsManager {
             for (const option of i.data.options || [])
                 i.data.option[option.name] = option.value;
             //
-            if (i.data.type === const_1.InteractionCommandType.USER)
+            if (i.data.type === InteractionCommandType.USER)
                 i.data.target = i.data.resolved.users[i.data.target_id];
-            if (i.data.type === const_1.InteractionCommandType.MESSAGE)
+            if (i.data.type === InteractionCommandType.MESSAGE)
                 i.data.target = i.data.resolved.messages[i.data.target_id];
             //
             CordoCommandsManager.findAndExecuteHandler(name, i);
@@ -70,34 +70,31 @@ class CordoCommandsManager {
     static findAndExecuteHandler(name, i) {
         if (CordoCommandsManager.commandHandlers.has(name)) {
             const handler = CordoCommandsManager.commandHandlers.get(name);
-            handler(replies_1.default.buildReplyableCommandInteraction(i));
+            handler(CordoReplies.buildReplyableCommandInteraction(i));
             return;
         }
         const regexSearchResult = [...CordoCommandsManager.slottedCommandHandlers.values()]
             .find(h => h.regex.test(name));
         if (regexSearchResult) {
-            const params = utils_1.parseParams(regexSearchResult.command, name);
-            regexSearchResult.handler(replies_1.default.buildReplyableCommandInteraction(i, { params }));
+            const params = parseParams(regexSearchResult.command, name);
+            regexSearchResult.handler(CordoReplies.buildReplyableCommandInteraction(i, { params }));
             return;
         }
-        if (states_1.default.getStateById(name + '_main')) {
-            replies_1.default.buildReplyableCommandInteraction(i).state(name + '_main');
+        if (CordoStatesManager.getStateById(name + '_main')) {
+            CordoReplies.buildReplyableCommandInteraction(i).state(name + '_main');
             return;
         }
-        __1.default._data.logger.warn(`Unhandled command "${name}"`);
-        user_error_messages_1.default.interactionInvalid(i);
+        Cordo._data.logger.warn(`Unhandled command "${name}"`);
+        UserErrorMessages.interactionInvalid(i);
     }
     static onCommandFail(i, ex) {
-        __1.default._data.logger.warn(ex);
+        Cordo._data.logger.warn(ex);
         try {
-            user_error_messages_1.default.interactionFailed(i);
+            UserErrorMessages.interactionFailed(i);
         }
         catch (ex) {
-            __1.default._data.logger.warn(ex);
+            Cordo._data.logger.warn(ex);
         }
     }
 }
-exports.default = CordoCommandsManager;
-CordoCommandsManager.commandHandlers = new Map();
-CordoCommandsManager.slottedCommandHandlers = new Set();
 //# sourceMappingURL=commands.js.map

@@ -1,1 +1,0 @@
-{"version":3,"file":"component-interaction.js","sourceRoot":"","sources":["../../../src/v2/interactions/component-interaction.ts"],"names":[],"mappings":";;;AA0CA,EAAE;AAEF,SAAgB,6BAA6B,CAAC,IAAiC;IAC7E,OAAO;QACL,QAAQ,EAAE,IAAI,CAAC,SAAS;QACxB,IAAI,EAAE,IAAI,CAAC,cAAc;QACzB,MAAM,EAAE,IAAI,CAAC,MAAM;KACpB,CAAA;AACH,CAAC;AAND,sEAMC"}
