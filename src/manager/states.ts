@@ -12,7 +12,7 @@ export default class CordoStatesManager {
 
   //
 
-  public static findUiStates(dir: string | string[], prefix?: string) {
+  public static async findUiStates(dir: string | string[], prefix?: string) {
     if (typeof dir !== 'string') dir = path.join(...dir)
     for (const file of fs.readdirSync(dir)) {
       const fullPath = path.join(dir, file)
@@ -21,7 +21,7 @@ export default class CordoStatesManager {
 
       if (file.includes('.')) {
         if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
-        CordoStatesManager.registerUiState(fullName, require(fullPath).default)
+        CordoStatesManager.registerUiState(fullName, (await import(fullPath)).default)
       } else {
         CordoStatesManager.findUiStates(fullPath, fullName)
       }

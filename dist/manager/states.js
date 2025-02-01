@@ -6,7 +6,7 @@ const __1 = require("..");
 const utils_1 = require("../lib/utils");
 class CordoStatesManager {
     //
-    static findUiStates(dir, prefix) {
+    static async findUiStates(dir, prefix) {
         if (typeof dir !== 'string')
             dir = path.join(...dir);
         for (const file of fs.readdirSync(dir)) {
@@ -17,7 +17,7 @@ class CordoStatesManager {
             if (file.includes('.')) {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
-                CordoStatesManager.registerUiState(fullName, require(fullPath).default);
+                CordoStatesManager.registerUiState(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
             }
             else {
                 CordoStatesManager.findUiStates(fullPath, fullName);

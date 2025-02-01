@@ -8,7 +8,7 @@ const api_1 = require("../api");
 const const_1 = require("../types/const");
 class CordoAutocompleterManager {
     //
-    static findAutocompleteHandlers(dir, prefix) {
+    static async findAutocompleteHandlers(dir, prefix) {
         if (typeof dir !== 'string')
             dir = path.join(...dir);
         for (const file of fs.readdirSync(dir)) {
@@ -20,7 +20,7 @@ class CordoAutocompleterManager {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 try {
-                    CordoAutocompleterManager.registerAutocompleteHandler(fullName, require(fullPath).default);
+                    CordoAutocompleterManager.registerAutocompleteHandler(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
                 }
                 catch (ex) {
                     console.error(ex);

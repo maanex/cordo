@@ -3,7 +3,7 @@ import { InteractionCommandHandler, SlottedCommandHandler } from '../types/custo
 export default class CordoCommandsManager {
     static readonly commandHandlers: Map<string, InteractionCommandHandler>;
     static readonly slottedCommandHandlers: Set<SlottedCommandHandler>;
-    static findCommandHandlers(dir: string | string[], prefix?: string): void;
+    static findCommandHandlers(dir: string | string[], prefix?: string): Promise<void>;
     static registerCommandHandler(command: string, handler: InteractionCommandHandler): void;
     static onCommand(i: CommandInteraction): void;
     private static findAndExecuteHandler;

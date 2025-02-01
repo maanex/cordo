@@ -18,7 +18,7 @@ export default class CordoComponentsManager {
 
   //
 
-  public static findComponentHandlers(dir: string | string[], prefix?: string) {
+  public static async findComponentHandlers(dir: string | string[], prefix?: string) {
     if (typeof dir !== 'string') dir = path.join(...dir)
     for (const file of fs.readdirSync(dir)) {
       const fullPath = path.join(dir, file)
@@ -27,7 +27,7 @@ export default class CordoComponentsManager {
 
       if (file.includes('.')) {
         if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
-        CordoComponentsManager.registerComponentHandler(fullName, require(fullPath).default)
+        CordoComponentsManager.registerComponentHandler(fullName, (await import(fullPath)).default)
       } else {
         CordoComponentsManager.findComponentHandlers(fullPath, fullName)
       }

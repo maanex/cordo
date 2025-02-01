@@ -14,7 +14,7 @@ export default class CordoAutocompleterManager {
 
   //
 
-  public static findAutocompleteHandlers(dir: string | string[], prefix?: string) {
+  public static async findAutocompleteHandlers(dir: string | string[], prefix?: string) {
     if (typeof dir !== 'string') dir = path.join(...dir)
     for (const file of fs.readdirSync(dir)) {
       const fullPath = path.join(dir, file)
@@ -24,7 +24,7 @@ export default class CordoAutocompleterManager {
       if (file.includes('.')) {
         if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         try {
-          CordoAutocompleterManager.registerAutocompleteHandler(fullName, require(fullPath).default)
+          CordoAutocompleterManager.registerAutocompleteHandler(fullName, (await import(fullPath)).default)
         } catch (ex) {
           console.error(ex)
         }

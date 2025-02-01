@@ -11,7 +11,7 @@ const utils_1 = require("../lib/utils");
 const states_1 = require("./states");
 class CordoComponentsManager {
     //
-    static findComponentHandlers(dir, prefix) {
+    static async findComponentHandlers(dir, prefix) {
         if (typeof dir !== 'string')
             dir = path.join(...dir);
         for (const file of fs.readdirSync(dir)) {
@@ -22,7 +22,7 @@ class CordoComponentsManager {
             if (file.includes('.')) {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
-                CordoComponentsManager.registerComponentHandler(fullName, require(fullPath).default);
+                CordoComponentsManager.registerComponentHandler(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
             }
             else {
                 CordoComponentsManager.findComponentHandlers(fullPath, fullName);

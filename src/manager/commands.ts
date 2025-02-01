@@ -17,7 +17,7 @@ export default class CordoCommandsManager {
 
   //
 
-  public static findCommandHandlers(dir: string | string[], prefix?: string) {
+  public static async findCommandHandlers(dir: string | string[], prefix?: string) {
     if (typeof dir !== 'string') dir = path.join(...dir)
     for (const file of fs.readdirSync(dir)) {
       const fullPath = path.join(dir, file)
@@ -27,7 +27,7 @@ export default class CordoCommandsManager {
       if (file.includes('.')) {
         if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts'))) continue
         try {
-          CordoCommandsManager.registerCommandHandler(fullName, require(fullPath).default)
+          CordoCommandsManager.registerCommandHandler(fullName, (await import(fullPath)).default)
         } catch (ex) {
           console.error(ex)
         }

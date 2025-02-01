@@ -10,7 +10,7 @@ const utils_1 = require("../lib/utils");
 const states_1 = require("./states");
 class CordoCommandsManager {
     //
-    static findCommandHandlers(dir, prefix) {
+    static async findCommandHandlers(dir, prefix) {
         if (typeof dir !== 'string')
             dir = path.join(...dir);
         for (const file of fs.readdirSync(dir)) {
@@ -22,7 +22,7 @@ class CordoCommandsManager {
                 if (!file.endsWith('.js') && !(process.versions.bun && file.endsWith('.ts')))
                     continue;
                 try {
-                    CordoCommandsManager.registerCommandHandler(fullName, require(fullPath).default);
+                    CordoCommandsManager.registerCommandHandler(fullName, (await Promise.resolve().then(() => require(fullPath))).default);
                 }
                 catch (ex) {
                     console.error(ex);
