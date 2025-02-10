@@ -1,6 +1,6 @@
 import { ButtonStyle } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
-import { FunctInternals, type CordoFunct } from "../../core/functs/funct"
+import { FunctInternals, type CordoFunct } from "../../core/funct"
 
 
 export function button() {
