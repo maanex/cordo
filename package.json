@@ -2,8 +2,16 @@
   "name": "cordo",
   "version": "1.17.3",
   "description": "A framework for handling complex discord api interactions",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./core": "./src/core/index.ts",
+    "./components": "./src/components/index.ts"
+  },
+  "files": [
+    "src/index.ts",
+    "src/core/index.ts",
+    "src/core/components/index.ts"
+  ],
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
@@ -23,6 +31,7 @@
   "homepage": "https://github.com/Maanex/cordo#readme",
   "dependencies": {
     "axios": "^0.21.4",
+    "defu": "^6.1.4",
     "discord-interactions": "^2.4.1",
     "express": "^4.17.3"
   },
