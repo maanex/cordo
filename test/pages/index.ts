@@ -1,5 +1,9 @@
-import { defineCordoRoute } from "../../src/core/files/route"
+import { button } from "../../src/components"
+import { defineCordoRoute } from "../../src/core"
 
 
-export default defineCordoRoute({
-})
+export default defineCordoRoute([
+  button()
+    .label('Hello')
+    .emoji('👋')
+])

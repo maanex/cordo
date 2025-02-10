@@ -5,7 +5,8 @@ cordo lockfile version 1
 idc 0
 
 [routes]
-k000 index.ts
-l000 index2.ts
+0000 index.ts
+1000 nested/cool.ts
+2000 nested/[id]/inner.ts
 
 # EOF

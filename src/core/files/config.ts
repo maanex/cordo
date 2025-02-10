@@ -7,6 +7,7 @@ const CordoConfig = Symbol('CordoConfig')
 export type CordoConfig = {
   rootDir: string
   lockfile: string
+  typeDest: string | null
   paths: {
     pages: string
   }
@@ -21,6 +22,7 @@ export namespace ConfigInternals {
   const defaultConfig: CordoConfig = {
     rootDir: process.cwd(),
     lockfile: join(process.cwd(), 'cordo.lock'),
+    typeDest: null,
     paths: {
       pages: 'pages'
     }
@@ -56,6 +58,7 @@ export namespace ConfigInternals {
     return {
       rootDir: config.rootDir,
       lockfile: config.lockfile,
+      typeDest: config.typeDest,
       paths: {
         pages: join(config.rootDir, config.paths.pages)
       }

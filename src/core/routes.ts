@@ -27,7 +27,7 @@ export namespace Routes {
         if (!supportedExtensions.some(ext => item.name.endsWith(`.${ext}`)))
           continue
 
-        const route = RouteInternals.readRoute(join(treeRoot, item.name))
+        const route = await RouteInternals.readRoute(join(treeRoot, item.name))
         if (!route)
           continue
 

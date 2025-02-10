@@ -1,11 +1,25 @@
+import type { CordoComponent, StringComponentType } from "../../components/component"
+import type { CordoInteraction } from "../interaction"
+import type { CordoModifier } from "../../components/modifier"
 
 
 const CordoRoute = Symbol('CordoRoute')
 
-export type CordoRoute = {}
+type RouteResponse = Array<CordoComponent<StringComponentType> | CordoModifier>
+type AsyncInteractionHandler = (i: CordoInteraction) => RouteResponse | Promise<RouteResponse>
 
-export function defineCordoRoute(conf: Partial<CordoRoute> = {}) {
-  return { ...conf, [CordoRoute]: CordoRoute }
+export type CordoRoute = {
+  [CordoRoute]: CordoRoute
+  handler: AsyncInteractionHandler
+}
+
+export function defineCordoRoute(route: RouteResponse | AsyncInteractionHandler) {
+  return {
+    [CordoRoute]: CordoRoute,
+    handler: Array.isArray(route)
+      ? () => route as RouteResponse
+      : route as AsyncInteractionHandler
+  }
 }
 
 export namespace RouteInternals {
