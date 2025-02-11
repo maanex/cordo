@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs"
 import { join } from "node:path"
-import { InteractionResponseType, InteractionType } from "discord-api-types/v10"
+import { InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10"
 import { LibIds } from "../lib/ids"
 import { isComponent, readComponent, type CordoComponent, type StringComponentType } from "../components/component"
 import type { CordoModifier } from "../components/modifier"
@@ -87,10 +87,18 @@ export namespace Routes {
 
   export function getRouteForCommand(command: string) {
     const routePath = `command/${command}`
-    return InteractionEnvironment.Utils.getRouteFromPath(routePath)
+    return {
+      route: InteractionEnvironment.Utils.getRouteFromPath(routePath),
+      path: routePath
+    }
   }
 
-  export async function callRoute(routeName: string, args: string[], i: CordoInteraction): Promise<Record<string, any> | null> {
+  export async function callRoute(
+    routeName: string,
+    args: string[],
+    i: CordoInteraction,
+    opts: { asReply?: boolean, isPrivate?: boolean } = {}
+  ): Promise<Record<string, any> | null> {
     const route = InteractionEnvironment.Utils.getRouteFromId(routeName)
     if (!route) return null
 
@@ -112,10 +120,13 @@ export namespace Routes {
 
     let type: InteractionResponseType = InteractionResponseType.Pong
     if (i.type === InteractionType.ApplicationCommand) {
-      if (InteractionInternals.get(i).answered)
-        type = InteractionResponseType.UpdateMessage
-      else
-        type = InteractionResponseType.ChannelMessageWithSource
+      type = InteractionInternals.get(i).answered
+        ? InteractionResponseType.UpdateMessage
+        : InteractionResponseType.ChannelMessageWithSource
+    } else if (i.type === InteractionType.MessageComponent) {
+      type = opts.asReply
+        ? InteractionResponseType.ChannelMessageWithSource
+        : InteractionResponseType.UpdateMessage
     }
 
     InteractionEnvironment.Utils.resetIdCounter()
@@ -123,7 +134,7 @@ export namespace Routes {
       type,
       data: {
         components: components.map(c => readComponent(c).render()),
-        flags: (1 << 15)
+        flags: (1 << 15) | (opts.isPrivate ? MessageFlags.Ephemeral : 0)
       }
     }
   }

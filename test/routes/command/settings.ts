@@ -1,34 +1,20 @@
-import { button, text } from "../../../src/components"
-import { container } from "../../../src/components/builtin/container"
-import { divider } from "../../../src/components/builtin/divider"
-import { linkButton } from "../../../src/components/builtin/link-button"
-import { row } from "../../../src/components/builtin/row"
-import { section } from "../../../src/components/builtin/section"
+import { button, container, row, text } from "../../../src/components"
 import { defineCordoRoute } from "../../../src/core"
-import { goto, run } from "../../../src/core/funct"
+import { goto } from "../../../src/core/funct"
 
 
-export default defineCordoRoute(() => {
+export default defineCordoRoute(({ fullRoute }) => {
 
   const button1 = button()
-    .label('Hello')
+    .label('The Button')
     .style('primary')
-
-  const backButton = button()
-    .label('< Back')
-    .style('secondary')
-    .onClick(goto('..'))
+    .onClick(goto('index'))
 
   return [
     container(
       text('Gamers!'),
-      row(button1, backButton),
-      divider().size('large'),
-      section(
-        text('Huhu').size('h1'),
-        text('content goes here')
-      ).decorate(linkButton('https://google.com')),
-      row(button())
-    )
+      row(button1)
+    ),
+    text(fullRoute).size('small')
   ]
 })

@@ -7,6 +7,7 @@ const CordoRoute = Symbol('CordoRoute')
 
 export type RouteInput = {
   params: Record<string, string>
+  fullRoute: string
   rawInteraction: CordoInteraction
 }
 
@@ -57,6 +58,7 @@ export namespace RouteInternals {
 
     return {
       params,
+      fullRoute: route.path,
       rawInteraction: interaction
     }
   }

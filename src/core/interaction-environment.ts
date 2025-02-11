@@ -34,6 +34,7 @@ export namespace InteractionEnvironment {
       if (path.startsWith('./')) return currentRoute + path.slice(1)
 
       const cwd = currentRoute.split('/')
+      if (cwd.at(-1) === DefaultFileName) cwd.pop()
       while (path.startsWith('.')) {        
         if (path.startsWith('..')) {
           if (cwd.length <= 0)
@@ -58,6 +59,8 @@ export namespace InteractionEnvironment {
 
     export function getRouteFromPath(path: string) {
       const { lockfile, currentRoute } = getCtx()
+      console.log('--->', path)
+      console.log('...', currentRoute)
 
       const start = resolvePathDots(path, currentRoute)
       if (start === null) {

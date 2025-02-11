@@ -11,15 +11,11 @@ export function text(content: string) {
     })),
 
     size: (size: 'h1' | 'h2' | 'h3' | 'small' | 'default') => {
-      sizePrefix = (size === 'h1')
-        ? '# '
-        : (size === 'h2')
-          ? '## '
-          : (size === 'h3')
-            ? '### '
-            : (size === 'small')
-              ? '-# '
-              : ''
+      if (size === 'h1') sizePrefix = '# '
+      else if (size === 'h2') sizePrefix = '## '
+      else if (size === 'h3') sizePrefix = '### '
+      else if (size === 'small') sizePrefix = '-# '
+      else sizePrefix = ''
       return out
     }
   }

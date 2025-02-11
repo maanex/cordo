@@ -14,7 +14,6 @@ const clientPublicKey = 'ae92419b8a8752234363888abdc0d2b7bdfc730b4b9182dd6c1d5af
 const checkKey = verifyKeyMiddleware(clientPublicKey)
 app.post('/', (req: Request, res: Response) => {
   checkKey(req, res, () => {
-    console.log(req.body)
     const interaction = req.body as APIInteraction
     // interaction._httpCallback = (payload: any) => res.status(200).json(payload)
     Cordo.triggerInteraction(interaction, {

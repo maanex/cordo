@@ -3,6 +3,7 @@ import { InteractionInternals, type CordoInteraction } from "./interaction"
 import { InteractionEnvironment } from "./interaction-environment"
 import type { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
+import { Flags, FunctInternals } from "./funct"
 
 
 export namespace CordoGateway {
@@ -46,9 +47,29 @@ export namespace CordoGateway {
     if (i.type === InteractionType.ApplicationCommand) {
       if (i.data.type === ApplicationCommandType.ChatInput) {
         const name = i.data.name
-        const route = Routes.getRouteForCommand(name)
+        const { route, path } = Routes.getRouteForCommand(name)
+        InteractionEnvironment.getCtx().currentRoute = path
         const res = await Routes.callRoute(route.routeId, route.args, i)
-        respondTo(i, res)
+        return respondTo(i, res)
+      }
+    } else if (i.type === InteractionType.MessageComponent) {
+      const id = i.data.custom_id
+      const actions = FunctInternals.parseCustomId(id)
+      if (!actions.length)
+        respondTo(i, { type: InteractionResponseType.DeferredMessageUpdate })
+
+      for (const action of actions) {
+        const funct = FunctInternals.readFunct(action)
+        if (funct.type === 'run') continue // ignore for now
+
+        if (funct.type === 'goto') {
+          const route = InteractionEnvironment.Utils.getRouteFromPath(funct.path)
+          InteractionEnvironment.getCtx().currentRoute = funct.path
+          const asReply = (funct.flags & Flags.Goto.AsReply) !== 0
+          const isPrivate = (funct.flags & Flags.Goto.Private) !== 0
+          const res = await Routes.callRoute(route.routeId, route.args, i, { asReply, isPrivate })
+          return respondTo(i, res)
+        }
       }
     }
   }

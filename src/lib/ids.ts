@@ -23,4 +23,8 @@ export namespace LibIds {
     return out
   }
 
+  export function parseSingle(string: string) {
+    return bitSet.indexOf(string)
+  }
+
 }
