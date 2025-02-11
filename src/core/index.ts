@@ -11,7 +11,7 @@ export { type CordoRoute, defineCordoRoute } from './files/route'
 async function mountCordo() {
   const config = await ConfigInternals.readAndParseConfig()
   const lockfile = await LockfileInternals.readOrCreateLockfile(config.lockfile)
-  await Routes.readFsTreeAndSyncLockfile(config.paths.pages, lockfile)
+  await Routes.readFsTreeAndSyncLockfile(config.paths.routes, lockfile)
   LockfileInternals.writeLockfile(config.lockfile, lockfile, config.typeDest)
 }
 

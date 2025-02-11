@@ -1,6 +1,6 @@
 import { ButtonStyle } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
-import { FunctInternals, type CordoFunct } from "../../core/funct"
+import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/funct"
 
 
 export function button() {
@@ -33,8 +33,8 @@ export function button() {
       else if (style === 'danger') styleVal = ButtonStyle.Danger
       return out
     },
-    onClick: (funct: CordoFunct) => {
-      functVal.push(funct)
+    onClick: (...funct: CordoFunctRun) => {
+      functVal.push(...funct)
       return out
     }
   }

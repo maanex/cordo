@@ -39,3 +39,7 @@ export function createComponent<Type extends StringComponentType>(type: Type, re
     }
   }
 }
+
+export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponent] {
+  return comp[CordoComponent]!
+}

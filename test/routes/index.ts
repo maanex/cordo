@@ -3,7 +3,7 @@ import { defineCordoRoute } from "../../src/core"
 
 
 export default defineCordoRoute([
-  button()
-    .label('Hello')
-    .emoji('👋')
+  // button()
+  //   .label('Hello')
+  //   .emoji('👋')
 ])

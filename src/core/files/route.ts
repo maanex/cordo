@@ -1,4 +1,4 @@
-import type { CordoComponent, StringComponentType } from "../../components/component"
+import { type CordoComponent, type StringComponentType } from "../../components/component"
 import type { CordoInteraction } from "../interaction"
 import type { CordoModifier } from "../../components/modifier"
 
@@ -27,6 +27,7 @@ export namespace RouteInternals {
   export type ParsedRoute = {
     name: string | null
     path: string
+    realPath: string
     impl: CordoRoute
   }
 

@@ -9,7 +9,7 @@ export type CordoConfig = {
   lockfile: string
   typeDest: string | null
   paths: {
-    pages: string
+    routes: string
   }
 }
 
@@ -24,7 +24,7 @@ export namespace ConfigInternals {
     lockfile: join(process.cwd(), 'cordo.lock'),
     typeDest: null,
     paths: {
-      pages: 'pages'
+      routes: 'routes'
     }
   }
 
@@ -60,7 +60,7 @@ export namespace ConfigInternals {
       lockfile: config.lockfile,
       typeDest: config.typeDest,
       paths: {
-        pages: join(config.rootDir, config.paths.pages)
+        routes: join(config.rootDir, config.paths.routes)
       }
     }
   }

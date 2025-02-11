@@ -67,13 +67,17 @@ export namespace LockfileInternals {
 
         if (block === 'reg') {
           const [ key, value ] = line.split(' ')
-          if (key === 'ric')
+          if (key === 'idc')
             out.reg.idCounter = parseInt(value) ?? 0
         }
 
         if (block === 'routes') {
           const [ name, path ] = line.split(' ')
-          out.routes.push({ name, path })
+          out.routes.push({
+            name,
+            path: path.replace(/\..+$/, ''),
+            realPath: path
+          })
         }
       }
 
@@ -92,7 +96,7 @@ export namespace LockfileInternals {
       `idc ${data.reg.idCounter}`,
       '',
       '[routes]',
-      ...data.routes.map(route => `${route.name} ${route.path}`),
+      ...data.routes.map(route => `${route.name} ${route.realPath}`),
       '',
       '# EOF'
     ]
@@ -100,11 +104,16 @@ export namespace LockfileInternals {
     await fs.writeFile(path, content.join('\n'))
 
     if (typeDest) {
-      console.log(data.routes.map(route => route.name))
+      const routes = data.routes.map(route => route.path!.replaceAll(/\[.+\]/g, '${string}'))
+      for (const route of routes) {
+        if (route.endsWith('/index'))
+          routes.push(route.slice(0, -'/index'.length))
+      }
+
       const types = [
         'declare module "cordo" {',
         `  export type DynamicTypes = {`,
-        `    Route: ${data.routes.map(route => `\`${route.name!.replaceAll(/\[.+\]/g, '${string}')}\``).join(' | ')}`,
+        `    Route: ${routes.map(route => `\`${route}\``).join(' | ')}`,
         '  }',
         '}',
         ''

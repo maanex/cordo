@@ -46,12 +46,13 @@ export namespace Routes {
 
     const out: RouteInternals.ParsedRoute[] = []
     for (const file of files) {
-      const fromLockfile = lockfile.routes.find(route => route.path === file.path.join('/'))
+      const fromLockfile = lockfile.routes.find(route => route.realPath === file.path.join('/'))
 
       if (fromLockfile) {
         out.push({
           name: fromLockfile.name,
-          path: file.path.join('/'),
+          path: file.path.join('/').replace(/\..+$/, ''),
+          realPath: file.path.join('/'),
           impl: file.route
         })
       } else {
@@ -59,12 +60,14 @@ export namespace Routes {
         const strId = LibIds.stringify(id, LockfileInternals.Const.idLength)
         out.push({
           name: strId,
-          path: file.path.join('/'),
+          path: file.path.join('/').replace(/\..+$/, ''),
+          realPath: file.path.join('/'),
           impl: file.route
         })
         lockfile.routes.push({
           name: strId,
-          path: file.path.join('/')
+          path: file.path.join('/').replace(/\..+$/, ''),
+          realPath: file.path.join('/')
         })
       }
     }
