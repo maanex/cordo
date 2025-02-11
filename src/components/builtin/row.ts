@@ -9,9 +9,11 @@ type AllowedComponentArray
   | [ AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents ]
   | [ AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents ]
 
-export function row(...components: AllowedComponentArray) {
+export function row(...components: AllowedComponentArray | [ AllowedComponentArray ]) {
+  if (Array.isArray(components[0]))
+    components = components[0]
   return createComponent('ActionRow', () => ({
     type: ComponentType.ActionRow,
-    components: components.map(c => readComponent(c).render())
+    components: (components as AllowedComponentArray).map(c => readComponent(c).render())
   }))
 }

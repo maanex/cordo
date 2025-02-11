@@ -8,7 +8,7 @@ export default defineCordoRoute(({ fullRoute }) => {
   const button1 = button()
     .label('clicker')
     .style('success')
-    .onClick(goto('command/settings'))
+    .onClick(goto('command/settings', { private: true, asReply: true }))
 
   const random = ~~(Math.random() * 1000)
   const button2 = button()
