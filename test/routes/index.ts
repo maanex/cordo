@@ -16,10 +16,16 @@ export default defineCordoRoute(({ fullRoute }) => {
     .style('danger')
     .onClick(goto(`nested/${random}`))
 
+  const button3 = button()
+    .label('This goes deeeeeep')
+    .style('danger')
+    .onClick(goto(`nested/${~~(Math.random() * 1000)}/owouwu/${(~~(Math.random() * 801294419283)).toString(34)}`))
+
   return [
     container(
       text('HOMEPAGE').size("h1"),
-      row(button1, button2)
+      row(button1, button2),
+      row(button3)
     ),
     text(fullRoute).size('small')
   ]
