@@ -22,11 +22,11 @@ export type TypedCordoFunct<Type extends FunctInternals.Types> = {
 export type CordoFunct = TypedCordoFunct<FunctInternals.Types>
 
 
-export function goto(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${string}`, opts?: { reply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
+export function goto(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${string}`, opts?: { asReply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
   return FunctInternals.createFunct({
     type: 'goto',
     path,
-    flags: (opts?.reply ? (1 << 0) : 0) | (opts?.private ? (1 << 1) : 0)
+    flags: (opts?.asReply ? (1 << 0) : 0) | (opts?.private ? (1 << 1) : 0)
   })
 }
 
@@ -40,9 +40,16 @@ export function run(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${s
 
 export namespace FunctInternals {
 
-  const FunctVersion = 1
+  /** the current version of custom ids. pick another non base64 character if you make breaking changes */
+  const FunctVersion = '$'
+  /** customids starting with this will be ignored silently */
+  const NoopIndicator = '!'
 
-  export type Types = 'goto' | 'run'
+  export const Types = [
+    'goto',
+    'run'
+  ] as const
+  export type Types = typeof Types[number]
 
   export function isFunct(obj: any): obj is CordoFunct {
     return obj && obj[FunctSymbol] === FunctSymbol
@@ -53,8 +60,9 @@ export namespace FunctInternals {
   }
 
   export function compileFunctToCustomId(funct: CordoFunct | CordoFunct[]): string {
+    const idc = InteractionEnvironment.Utils.requestNewId(true)
     if (Array.isArray(funct) && funct.length === 0)
-      return '!' + ~~(Math.random() * 1e9)
+      return NoopIndicator + idc
 
     const list = Array.isArray(funct) ? funct : [ funct ]
     const argus: string[] = []
@@ -63,19 +71,24 @@ export namespace FunctInternals {
 
     for (const fun of list) {
       const arg = fun[FunctSymbol]
+      const typeId = Types.indexOf(arg.type)
+
       if (arg.type === 'goto' || arg.type === 'run') {
-        const { routeId, args } = InteractionEnvironment.Utils.getRoute(arg.path)
+        const { routeId, args } = InteractionEnvironment.Utils.getRouteFromPath(arg.path)
         command.push(routeId)
         argus.push(...args)
-        flags.push(arg.flags)
+        flags.push(arg.flags << 2 | typeId)
       }
     }
 
-    const flagsStr = flags.some(f => f !== 0)
-      ? `:${flags.map(f => LibIds.stringify(f, 1)).join('')}`
-      : ''
+    const flagsStr = flags.map(f => LibIds.stringify(f, 1)).join('')
+    return `${flagsStr}${FunctVersion}${command.join('')}/${argus.join('/')}${idc}`
+  }
 
-    return `${FunctVersion}${command.join('')}${flagsStr}/${argus.join('/')}`
+  export function parseCustomId(id: string): CordoFunct[] {
+    if (id.startsWith(NoopIndicator)) return []
+
+    return []
   }
 
 }

@@ -4,15 +4,15 @@ import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/
 
 
 export function button() {
-  let labelVal = ''
-  let emojiVal = ''
+  let labelVal: string | undefined = undefined
+  let emojiVal: string | undefined = undefined
   let styleVal = ButtonStyle.Secondary
   const functVal: CordoFunct[] = []
 
   const out = {
     ...createComponent('Button', () => ({
       type: ComponentType.Button,
-      label: labelVal,
+      label: labelVal ?? (emojiVal ? '' : 'Click'),
       emoji: emojiVal,
       style: styleVal,
       custom_id: FunctInternals.compileFunctToCustomId(functVal)

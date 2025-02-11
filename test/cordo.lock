@@ -2,12 +2,13 @@
 cordo lockfile version 1
 
 [reg]
-idc 4
+idc 5
 
 [routes]
 0000 index.ts
 1000 nested/cool.ts
 2000 nested/[id]/inner.ts
 3000 nested/[id]/index.ts
+4000 command/settings.ts
 
 # EOF

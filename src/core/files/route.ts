@@ -5,8 +5,13 @@ import type { CordoModifier } from "../../components/modifier"
 
 const CordoRoute = Symbol('CordoRoute')
 
-type RouteResponse = Array<CordoComponent<StringComponentType> | CordoModifier>
-type AsyncInteractionHandler = (i: CordoInteraction) => RouteResponse | Promise<RouteResponse>
+export type RouteInput = {
+  params: Record<string, string>
+  rawInteraction: CordoInteraction
+}
+
+export type RouteResponse = Array<CordoComponent<StringComponentType> | CordoModifier>
+export type AsyncInteractionHandler = (i: RouteInput) => RouteResponse | Promise<RouteResponse>
 
 export type CordoRoute = {
   [CordoRoute]: CordoRoute
@@ -40,7 +45,20 @@ export namespace RouteInternals {
     if (!content.default[CordoRoute])
       return null
 
-    return content
+    return content.default
+  }
+
+  export function buildRouteInput(route: ParsedRoute, args: string[], interaction: CordoInteraction) {
+    const params = route.path
+      .split('/')
+      .filter(p => /^\[\w+\]$/.test(p))
+      .map(p => p.slice(1, -1))
+      .reduce((obj, name, idx) => ({ [name]: args[idx], ...obj }), {} as Record<string, string>)
+
+    return {
+      params,
+      rawInteraction: interaction
+    }
   }
 
 }

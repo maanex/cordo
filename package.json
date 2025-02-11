@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
+    "tunnel": "cloudflared tunnel --config ~/.cloudflared/config.yml run fsb",
     "dev": "tsc && node --trace-warnings ./build/index.js",
     "test": "echo \"Error: no tests specified\" && exit 0",
     "prepub": "npm run lint && npm run build && npm run test && npm pub"

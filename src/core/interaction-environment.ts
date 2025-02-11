@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks'
+import { LibIds } from '../lib/ids'
 import type { CordoInteraction } from './interaction'
 import type { LockfileInternals } from './lockfile'
 
@@ -7,6 +8,7 @@ type Context = {
   currentRoute: string
   lockfile: LockfileInternals.ParsedLockfile
   invoker: CordoInteraction
+  idCounter: number
 }
 
 export namespace InteractionEnvironment {
@@ -15,7 +17,7 @@ export namespace InteractionEnvironment {
 
   const als = new AsyncLocalStorage<Context>()
 
-  export function run(fn: () => void, ctx: Context) {
+  export function createNew(fn: () => any, ctx: Context) {
     als.run(ctx, fn)
   }
 
@@ -54,12 +56,12 @@ export namespace InteractionEnvironment {
         : path
     }
 
-    export function getRoute(route: string) {
+    export function getRouteFromPath(path: string) {
       const { lockfile, currentRoute } = getCtx()
 
-      const start = resolvePathDots(route, currentRoute)
+      const start = resolvePathDots(path, currentRoute)
       if (start === null) {
-        console.log('Invalid route', route)
+        console.log('Invalid route', path)
         return { routeId: '####', args: [] }
       }
       console.debug('Start:', start)
@@ -103,7 +105,7 @@ export namespace InteractionEnvironment {
       })
 
       if (options.length === 0) {
-        console.log('Could not find route', route, '(', route, ')')
+        console.log('Could not find route', path, '(', path, ')')
         return { routeId: '####', args: [] }
       }
 
@@ -116,6 +118,20 @@ export namespace InteractionEnvironment {
         routeId: winner.route.name!,
         args: winner.args
       }
+    }
+
+    export function getRouteFromId(routeId: string) {
+      return getCtx().lockfile.$runtime.routeImpls.get(routeId)
+    }
+
+    export function resetIdCounter() {
+      return getCtx().idCounter = 0
+    }
+
+    export function requestNewId<T extends boolean>(asString: T): T extends true ? string : number {
+      const id = ++getCtx().idCounter
+      if (!asString) return id as any
+      return LibIds.stringify(id, 1) as any
     }
 
   }

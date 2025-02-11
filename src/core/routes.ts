@@ -1,8 +1,13 @@
 import { promises as fs } from "node:fs"
 import { join } from "node:path"
+import { InteractionResponseType, InteractionType } from "discord-api-types/v10"
 import { LibIds } from "../lib/ids"
+import { isComponent, readComponent, type CordoComponent, type StringComponentType } from "../components/component"
+import type { CordoModifier } from "../components/modifier"
 import { LockfileInternals } from "./lockfile"
 import { RouteInternals, type CordoRoute } from "./files/route"
+import { InteractionInternals, type CordoInteraction } from "./interaction"
+import { InteractionEnvironment } from "./interaction-environment"
 
 
 export namespace Routes {
@@ -72,7 +77,55 @@ export namespace Routes {
       }
     }
 
+    for (const item of out)
+      lockfile.$runtime.routeImpls.set(item.name!, item)
+
     return out
+  }
+
+  //
+
+  export function getRouteForCommand(command: string) {
+    const routePath = `command/${command}`
+    return InteractionEnvironment.Utils.getRouteFromPath(routePath)
+  }
+
+  export async function callRoute(routeName: string, args: string[], i: CordoInteraction): Promise<Record<string, any> | null> {
+    const route = InteractionEnvironment.Utils.getRouteFromId(routeName)
+    if (!route) return null
+
+    const input = RouteInternals.buildRouteInput(route, args, i)
+    const rendered = await route.impl.handler(input)
+
+    const components: CordoComponent<StringComponentType>[] = []
+    const modifiers: CordoModifier[] = []
+
+    for (const item of rendered) {
+      if (isComponent(item)) 
+        components.push(item)
+       else 
+        modifiers.push(item)
+    }
+
+    //
+    // TODO modifiers
+
+    let type: InteractionResponseType = InteractionResponseType.Pong
+    if (i.type === InteractionType.ApplicationCommand) {
+      if (InteractionInternals.get(i).answered)
+        type = InteractionResponseType.UpdateMessage
+      else
+        type = InteractionResponseType.ChannelMessageWithSource
+    }
+
+    InteractionEnvironment.Utils.resetIdCounter()
+    return {
+      type,
+      data: {
+        components: components.map(c => readComponent(c).render()),
+        flags: (1 << 15)
+      }
+    }
   }
 
 }

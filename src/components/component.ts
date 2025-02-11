@@ -43,3 +43,7 @@ export function createComponent<Type extends StringComponentType>(type: Type, re
 export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponent] {
   return comp[CordoComponent]!
 }
+
+export function isComponent(t: Record<string, any>): t is CordoComponent<StringComponentType> {
+  return CordoComponent in t
+}

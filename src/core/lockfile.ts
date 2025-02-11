@@ -10,6 +10,9 @@ export namespace LockfileInternals {
       idCounter: number
     }
     routes: Array<Omit<RouteInternals.ParsedRoute, 'impl'>>
+    $runtime: {
+      routeImpls: Map<string, RouteInternals.ParsedRoute>
+    }
   }
 
   export const Const = {
@@ -22,7 +25,10 @@ export namespace LockfileInternals {
       reg: {
         idCounter: 0
       },
-      routes: []
+      routes: [],
+      $runtime: {
+        routeImpls: new Map()
+      }
     }
   }
 
