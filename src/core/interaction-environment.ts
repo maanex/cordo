@@ -59,15 +59,12 @@ export namespace InteractionEnvironment {
 
     export function getRouteFromPath(path: string) {
       const { lockfile, currentRoute } = getCtx()
-      console.log('--->', path)
-      console.log('...', currentRoute)
 
       const start = resolvePathDots(path, currentRoute)
       if (start === null) {
         console.log('Invalid route', path)
         return { routeId: '####', args: [] }
       }
-      console.debug('Start:', start)
 
       const segments = start.split('/').filter(Boolean)
       let options = lockfile.routes.map(r => ({
@@ -114,8 +111,6 @@ export namespace InteractionEnvironment {
 
       const maxSpecificity = Math.max(...options.map(o => o.specificity))
       const winner = options.find(o => o.specificity === maxSpecificity)!
-
-      console.debug('Winner:', winner.route.realPath, `(${winner.specificity})`)
 
       return {
         routeId: winner.route.name!,

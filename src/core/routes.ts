@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs"
 import { join } from "node:path"
 import { InteractionResponseType, InteractionType, MessageFlags } from "discord-api-types/v10"
 import { LibIds } from "../lib/ids"
-import { isComponent, readComponent, type CordoComponent, type StringComponentType } from "../components/component"
+import { isComponent, renderComponentList } from "../components/component"
 import type { CordoModifier } from "../components/modifier"
 import { LockfileInternals } from "./lockfile"
 import { RouteInternals, type CordoRoute } from "./files/route"
@@ -105,13 +105,10 @@ export namespace Routes {
     const input = RouteInternals.buildRouteInput(route, args, i)
     const rendered = await route.impl.handler(input)
 
-    const components: CordoComponent<StringComponentType>[] = []
     const modifiers: CordoModifier[] = []
 
     for (const item of rendered) {
-      if (isComponent(item)) 
-        components.push(item)
-       else 
+      if (!isComponent(item)) 
         modifiers.push(item)
     }
 
@@ -133,7 +130,7 @@ export namespace Routes {
     return {
       type,
       data: {
-        components: components.map(c => readComponent(c).render()),
+        components: renderComponentList(rendered, null, []),
         flags: (1 << 15) | (opts.isPrivate ? MessageFlags.Ephemeral : 0)
       }
     }

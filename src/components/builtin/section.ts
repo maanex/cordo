@@ -1,4 +1,4 @@
-import { ComponentType, createComponent, readComponent, type CordoComponent } from "../component"
+import { ComponentType, createComponent, renderComponent, renderComponentList, type CordoComponent } from "../component"
 
 
 type AllowedComponentsContent = CordoComponent<'TextDisplay'>
@@ -8,10 +8,10 @@ export function section(...components: AllowedComponentsContent[]) {
   let accessory: AllowedComponentsAccessory | undefined = undefined
 
   const out = {
-    ...createComponent('Section', () => ({
+    ...createComponent('Section', ({ hirarchy }) => ({
       type: ComponentType.Section,
-      components: components.map(c => readComponent(c).render()),
-      accessory: accessory ? readComponent(accessory).render() : undefined
+      components: renderComponentList(components, 'Section', hirarchy),
+      accessory: accessory ? renderComponent(accessory, 'Section', hirarchy) : undefined
     })),
 
     decorate(component: AllowedComponentsAccessory) {

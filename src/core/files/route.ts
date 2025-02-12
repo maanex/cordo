@@ -58,7 +58,7 @@ export namespace RouteInternals {
 
     return {
       params,
-      fullRoute: route.path,
+      fullRoute: route.path.replace(/(\/|^)index$/, '') || '/',
       rawInteraction: interaction
     }
   }

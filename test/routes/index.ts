@@ -1,9 +1,10 @@
 import { button, container, row, text } from "../../src/components"
+import { debugRoute } from "../../src/components/mods/debug-route"
 import { defineCordoRoute } from "../../src/core"
 import { goto } from "../../src/core/funct"
 
 
-export default defineCordoRoute(({ fullRoute }) => {
+export default defineCordoRoute(() => {
 
   const button1 = button()
     .label('clicker')
@@ -25,8 +26,8 @@ export default defineCordoRoute(({ fullRoute }) => {
     container(
       text('HOMEPAGE').size("h1"),
       row(button1, button2),
-      row(button3)
+      row(button3, button().label('Buttons').onClick(goto('buttons'))),
     ),
-    text(fullRoute).size('small')
+    debugRoute()
   ]
 })

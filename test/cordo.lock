@@ -2,7 +2,7 @@
 cordo lockfile version 1
 
 [reg]
-idc 7
+idc 8
 
 [routes]
 0000 index.ts
@@ -12,5 +12,6 @@ idc 7
 4000 command/settings.ts
 5000 nested/index.ts
 6000 nested/[id]/[test]/[deep].ts
+7000 buttons.ts
 
 # EOF

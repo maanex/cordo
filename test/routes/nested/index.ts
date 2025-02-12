@@ -1,9 +1,10 @@
-import { button, row, text } from "../../../src/components"
+import { button, row } from "../../../src/components"
+import { debugRoute } from "../../../src/components/mods/debug-route"
 import { defineCordoRoute } from "../../../src/core"
 import { goto } from "../../../src/core/funct"
 
 
-export default defineCordoRoute(({ fullRoute }) => [
+export default defineCordoRoute([
   row(
     button()
       .label('Up again!')
@@ -14,5 +15,5 @@ export default defineCordoRoute(({ fullRoute }) => [
         goto('..')
       )
   ),
-  text(fullRoute).size('small')
+  debugRoute()
 ])

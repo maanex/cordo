@@ -33,7 +33,7 @@ export const Flags = {
   }
 }
 
-export function goto(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${string}`, opts?: { asReply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
+export function goto(path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`, opts?: { asReply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
   return FunctInternals.createFunct({
     type: 'goto',
     path,

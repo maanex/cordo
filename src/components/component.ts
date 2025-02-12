@@ -1,3 +1,5 @@
+import { row } from "./builtin/row"
+import { readModifier, type CordoModifier } from "./modifier"
 
 
 const CordoComponent = Symbol('CordoComponent')
@@ -26,11 +28,15 @@ export type CordoComponent<Type extends StringComponentType> = {
   [CordoComponent]: {
     nativeName: Type
     nativeType: typeof ComponentType[Type]
-    render: () => Record<string, any>
+    render: (meta: { hirarchy: Array<StringComponentType> }) => Record<string, any>
   }
 }
+export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponent]
 
-export function createComponent<Type extends StringComponentType>(type: Type, render: () => Record<string, any>): CordoComponent<Type> {
+export function createComponent<Type extends StringComponentType>(
+  type: Type,
+  render: CordoComponentPayload<Type>['render']
+): CordoComponent<Type> {
   return {
     [CordoComponent]: {
       nativeName: type,
@@ -46,4 +52,66 @@ export function readComponent<T extends CordoComponent<StringComponentType>>(com
 
 export function isComponent(t: Record<string, any>): t is CordoComponent<StringComponentType> {
   return CordoComponent in t
+}
+
+export function renderComponent(c: CordoComponent<StringComponentType> | CordoComponentPayload<StringComponentType>, parent: StringComponentType | null, hirarchy: Array<StringComponentType> = []) {
+  const extracted = CordoComponent in c ? readComponent(c) : c
+  return extracted.render({
+    hirarchy: parent
+      ? [ parent, ...hirarchy ]
+      : hirarchy
+  })
+}
+
+export function renderComponentList(
+  list: Array<CordoComponent<StringComponentType> | CordoModifier>,
+  parent: StringComponentType | null,
+  hirarchy: Array<StringComponentType> = []
+) {
+  let pipeline: Array<CordoComponentPayload<StringComponentType>> = []
+  const queueButtons: Array<CordoComponent<StringComponentType>> = []
+  const modifiers: Array<ReturnType<typeof readModifier>> = []
+
+  for (const item of list) {
+    if (!isComponent(item)) {
+      modifiers.push(readModifier(item))
+      continue
+    }
+
+    let parsed = readComponent(item)
+    for (const mod of modifiers) {
+      if (mod.hooks?.onRender)
+        parsed = mod.hooks.onRender(parsed)
+    }
+
+    if (parsed.nativeName === 'Button' && parent !== 'ActionRow') {
+      queueButtons.push(item)
+      if (queueButtons.length === 5) {
+        pipeline.push(readComponent(row(...queueButtons as any)))
+        queueButtons.splice(0)
+      }
+      continue
+    }
+
+    if (queueButtons.length > 0) {
+      pipeline.push(readComponent(row(...queueButtons as any)))
+      queueButtons.splice(0)
+    }
+
+    pipeline.push(parsed)
+  }
+
+  for (const mod of modifiers) {
+    if (mod.hooks?.preRender)
+      pipeline = mod.hooks.preRender(pipeline)
+  }
+
+  let output = pipeline.map(c => renderComponent(c, parent, hirarchy))
+
+  for (const mod of modifiers) {
+    if (mod.hooks?.postRender)
+      output = mod.hooks.postRender(output)
+  }
+
+  return output
 }

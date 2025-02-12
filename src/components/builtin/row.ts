@@ -1,4 +1,4 @@
-import { ComponentType, createComponent, readComponent, type CordoComponent } from "../component"
+import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
 
 
 type AllowedComponents = CordoComponent<'Button'>
@@ -12,8 +12,8 @@ type AllowedComponentArray
 export function row(...components: AllowedComponentArray | [ AllowedComponentArray ]) {
   if (Array.isArray(components[0]))
     components = components[0]
-  return createComponent('ActionRow', () => ({
+  return createComponent('ActionRow', ({ hirarchy }) => ({
     type: ComponentType.ActionRow,
-    components: (components as AllowedComponentArray).map(c => readComponent(c).render())
+    components: renderComponentList(components as AllowedComponentArray, 'ActionRow', hirarchy)
   }))
 }
