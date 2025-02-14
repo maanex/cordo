@@ -33,6 +33,7 @@ export const Flags = {
   }
 }
 
+/** goto will open the route provided */
 export function goto(path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`, opts?: { asReply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
   return FunctInternals.createFunct({
     type: 'goto',
@@ -41,6 +42,11 @@ export function goto(path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | 
   })
 }
 
+/** run will execute code on the route provided.
+ * if wait is false, the code will be executed in the background and the next action is taken or the interaction is ack'd
+ * if wait is true, the next action will wait for this route to finish running. if this route throws an error the error will be shown and the next action will not be taken
+ * //TODO maybe we want to add an option to ignore errors or one to make errors show up in a reply
+ */
 export function run(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${string}`, opts?: { wait?: boolean }): TypedCordoFunct<'run'> {
   return FunctInternals.createFunct({
     type: 'run',

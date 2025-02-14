@@ -69,7 +69,7 @@ export function renderComponentList(
   hirarchy: Array<StringComponentType> = []
 ) {
   let pipeline: Array<CordoComponentPayload<StringComponentType>> = []
-  const queueButtons: Array<CordoComponent<StringComponentType>> = []
+  const rowBuilder: Array<CordoComponent<StringComponentType>> = []
   const modifiers: Array<ReturnType<typeof readModifier>> = []
 
   for (const item of list) {
@@ -84,21 +84,38 @@ export function renderComponentList(
         parsed = mod.hooks.onRender(parsed)
     }
 
-    if (parsed.nativeName === 'Button' && parent !== 'ActionRow') {
-      queueButtons.push(item)
-      if (queueButtons.length === 5) {
-        pipeline.push(readComponent(row(...queueButtons as any)))
-        queueButtons.splice(0)
+    if (parent !== 'ActionRow') {
+      if (parsed.nativeName === 'Button') {
+        rowBuilder.push(item)
+        if (rowBuilder.length === 5) {
+          pipeline.push(readComponent(row(...rowBuilder as any)))
+          rowBuilder.splice(0)
+        }
+        continue
       }
-      continue
+
+      if (parsed.nativeName === 'StringSelect') {
+        if (rowBuilder.length > 0) {
+          pipeline.push(readComponent(row(...rowBuilder as any)))
+          rowBuilder.splice(0)
+        }
+
+        pipeline.push(readComponent(row(item as any)))
+        continue
+      }
     }
 
-    if (queueButtons.length > 0) {
-      pipeline.push(readComponent(row(...queueButtons as any)))
-      queueButtons.splice(0)
+    if (rowBuilder.length > 0) {
+      pipeline.push(readComponent(row(...rowBuilder as any)))
+      rowBuilder.splice(0)
     }
 
     pipeline.push(parsed)
+  }
+
+  if (rowBuilder.length > 0) {
+    pipeline.push(readComponent(row(...rowBuilder as any)))
+    rowBuilder.splice(0)
   }
 
   for (const mod of modifiers) {

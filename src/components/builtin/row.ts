@@ -1,7 +1,7 @@
 import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
 
 
-type AllowedComponents = CordoComponent<'Button'>
+type AllowedComponents = CordoComponent<'Button' | 'StringSelect'>
 type AllowedComponentArray
   = [ AllowedComponents ]
   | [ AllowedComponents, AllowedComponents ]

@@ -1,13 +1,8 @@
 import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
 
 
-type AllowedComponents = CordoComponent<'ActionRow' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File'>
-type AllowedComponentArray
-  = [ AllowedComponents ]
-  | [ AllowedComponents, AllowedComponents ]
-  | [ AllowedComponents, AllowedComponents, AllowedComponents ]
-  | [ AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents ]
-  | [ AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents, AllowedComponents ]
+type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'>
+type AllowedComponentArray = AllowedComponents[]
 
 export function container(...components: AllowedComponentArray) {
   let accentColor: string | number | undefined = undefined
