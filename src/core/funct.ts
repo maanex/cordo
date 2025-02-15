@@ -2,6 +2,9 @@ import type { DynamicTypes } from "cordo"
 import { LibIds } from "../lib/ids"
 import { InteractionEnvironment } from "./interaction-environment"
 import { LockfileInternals } from "./lockfile"
+import { Routes } from "./routes"
+import type { CordoInteraction } from "./interaction"
+import type { RouteResponse } from "./files/route"
 
 
 const FunctSymbol = Symbol('FunctSymbol')
@@ -26,7 +29,8 @@ export type CordoFunct = TypedCordoFunct<FunctInternals.Types>
 export const Flags = {
   Goto: {
     AsReply: 1 << 0,
-    Private: 1 << 1
+    Private: 1 << 1,
+    DisableComponents: 1 << 2,
   },
   Run: {
     Wait: 1 << 0
@@ -34,11 +38,18 @@ export const Flags = {
 }
 
 /** goto will open the route provided */
-export function goto(path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`, opts?: { asReply?: boolean, private?: boolean }): TypedCordoFunct<'goto'> {
+export function goto(
+  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`,
+  opts?: {
+    asReply?: boolean,
+    private?: boolean,
+    disableComponents?: boolean
+  }
+): TypedCordoFunct<'goto'> {
   return FunctInternals.createFunct({
     type: 'goto',
     path,
-    flags: (opts?.asReply ? Flags.Goto.AsReply : 0) | (opts?.private ? Flags.Goto.Private : 0)
+    flags: (opts?.asReply ? Flags.Goto.AsReply : 0) | (opts?.private ? Flags.Goto.Private : 0) | (opts?.disableComponents ? Flags.Goto.DisableComponents : 0)
   })
 }
 
@@ -47,7 +58,10 @@ export function goto(path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | 
  * if wait is true, the next action will wait for this route to finish running. if this route throws an error the error will be shown and the next action will not be taken
  * //TODO maybe we want to add an option to ignore errors or one to make errors show up in a reply
  */
-export function run(path: DynamicTypes['Route'] | `./${string}` | '..' | `../${string}`, opts?: { wait?: boolean }): TypedCordoFunct<'run'> {
+export function run(
+  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`,
+  opts?: { wait?: boolean }
+): TypedCordoFunct<'run'> {
   return FunctInternals.createFunct({
     type: 'run',
     path,
@@ -164,6 +178,23 @@ export namespace FunctInternals {
     }
 
     return out
+  }
+
+  //
+
+  export function evalFunct(funct: CordoFunct, i: CordoInteraction) {
+    const { type, path, flags } = readFunct(funct)
+    if (type === 'goto') {
+      const route = InteractionEnvironment.Utils.getRouteFromPath(path)
+      InteractionEnvironment.getCtx().currentRoute = path
+      const asReply = (flags & Flags.Goto.AsReply) !== 0
+      const isPrivate = (flags & Flags.Goto.Private) !== 0
+      const disableComponents = (flags & Flags.Goto.DisableComponents) !== 0
+      return Routes.callRoute(route.routeId, route.args, i, { asReply, isPrivate, disableComponents })
+    } else if (type === 'run') {
+      // TODO
+      return Promise.resolve(null as unknown as RouteResponse)
+    }
   }
 
 }

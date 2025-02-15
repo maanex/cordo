@@ -31,6 +31,7 @@ export default defineCordoRoute(() => {
       ':star:', '4.2/5'
     ),
   )
+  // test
 
   return [
     games,

@@ -74,7 +74,9 @@ export function renderComponentList(
 
   for (const item of list) {
     if (!isComponent(item)) {
-      modifiers.push(readModifier(item))
+      const mod = readModifier(item)
+      if (!modifiers.some(m => m.name === mod.name))
+        modifiers.push(mod)
       continue
     }
 

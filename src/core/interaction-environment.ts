@@ -2,11 +2,13 @@ import { AsyncLocalStorage } from 'async_hooks'
 import { LibIds } from '../lib/ids'
 import type { CordoInteraction } from './interaction'
 import type { LockfileInternals } from './lockfile'
+import type { CordoConfig } from './files/config'
 
 
 type Context = {
   currentRoute: string
   lockfile: LockfileInternals.ParsedLockfile
+  config: CordoConfig
   invoker: CordoInteraction
   idCounter: number
 }

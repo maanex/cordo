@@ -1,16 +1,20 @@
 {
   "name": "cordo",
-  "version": "1.17.3",
+  "version": "2.0.0-rc1",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
     "./core": "./src/core/index.ts",
-    "./components": "./src/components/index.ts"
+    "./components": "./src/components/index.ts",
+    "./errors": "./src/errors/index.ts",
+    "./http": "./src/http/index.ts"
   },
   "files": [
     "src/index.ts",
     "src/core/index.ts",
-    "src/core/components/index.ts"
+    "src/components/index.ts",
+    "src/errors/index.ts",
+    "src/http/index.ts"
   ],
   "scripts": {
     "build": "tsc",
@@ -35,7 +39,8 @@
     "defu": "^6.1.4",
     "discord-api-types": "^0.37.119",
     "discord-interactions": "^2.4.1",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "type-fest": "^4.34.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

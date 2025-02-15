@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import defu from 'defu'
+import type { PartialDeep } from 'type-fest'
 
 
 const CordoConfig = Symbol('CordoConfig')
@@ -8,12 +9,19 @@ export type CordoConfig = {
   rootDir: string
   lockfile: string
   typeDest: string | null
+  upstream: {
+    baseUrl: string
+  }
+  client: {
+    id: string
+    publicKey: string
+  }
   paths: {
     routes: string
   }
 }
 
-export function defineCordoConfig(conf: Partial<CordoConfig> = {}) {
+export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}) {
   return { ...conf, [CordoConfig]: CordoConfig }
 }
 
@@ -23,6 +31,13 @@ export namespace ConfigInternals {
     rootDir: process.cwd(),
     lockfile: join(process.cwd(), 'cordo.lock'),
     typeDest: null,
+    upstream: {
+      baseUrl: 'https://discord.com/api/v10'
+    },
+    client: {
+      id: '',
+      publicKey: ''
+    },
     paths: {
       routes: 'routes'
     }
@@ -59,6 +74,8 @@ export namespace ConfigInternals {
       rootDir: config.rootDir,
       lockfile: config.lockfile,
       typeDest: config.typeDest,
+      upstream: config.upstream,
+      client: config.client,
       paths: {
         routes: join(config.rootDir, config.paths.routes)
       }

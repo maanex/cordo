@@ -1,9 +1,12 @@
 import { ApplicationCommandType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
+import type { Method } from "axios"
+import axios from "axios"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
 import { InteractionEnvironment } from "./interaction-environment"
 import type { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
-import { Flags, FunctInternals } from "./funct"
+import { FunctInternals } from "./funct"
+import type { CordoConfig } from "./files/config"
 
 
 export namespace CordoGateway {
@@ -12,6 +15,7 @@ export namespace CordoGateway {
     interaction: CordoInteraction | APIInteraction,
     httpCallback?: (payload: any) => any
     lockfile: LockfileInternals.ParsedLockfile
+    config: CordoConfig
   }) {
     if (opts.interaction.type === InteractionType.Ping)
       return handlePing(opts.interaction, opts.httpCallback)
@@ -24,6 +28,7 @@ export namespace CordoGateway {
     InteractionEnvironment.createNew(() => handleInteraction(interaction), {
       invoker: interaction,
       lockfile: opts.lockfile,
+      config: opts.config,
       currentRoute: '',
       idCounter: 0
     })
@@ -33,15 +38,60 @@ export namespace CordoGateway {
     httpCallback?.({ type: InteractionResponseType.Pong })
   }
 
-  function respondTo(i: CordoInteraction, payload: any) {
+  function apiRequest(method: Method, url: string, body?: Record<string, any>) {
+    const config = InteractionEnvironment.getCtx().config
+    return axios({
+      method,
+      url,
+      baseURL: config.upstream.baseUrl,
+      data: body,
+      validateStatus: null
+    })
+  }
+
+  /** if the payload is null the interaction will be defered if not done already */
+  export function respondTo(i: CordoInteraction, payload: Record<string, any> | null) {
     const internals = InteractionInternals.get(i)
+
     if (internals.httpCallback && !internals.answered) {
       internals.answered = true
-      return internals.httpCallback(payload)
+
+      if (payload)
+        return internals.httpCallback(payload)
+
+      if (i.type === InteractionType.ApplicationCommand)
+        return internals.httpCallback({ type: InteractionResponseType.DeferredChannelMessageWithSource })
+
+      if (i.type === InteractionType.MessageComponent)
+        return internals.httpCallback({ type: InteractionResponseType.DeferredMessageUpdate })
+
+      return null
     }
 
-    // TODO: send to discord
+    if (!payload)
+      return null
+
+    if (!internals.answered) 
+      return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, payload)
+
+    const { type, data } = payload
+    if (!type || !data)
+      return null
+
+    const config = InteractionEnvironment.getCtx().config
+    if (!config.client.id)
+      return null
+
+    if (type === InteractionResponseType.ChannelMessageWithSource)
+      return apiRequest('post', `/webhooks/${config.client.id}/${i.token}`, data)
+
+    if (type === InteractionResponseType.UpdateMessage)
+      return apiRequest('patch', `/webhooks/${config.client.id}/${i.token}/messages/@original`, data)
+
+    return null
   }
+
+  //
 
   async function handleInteraction(i: CordoInteraction) {
     if (i.type === InteractionType.ApplicationCommand) {
@@ -49,8 +99,7 @@ export namespace CordoGateway {
         const name = i.data.name
         const { route, path } = Routes.getRouteForCommand(name)
         InteractionEnvironment.getCtx().currentRoute = path
-        const res = await Routes.callRoute(route.routeId, route.args, i)
-        return respondTo(i, res)
+        return Routes.callRoute(route.routeId, route.args, i)
       }
     } else if (i.type === InteractionType.MessageComponent) {
       const id = i.data.custom_id
@@ -58,19 +107,8 @@ export namespace CordoGateway {
       if (!actions.length)
         respondTo(i, { type: InteractionResponseType.DeferredMessageUpdate })
 
-      for (const action of actions) {
-        const funct = FunctInternals.readFunct(action)
-        if (funct.type === 'run') continue // ignore for now
-
-        if (funct.type === 'goto') {
-          const route = InteractionEnvironment.Utils.getRouteFromPath(funct.path)
-          InteractionEnvironment.getCtx().currentRoute = funct.path
-          const asReply = (funct.flags & Flags.Goto.AsReply) !== 0
-          const isPrivate = (funct.flags & Flags.Goto.Private) !== 0
-          const res = await Routes.callRoute(route.routeId, route.args, i, { asReply, isPrivate })
-          return respondTo(i, res)
-        }
-      }
+      for (const action of actions) 
+        await FunctInternals.evalFunct(action, i)
     }
   }
 

@@ -2,7 +2,7 @@
 cordo lockfile version 1
 
 [reg]
-idc 10
+idc 11
 
 [routes]
 0000 index.ts
@@ -15,5 +15,6 @@ idc 10
 7000 buttons.ts
 8000 command/help.ts
 9000 command/free.ts
+a000 command/invite.ts
 
 # EOF
