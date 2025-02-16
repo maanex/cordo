@@ -1,9 +1,16 @@
 import { resolve } from 'node:path'
 import defu from 'defu'
-import type { PartialDeep } from 'type-fest'
+import type { PartialDeep, Promisable } from 'type-fest'
+import type { APIInteraction } from 'discord-api-types/v10'
+import type { AxiosResponse } from 'axios'
+import type { CordoInteraction } from '../interaction'
+import type { StringComponentType } from '../../components/component'
 
 
 const CordoConfigSymbol = Symbol('CordoConfigSymbol')
+
+type HookFor<T, Context = never> = null | ((value: T, context: Context) => Promisable<T | null>)
+type TransformHookFor<T, Context = never> = null | ((value: T, context: Context) => T)
 
 export type CordoConfig = {
   rootDir: string
@@ -18,6 +25,24 @@ export type CordoConfig = {
   }
   paths: {
     routes: string
+  }
+  /** hooks allow you to process certain data at certain points during cordo's internals. you can always return null to stop the flow of data at that point. */
+  hooks: {
+    /** gets called before cordo does anything with the interaction */
+    onRawInteraction: HookFor<APIInteraction>,
+    /** gets called after being read but before getting handled */
+    onBeforeHandle: HookFor<CordoInteraction>,
+    /** gets called before a response is returned or sent to discord */
+    onBeforeRespond: HookFor<Record<string, any> | null, { interaction: CordoInteraction }>
+    /** gets called with the response of outgoing api calls. DOES NOT get called on the first response as that's not an outgoing api call */
+    onAfterRespond: HookFor<AxiosResponse>,
+    /** gets called when outgoing api calls fail */
+    onNetworkError: HookFor<any>,
+
+    /** transforms the name of the invoked command to a file or route name */
+    transformCommandName: TransformHookFor<string>,
+    /** gets called by all cordo builtin components that render user facing text. e.g. buttons, text components, selects, etc */
+    transformUserFacingText: TransformHookFor<string, { component: StringComponentType, position: null | string, interaction?: CordoInteraction }>,
   }
 }
 
@@ -43,6 +68,15 @@ export namespace ConfigInternals {
     },
     paths: {
       routes: './routes'
+    },
+    hooks: {
+      onRawInteraction: null,
+      onBeforeHandle: null,
+      onBeforeRespond: null,
+      onAfterRespond: null,
+      onNetworkError: null,
+      transformCommandName: null,
+      transformUserFacingText: null
     }
   }
 

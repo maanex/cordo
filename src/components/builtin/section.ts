@@ -8,10 +8,10 @@ export function section(...components: AllowedComponentsContent[]) {
   let accessory: AllowedComponentsAccessory | undefined = undefined
 
   const out = {
-    ...createComponent('Section', ({ hirarchy }) => ({
+    ...createComponent('Section', ({ hirarchy, attributes }) => ({
       type: ComponentType.Section,
-      components: renderComponentList(components, 'Section', hirarchy),
-      accessory: accessory ? renderComponent(accessory, 'Section', hirarchy) : undefined
+      components: renderComponentList(components, 'Section', hirarchy, attributes),
+      accessory: accessory ? renderComponent(accessory, 'Section', hirarchy, attributes) : undefined
     })),
 
     decorate(component: AllowedComponentsAccessory) {

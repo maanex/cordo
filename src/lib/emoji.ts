@@ -3,7 +3,7 @@ import type { APIEmoji } from "discord-api-types/v10"
 
 export namespace LibEmoji {
 
-  type PartialEmoji = { name: string, id: any } | { id: string, name: any }
+  type PartialEmoji = { name: string, id?: any } | { id: string, name?: any }
 
   export type Input = string | APIEmoji | PartialEmoji | { object: PartialEmoji }
 

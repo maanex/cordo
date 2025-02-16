@@ -7,6 +7,7 @@
     "./core": "./src/core/index.ts",
     "./components": "./src/components/index.ts",
     "./errors": "./src/errors/index.ts",
+    "./functions": "./src/functions/index.ts",
     "./http": "./src/http/index.ts"
   },
   "files": [
@@ -14,6 +15,7 @@
     "src/core/index.ts",
     "src/components/index.ts",
     "src/errors/index.ts",
+    "src/functions/index.ts",
     "src/http/index.ts"
   ],
   "scripts": {

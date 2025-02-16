@@ -7,20 +7,24 @@ import type { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
 import { FunctInternals } from "./funct"
 import type { CordoConfig } from "./files/config"
+import { Hooks } from "./hooks"
 
 
 export namespace CordoGateway {
 
-  export function triggerInteraction(opts: {
+  export async function triggerInteraction(opts: {
     interaction: CordoInteraction | APIInteraction,
     httpCallback?: (payload: any) => any
     lockfile: LockfileInternals.ParsedLockfile
     config: CordoConfig
   }) {
-    if (opts.interaction.type === InteractionType.Ping)
-      return handlePing(opts.interaction, opts.httpCallback)
+    const rawInteraction = await Hooks.callHook('onRawInteraction', opts.interaction, undefined, opts.config)
+    if (!rawInteraction) return
 
-    const interaction = InteractionInternals.upgrade(opts.interaction)
+    if (rawInteraction.type === InteractionType.Ping)
+      return handlePing(rawInteraction, opts.httpCallback)
+
+    const interaction = InteractionInternals.upgrade(rawInteraction)
     const internals = InteractionInternals.get(interaction)
 
     if (opts.httpCallback) internals.httpCallback = opts.httpCallback
@@ -47,12 +51,15 @@ export namespace CordoGateway {
       data: body,
       validateStatus: null
     })
+      .then(res => Hooks.callHook('onAfterRespond', res))
+      .catch(res => Hooks.callHook('onNetworkError', res))
   }
 
   /** if the payload is null the interaction will be defered if not done already */
-  export function respondTo(i: CordoInteraction, payload: Record<string, any> | null) {
-    const internals = InteractionInternals.get(i)
+  export async function respondTo(i: CordoInteraction, payload: Record<string, any> | null) {
+    payload = await Hooks.callHook('onBeforeRespond', payload, { interaction: i })
 
+    const internals = InteractionInternals.get(i)
     if (internals.httpCallback && !internals.answered) {
       internals.answered = true
 
@@ -94,6 +101,9 @@ export namespace CordoGateway {
   //
 
   async function handleInteraction(i: CordoInteraction) {
+    i = await Hooks.callHook('onBeforeHandle', i)
+    if (!i) return
+
     if (i.type === InteractionType.ApplicationCommand) {
       if (i.data.type === ApplicationCommandType.ChatInput) {
         const name = i.data.name
@@ -105,7 +115,7 @@ export namespace CordoGateway {
       const id = i.data.custom_id
       const actions = FunctInternals.parseCustomId(id)
       if (!actions.length)
-        respondTo(i, { type: InteractionResponseType.DeferredMessageUpdate })
+        await respondTo(i, { type: InteractionResponseType.DeferredMessageUpdate })
 
       for (const action of actions) 
         await FunctInternals.evalFunct(action, i)

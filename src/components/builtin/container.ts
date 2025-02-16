@@ -9,9 +9,9 @@ export function container(...components: AllowedComponentArray) {
   let spoiler: boolean | undefined = undefined
 
   const out = {
-    ...createComponent('Container', ({ hirarchy }) => ({
+    ...createComponent('Container', ({ hirarchy, attributes }) => ({
       type: ComponentType.Container,
-      components: renderComponentList(components, 'Container', hirarchy),
+      components: renderComponentList(components, 'Container', hirarchy, attributes),
       accent_color: typeof accentColor === 'string' ? parseInt(accentColor.slice(1), 16) : accentColor,
       spoiler
     })),

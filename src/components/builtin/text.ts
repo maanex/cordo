@@ -1,3 +1,4 @@
+import { Hooks } from "../../core/hooks"
 import { ComponentType, createComponent } from "../component"
 
 
@@ -7,8 +8,10 @@ export function text(...content: Array<string | { toString: () => string }>) {
   let innerSuffix: string = ''
   let linkUrl: string | null = null
 
-  function toString(): string {
-    const stringContent = content.map(c => typeof c === 'string' ? c : c.toString())
+  function toString(attributes: Record<string, any> = {}): string {
+    const stringContent = content
+      .map(c => typeof c === 'string' ? c : c.toString())
+      .map(c => Hooks.callHook('transformUserFacingText', c, { ...attributes, component: 'TextDisplay', position: null }))
     const innerContent = (innerPrefix ?? '') + stringContent.join(' ') + (innerSuffix ?? '')
     const outerContent = linkUrl
       ? `[${innerContent}](${linkUrl})`
@@ -17,9 +20,9 @@ export function text(...content: Array<string | { toString: () => string }>) {
   }
 
   const out = {
-    ...createComponent('TextDisplay', () => ({
+    ...createComponent('TextDisplay', ({ attributes }) => ({
       type: ComponentType.TextDisplay,
-      content: toString()
+      content: toString(attributes)
     })),
 
     toString,
@@ -79,7 +82,7 @@ export function text(...content: Array<string | { toString: () => string }>) {
         innerSuffix = '```' + innerSuffix
       }
       return out
-    },
+    }
   }
   
   return out

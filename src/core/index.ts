@@ -1,5 +1,6 @@
 import type { APIInteraction } from 'discord-api-types/v10'
 import defu from 'defu'
+import type { PartialDeep } from 'type-fest'
 import { Routes } from './routes'
 import { ConfigInternals, type CordoConfig } from './files/config'
 import { LockfileInternals } from './lockfile'
@@ -9,16 +10,15 @@ export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, defineCordoRoute, assertCordoRequest } from './files/route'
 export { type CordoInteraction } from './interaction'
-export { type CordoFunct, goto, run } from './funct'
 
 //
 
 let lockfile: LockfileInternals.ParsedLockfile | null = null
 let config: CordoConfig | null = null
 
-async function mountCordo(configOverrides?: CordoConfig) {
+async function mountCordo(configOverrides?: PartialDeep<CordoConfig>) {
   const fileConfig = await ConfigInternals.readAndParseConfig()
-  config = configOverrides ? defu(configOverrides, fileConfig) : fileConfig
+  config = configOverrides ? defu(configOverrides, fileConfig) as CordoConfig : fileConfig
 
   lockfile = await LockfileInternals.readOrCreateLockfile(config.lockfile)
   await Routes.readFsTreeAndSyncLockfile(config.paths.routes, lockfile)

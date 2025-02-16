@@ -1,6 +1,7 @@
 import { type APISelectMenuOption } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
 import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/funct"
+import { Hooks } from "../../core/hooks"
 
 
 export function selectString() {
@@ -11,14 +12,32 @@ export function selectString() {
   let disabledVal: boolean | undefined = undefined
   const functVal: CordoFunct[] = []
 
+  function getPlaceholder() {
+    if (!placeholderVal)
+      return undefined
+    return Hooks.callHook(
+      'transformUserFacingText',
+      placeholderVal,
+      { component: 'StringSelect', position: 'placeholder' }
+    )
+  }
+
+  function getOptions(): APISelectMenuOption[] {
+    return optionsVal.slice(0, 25).map(o => ({
+      ...o,
+      label: Hooks.callHook('transformUserFacingText', o.label, { component: 'StringSelect', position: 'option.label' }),
+      description: Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
+    }))
+  }
+
   const out = {
     ...createComponent('StringSelect', () => ({
       type: ComponentType.StringSelect,
-      placeholder: placeholderVal,
+      placeholder: getPlaceholder(),
       min_values: minValues,
       max_values: maxValues,
       disabled: disabledVal,
-      options: optionsVal.slice(0, 25),
+      options: getOptions(),
       custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
     })),
 

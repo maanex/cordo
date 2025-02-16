@@ -6,11 +6,12 @@ import { isComponent, renderComponentList } from "../components/component"
 import type { CordoModifier } from "../components/modifier"
 import { disableAllComponents } from "../components/mods/disable-all-components"
 import { LockfileInternals } from "./lockfile"
-import { RouteInternals, type CordoRouteSymbol, type RouteRequest, type RouteResponse } from "./files/route"
+import { RouteInternals, type CordoRoute, type RouteRequest, type RouteResponse } from "./files/route"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
 import { InteractionEnvironment } from "./interaction-environment"
 import { CordoGateway } from "./gateway"
 import { FunctInternals, goto, run } from "./funct"
+import { Hooks } from "./hooks"
 
 
 export namespace Routes {
@@ -213,7 +214,10 @@ export namespace Routes {
   }
 
   export function getRouteForCommand(command: string) {
-    const routePath = `command/${command}`
+    const fileName = Hooks.isDefined('transformCommandName')
+      ? Hooks.callHook('transformCommandName', command)
+      : command.replaceAll(' ', '-').replace(/[^\w-]/g, '').toLowerCase()
+    const routePath = `command/${fileName}`
     return {
       route: InteractionEnvironment.Utils.getRouteFromPath(routePath),
       path: routePath
@@ -249,7 +253,7 @@ export namespace Routes {
     return {
       type,
       data: {
-        components: renderComponentList(response, null, []),
+        components: renderComponentList(response, null, [], {}),
         flags: (1 << 15) | (opts.isPrivate ? MessageFlags.Ephemeral : 0)
       }
     }

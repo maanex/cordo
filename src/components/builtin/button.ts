@@ -1,25 +1,38 @@
 import { ButtonStyle, type APIEmoji } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
 import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/funct"
-import { LibEmoji } from "../../lib/emojis"
+import { LibEmoji } from "../../lib/emoji"
+import { Hooks } from "../../core/hooks"
 
 
 export function button() {
   let labelVal: string | undefined = undefined
   let emojiVal: APIEmoji | undefined = undefined
   let disabledVal: boolean | undefined = undefined
+  let visibleVal: boolean = true
   let styleVal = ButtonStyle.Secondary
   const functVal: CordoFunct[] = []
 
+  function getLabel() {
+    if (!labelVal)
+      return emojiVal ? '' : 'Click'
+
+    return Hooks.callHook(
+      'transformUserFacingText',
+      labelVal,
+      { component: 'Button', position: 'label' }
+    )
+  }
+
   const out = {
-    ...createComponent('Button', () => ({
+    ...createComponent('Button', () => visibleVal ? ({
       type: ComponentType.Button,
-      label: labelVal ?? (emojiVal ? '' : 'Click'),
+      label: getLabel(),
       emoji: emojiVal,
       style: styleVal,
       disabled: disabledVal,
       custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
-    })),
+    }) : null),
 
     label: (text: string) => {
       labelVal = text
@@ -38,6 +51,10 @@ export function button() {
     },
     disabled(disabled = true) {
       disabledVal = disabled
+      return out
+    },
+    visible(visible = true) {
+      visibleVal = visible
       return out
     },
     onClick: (...funct: CordoFunctRun) => {

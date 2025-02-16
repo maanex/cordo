@@ -1,3 +1,4 @@
+import defu from "defu"
 import { row } from "./builtin/row"
 import { readModifier, type CordoModifier } from "./modifier"
 
@@ -28,8 +29,13 @@ export type CordoComponent<Type extends StringComponentType> = {
   [CordoComponent]: {
     nativeName: Type
     nativeType: typeof ComponentType[Type]
-    render: (meta: { hirarchy: Array<StringComponentType> }) => Record<string, any>
+    attributes: Record<string, any>
+    render: (meta: {
+      hirarchy: Array<StringComponentType>
+      attributes: Record<string, any>
+    }) => Record<string, any> | null
   }
+  attributes: (attrs: Record<string, any>) => CordoComponent<Type>
 }
 export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponent]
 
@@ -37,13 +43,20 @@ export function createComponent<Type extends StringComponentType>(
   type: Type,
   render: CordoComponentPayload<Type>['render']
 ): CordoComponent<Type> {
-  return {
-    [CordoComponent]: {
-      nativeName: type,
-      nativeType: ComponentType[type],
-      render,
+  const comp = {
+    nativeName: type,
+    nativeType: ComponentType[type],
+    render,
+    attributes: {}
+  }
+  const out = {
+    [CordoComponent]: comp,
+    attributes: (attrs: Record<string, any>) => {
+      comp.attributes = defu(attrs, comp.attributes)
+      return out
     }
   }
+  return out
 }
 
 export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponent] {
@@ -54,19 +67,26 @@ export function isComponent(t: Record<string, any>): t is CordoComponent<StringC
   return CordoComponent in t
 }
 
-export function renderComponent(c: CordoComponent<StringComponentType> | CordoComponentPayload<StringComponentType>, parent: StringComponentType | null, hirarchy: Array<StringComponentType> = []) {
+export function renderComponent(
+  c: CordoComponent<StringComponentType> | CordoComponentPayload<StringComponentType>,
+  parent: StringComponentType | null,
+  hirarchy: Array<StringComponentType> = [],
+  inheritAttributes: Record<string, any> = {}
+) {
   const extracted = CordoComponent in c ? readComponent(c) : c
   return extracted.render({
     hirarchy: parent
       ? [ parent, ...hirarchy ]
-      : hirarchy
+      : hirarchy,
+    attributes: defu(extracted.attributes, inheritAttributes)
   })
 }
 
 export function renderComponentList(
   list: Array<CordoComponent<StringComponentType> | CordoModifier>,
   parent: StringComponentType | null,
-  hirarchy: Array<StringComponentType> = []
+  hirarchy: Array<StringComponentType> = [],
+  inheritAttributes: Record<string, any> = {}
 ) {
   let pipeline: Array<CordoComponentPayload<StringComponentType>> = []
   const rowBuilder: Array<CordoComponent<StringComponentType>> = []
@@ -125,7 +145,9 @@ export function renderComponentList(
       pipeline = mod.hooks.preRender(pipeline)
   }
 
-  let output = pipeline.map(c => renderComponent(c, parent, hirarchy))
+  let output = pipeline
+    .map(c => renderComponent(c, parent, hirarchy, inheritAttributes))
+    .filter(Boolean)
 
   for (const mod of modifiers) {
     if (mod.hooks?.postRender)
