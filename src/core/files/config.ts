@@ -1,9 +1,9 @@
-import { join } from 'node:path'
+import { resolve } from 'node:path'
 import defu from 'defu'
 import type { PartialDeep } from 'type-fest'
 
 
-const CordoConfig = Symbol('CordoConfig')
+const CordoConfigSymbol = Symbol('CordoConfigSymbol')
 
 export type CordoConfig = {
   rootDir: string
@@ -21,15 +21,18 @@ export type CordoConfig = {
   }
 }
 
-export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}) {
-  return { ...conf, [CordoConfig]: CordoConfig }
+export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}): PartialDeep<CordoConfig> & { [CordoConfigSymbol]: typeof CordoConfigSymbol } {
+  return {
+    ...conf,
+    [CordoConfigSymbol]: CordoConfigSymbol
+  }
 }
 
 export namespace ConfigInternals {
 
   const defaultConfig: CordoConfig = {
-    rootDir: process.cwd(),
-    lockfile: join(process.cwd(), 'cordo.lock'),
+    rootDir: '.',
+    lockfile: './cordo.lock',
     typeDest: null,
     upstream: {
       baseUrl: 'https://discord.com/api/v10'
@@ -39,7 +42,7 @@ export namespace ConfigInternals {
       publicKey: ''
     },
     paths: {
-      routes: 'routes'
+      routes: './routes'
     }
   }
 
@@ -47,7 +50,7 @@ export namespace ConfigInternals {
     if (process.env.CORDO_CONFIG_PATH)
       return String(process.env.CORDO_CONFIG_PATH)
     const searchRoot = process.cwd()
-    return join(searchRoot, 'cordo.config.ts')
+    return resolve(searchRoot, 'cordo.config.ts')
   }
 
   async function readConfig(): Promise<CordoConfig> {
@@ -58,7 +61,7 @@ export namespace ConfigInternals {
       if (!content || !content.default)
         return defaultConfig
 
-      if (!content.default[CordoConfig])
+      if (!content.default[CordoConfigSymbol])
         return defaultConfig
 
       return defu(content.default, defaultConfig)
@@ -67,19 +70,23 @@ export namespace ConfigInternals {
     }
   }
 
+  function resolveRelativePath(path: string, basePath = process.cwd()) {
+    return resolve(basePath, path)
+  }
+
   export async function readAndParseConfig(): Promise<CordoConfig> {
     const config = await readConfig()
 
-    return {
-      rootDir: config.rootDir,
-      lockfile: config.lockfile,
-      typeDest: config.typeDest,
-      upstream: config.upstream,
-      client: config.client,
-      paths: {
-        routes: join(config.rootDir, config.paths.routes)
-      }
-    }
+
+    config.rootDir = resolveRelativePath(config.rootDir)
+    config.lockfile = resolveRelativePath(config.lockfile)
+    config.typeDest = config.typeDest
+      ? resolveRelativePath(config.typeDest)
+      : null
+
+    config.paths.routes = resolveRelativePath(config.paths.routes, config.rootDir)
+
+    return config
   }
 
 }

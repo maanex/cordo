@@ -1,4 +1,14 @@
 
+import { createModifier as _createModifier } from './modifier'
+import {
+  createComponent as _createComponent,
+  ComponentType as _ComponentType,
+  readComponent as _readComponent,
+  isComponent as _isComponent,
+  renderComponent as _renderComponent,
+  renderComponentList as _renderComponentList,
+} from './component'
+
 export { button } from './builtin/button'
 export { container } from './builtin/container'
 export { divider } from './builtin/divider'
@@ -9,3 +19,19 @@ export { section } from './builtin/section'
 export { selectString } from './builtin/select-string'
 export { spacer } from './builtin/spacer'
 export { text } from './builtin/text'
+
+export { debugIdToLabel } from './mods/debug-id-to-label'
+export { debugPrint } from './mods/debug-print'
+export { debugRoute } from './mods/debug-route'
+export { disableAllComponents } from './mods/disable-all-components'
+
+export namespace Extend {
+  export const createModifier = _createModifier
+
+  export const createComponent = _createComponent
+  export const ComponentType = _ComponentType
+  export const readComponent = _readComponent
+  export const isComponent = _isComponent
+  export const renderComponent = _renderComponent
+  export const renderComponentList = _renderComponentList
+}

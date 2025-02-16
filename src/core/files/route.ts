@@ -6,7 +6,7 @@ import type { goto, run } from "../funct"
 import { CordoErrorRouteAssumptionFailed } from "../../errors"
 
 
-const CordoRoute = Symbol('CordoRoute')
+const CordoRouteSymbol = Symbol('CordoRoute')
 
 export type RouteResponse = Array<CordoComponent<StringComponentType> | CordoModifier>
 
@@ -104,13 +104,13 @@ export type RouteRequest = {
 export type AsyncInteractionHandler = (i: RouteRequest) => RouteResponse | Promise<RouteResponse> | void | Promise<void>
 
 export type CordoRoute = {
-  [CordoRoute]: CordoRoute
+  [CordoRouteSymbol]: typeof CordoRouteSymbol
   handler: AsyncInteractionHandler
 }
 
-export function defineCordoRoute(route: RouteResponse | AsyncInteractionHandler) {
+export function defineCordoRoute(route: RouteResponse | AsyncInteractionHandler): CordoRoute {
   return {
-    [CordoRoute]: CordoRoute,
+    [CordoRouteSymbol]: CordoRouteSymbol,
     handler: Array.isArray(route)
       ? () => route as RouteResponse
       : route as AsyncInteractionHandler
@@ -156,8 +156,8 @@ export namespace RouteInternals {
     if (!content || !content.default)
       return null
 
-    if (!content.default[CordoRoute])
-      return null
+    // if (!content.default[CordoRouteSymbol])
+    //   return null
 
     return content.default
   }

@@ -8,6 +8,8 @@ import { CordoGateway } from './gateway'
 export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, defineCordoRoute, assertCordoRequest } from './files/route'
+export { type CordoInteraction } from './interaction'
+export { type CordoFunct, goto, run } from './funct'
 
 //
 
