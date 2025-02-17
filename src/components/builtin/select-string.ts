@@ -4,7 +4,7 @@ import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/
 import { Hooks } from "../../core/hooks"
 
 
-export function selectString() {
+export function selectString<Values extends string = string>() {
   let placeholderVal: string | undefined = undefined
   let minValues: number | undefined = undefined
   let maxValues: number | undefined = undefined
@@ -37,7 +37,7 @@ export function selectString() {
       type: ComponentType.StringSelect,
       placeholder: getPlaceholder(),
       min_values: minValues,
-      max_values: maxValues,
+      max_values: maxValues ? Math.min(optionsVal.length, maxValues) : undefined,
       disabled: disabledVal,
       options: getOptions(),
       custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
@@ -47,11 +47,11 @@ export function selectString() {
       placeholderVal = text
       return out
     },
-    min: (num: number) => {
+    min: (num: number = 1) => {
       minValues = num
       return out
     },
-    max: (num: number) => {
+    max: (num: number = 25) => {
       maxValues = num
       return out
     },
@@ -59,15 +59,15 @@ export function selectString() {
       disabledVal = disabled
       return out
     },
-    onClick: (...funct: CordoFunctRun) => {
+    onSubmit: (...funct: CordoFunctRun) => {
       functVal.push(...funct)
       return out
     },
-    setOptions(options: APISelectMenuOption[]) {
+    setOptions(options: Array<APISelectMenuOption & { value: Values }>) {
       optionsVal = options
       return out
     },
-    addOption(o: APISelectMenuOption) {
+    addOption(o: APISelectMenuOption & { value: Values }) {
       optionsVal.push(o)
       return out
     }

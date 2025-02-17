@@ -59,8 +59,20 @@ export namespace InteractionEnvironment {
         : path
     }
 
-    export function getRouteFromPath(path: string) {
-      const { lockfile, currentRoute } = getCtx()
+    /**
+     * cordo allows for runtime variables in route paths
+     */
+    function substituteRuntimeVariables(args: string[], i: CordoInteraction) {
+      return args.map((arg) => {
+        if (arg === '$0' && 'values' in i.data!)
+          return i.data!.values[0]
+        return arg
+      })
+
+    }
+
+    export function getRouteFromPath(path: string, resolveRuntimeVars: boolean) {
+      const { lockfile, currentRoute, invoker } = getCtx()
 
       let startingPoint = currentRoute
       if (startingPoint.endsWith(DefaultFileName))
@@ -122,7 +134,9 @@ export namespace InteractionEnvironment {
 
       return {
         routeId: winner.route.name!,
-        args: winner.args
+        args: resolveRuntimeVars
+          ? substituteRuntimeVariables(winner.args, invoker)
+          : winner.args
       }
     }
 

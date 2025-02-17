@@ -11,9 +11,9 @@ const FunctSymbol = Symbol('FunctSymbol')
 
 export type CordoFunctRun
   = [ TypedCordoFunct<'goto' | 'run'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'goto'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto'> ]
+  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
+  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
+  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
 
 export type TypedCordoFunct<Type extends FunctInternals.Types> = {
   [FunctSymbol]: {
@@ -79,6 +79,8 @@ export namespace FunctInternals {
   const PlainArgumentIndicator = '/'
   /** the following argument should be infered from the lookup table */
   const LutArgumentIndicator = '\\'
+  /** the following argument has the same value as an earlier argument */
+  const ReferenceArgumentIndicator = '|'
 
   export const Types = [
     'goto',
@@ -113,15 +115,27 @@ export namespace FunctInternals {
       const typeId = Types.indexOf(arg.type)
 
       if (arg.type === 'goto' || arg.type === 'run') {
-        const { routeId, args } = InteractionEnvironment.Utils.getRouteFromPath(arg.path)
+        const { routeId, args } = InteractionEnvironment.Utils.getRouteFromPath(arg.path, false)
         command.push(routeId)
         argus.push(...args)
         flags.push(arg.flags << 2 | typeId)
       }
     }
 
+    let argusStr = ''
+    let counter = 0
+    for (const arg of argus) {
+      // check if this argument has already been added so we can just refernce it
+      const firstArrayPos = argus.indexOf(arg)
+      if (firstArrayPos < counter) 
+        argusStr += ReferenceArgumentIndicator + LibIds.stringify(firstArrayPos, 1)
+       else 
+        argusStr += PlainArgumentIndicator + arg
+      counter++
+    }
+
     const flagsStr = flags.map(f => LibIds.stringify(f, 1)).join('')
-    return `${flagsStr}${FunctVersion}${command.join('')}/${argus.join('/')}${idc}`
+    return `${flagsStr}${FunctVersion}${command.join('')}${argusStr}${idc}`
   }
 
   export function parseCustomId(id: string): CordoFunct[] {
@@ -148,12 +162,15 @@ export namespace FunctInternals {
         argsRaw.push(PlainArgumentIndicator)
       } else if (id[i] === LutArgumentIndicator) {
         argsRaw.push(LutArgumentIndicator)
+      } else if (id[i] === ReferenceArgumentIndicator) {
+        argsRaw.push(ReferenceArgumentIndicator)
       } else {
-        argsRaw[argsRaw.length-1] = argsRaw.at(-1) + id[i]
+        argsRaw[argsRaw.length-1] = argsRaw[argsRaw.length-1] + id[i]
       }
     }
 
     const out: CordoFunct[] = []
+    const parsedArguments: string[] = []
     for (const fun of header) {
       const routeId = routesRaw.shift()!
       const route = InteractionEnvironment.Utils.getRouteFromId(routeId)!
@@ -161,10 +178,17 @@ export namespace FunctInternals {
       for (const part of route.path.split('/')) {
         if (part.startsWith('[') && part.endsWith(']')) {
           const argRaw = argsRaw.shift()!
-          if (argRaw[0] === PlainArgumentIndicator)
+          if (argRaw[0] === PlainArgumentIndicator) {
             path.push(argRaw.slice(1))
-          else if (argRaw[0] === LutArgumentIndicator)
+            parsedArguments.push(argRaw.slice(1))
+          } else if (argRaw[0] === LutArgumentIndicator) {
             path.push('') // TODO: lookup
+            parsedArguments.push('')
+          } else if (argRaw[0] === ReferenceArgumentIndicator) {
+            const resolved = parsedArguments[LibIds.parseSingle(argRaw[1])] ?? ''
+            path.push(resolved)
+            parsedArguments.push(resolved)
+          }
         } else {
           path.push(part)
         }
@@ -185,7 +209,7 @@ export namespace FunctInternals {
   export function evalFunct(funct: CordoFunct, i: CordoInteraction) {
     const { type, path, flags } = readFunct(funct)
     if (type === 'goto') {
-      const route = InteractionEnvironment.Utils.getRouteFromPath(path)
+      const route = InteractionEnvironment.Utils.getRouteFromPath(path, true)
       InteractionEnvironment.getCtx().currentRoute = path
       const asReply = (flags & Flags.Goto.AsReply) !== 0
       const isPrivate = (flags & Flags.Goto.Private) !== 0

@@ -9,7 +9,6 @@ export function button() {
   let labelVal: string | undefined = undefined
   let emojiVal: APIEmoji | undefined = undefined
   let disabledVal: boolean | undefined = undefined
-  let visibleVal: boolean = true
   let styleVal = ButtonStyle.Secondary
   const functVal: CordoFunct[] = []
 
@@ -25,14 +24,14 @@ export function button() {
   }
 
   const out = {
-    ...createComponent('Button', () => visibleVal ? ({
+    ...createComponent('Button', () => ({
       type: ComponentType.Button,
       label: getLabel(),
       emoji: emojiVal,
       style: styleVal,
       disabled: disabledVal,
       custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
-    }) : null),
+    })),
 
     label: (text: string) => {
       labelVal = text
@@ -51,10 +50,6 @@ export function button() {
     },
     disabled(disabled = true) {
       disabledVal = disabled
-      return out
-    },
-    visible(visible = true) {
-      visibleVal = visible
       return out
     },
     onClick: (...funct: CordoFunctRun) => {

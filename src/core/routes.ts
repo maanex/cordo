@@ -219,7 +219,7 @@ export namespace Routes {
       : command.replaceAll(' ', '-').replace(/[^\w-]/g, '').toLowerCase()
     const routePath = `command/${fileName}`
     return {
-      route: InteractionEnvironment.Utils.getRouteFromPath(routePath),
+      route: InteractionEnvironment.Utils.getRouteFromPath(routePath, false),
       path: routePath
     }
   }

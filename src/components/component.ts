@@ -25,16 +25,18 @@ export const ComponentType = {
 export type StringComponentType = keyof typeof ComponentType
 export type ComponentIdFromName<Name extends StringComponentType> = typeof ComponentType[Name]
 
-export type CordoComponent<Type extends StringComponentType> = {
+export type CordoComponent<Type extends StringComponentType = StringComponentType> = {
   [CordoComponent]: {
     nativeName: Type
     nativeType: typeof ComponentType[Type]
+    visible: boolean
     attributes: Record<string, any>
     render: (meta: {
       hirarchy: Array<StringComponentType>
       attributes: Record<string, any>
     }) => Record<string, any> | null
   }
+  visible: (value: boolean) => CordoComponent<Type>
   attributes: (attrs: Record<string, any>) => CordoComponent<Type>
 }
 export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponent]
@@ -46,11 +48,16 @@ export function createComponent<Type extends StringComponentType>(
   const comp = {
     nativeName: type,
     nativeType: ComponentType[type],
-    render,
-    attributes: {}
+    visible: true,
+    attributes: {},
+    render
   }
   const out = {
     [CordoComponent]: comp,
+    visible(value: boolean) {
+      comp.visible = value
+      return out
+    },
     attributes: (attrs: Record<string, any>) => {
       comp.attributes = defu(attrs, comp.attributes)
       return out
@@ -64,7 +71,7 @@ export function readComponent<T extends CordoComponent<StringComponentType>>(com
 }
 
 export function isComponent(t: Record<string, any>): t is CordoComponent<StringComponentType> {
-  return CordoComponent in t
+  return !!t && CordoComponent in t
 }
 
 export function renderComponent(
@@ -74,6 +81,8 @@ export function renderComponent(
   inheritAttributes: Record<string, any> = {}
 ) {
   const extracted = CordoComponent in c ? readComponent(c) : c
+  if (!extracted.visible)
+    return null
   return extracted.render({
     hirarchy: parent
       ? [ parent, ...hirarchy ]
@@ -93,6 +102,9 @@ export function renderComponentList(
   const modifiers: Array<ReturnType<typeof readModifier>> = []
 
   for (const item of list) {
+    if (!item)
+      continue
+
     if (!isComponent(item)) {
       const mod = readModifier(item)
       if (!modifiers.some(m => m.name === mod.name))

@@ -12,7 +12,7 @@ export function text(...content: Array<string | { toString: () => string }>) {
     const stringContent = content
       .map(c => typeof c === 'string' ? c : c.toString())
       .map(c => Hooks.callHook('transformUserFacingText', c, { ...attributes, component: 'TextDisplay', position: null }))
-    const innerContent = (innerPrefix ?? '') + stringContent.join(' ') + (innerSuffix ?? '')
+    const innerContent = (innerPrefix ?? '') + stringContent.join(' ').replace(/^ +| +$/mg, '') + (innerSuffix ?? '')
     const outerContent = linkUrl
       ? `[${innerContent}](${linkUrl})`
       : innerContent
