@@ -6,8 +6,10 @@ export function image(url: string) {
   let spoiler: boolean | undefined = undefined
 
   const out = {
-    ...createComponent('Thumbnail', ({ }) => ({
-      type: ComponentType.Thumbnail,
+    ...createComponent('Thumbnail', ({ hirarchy }) => ({
+      type: hirarchy[0] === 'MediaGallery' // if placed inside a media gallery we act as a media gallery item instead
+        ? undefined
+        : ComponentType.Thumbnail,
       media: {
         url
       },

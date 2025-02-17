@@ -2,7 +2,7 @@ import { ComponentType, createComponent, renderComponentList, type CordoComponen
 
 
 type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'>
-type AllowedComponentArray = AllowedComponents[]
+type AllowedComponentArray = Array<AllowedComponents | AllowedComponents[]>
 
 export function container(...components: AllowedComponentArray) {
   let accentColor: string | number | undefined = undefined
@@ -11,7 +11,7 @@ export function container(...components: AllowedComponentArray) {
   const out = {
     ...createComponent('Container', ({ hirarchy, attributes }) => ({
       type: ComponentType.Container,
-      components: renderComponentList(components, 'Container', hirarchy, attributes),
+      components: renderComponentList(components.flat(), 'Container', hirarchy, attributes),
       accent_color: typeof accentColor === 'string' ? parseInt(accentColor.slice(1), 16) : accentColor,
       spoiler
     })),

@@ -3,7 +3,7 @@ import { ComponentType, createComponent } from "../component"
 
 
 export function text(...content: Array<string | { toString: () => string }>) {
-  let sizePrefix: string = ''
+  let outerPrefix: string = ''
   let innerPrefix: string = ''
   let innerSuffix: string = ''
   let linkUrl: string | null = null
@@ -16,7 +16,7 @@ export function text(...content: Array<string | { toString: () => string }>) {
     const outerContent = linkUrl
       ? `[${innerContent}](${linkUrl})`
       : innerContent
-    return sizePrefix + outerContent as string
+    return outerPrefix + outerContent as string
   }
 
   const out = {
@@ -28,11 +28,11 @@ export function text(...content: Array<string | { toString: () => string }>) {
     toString,
 
     size: (size: 'h1' | 'h2' | 'h3' | 'small' | 'default') => {
-      if (size === 'h1') sizePrefix = '# '
-      else if (size === 'h2') sizePrefix = '## '
-      else if (size === 'h3') sizePrefix = '### '
-      else if (size === 'small') sizePrefix = '-# '
-      else sizePrefix = ''
+      if (size === 'h1') outerPrefix = '# '
+      else if (size === 'h2') outerPrefix = '## '
+      else if (size === 'h3') outerPrefix = '### '
+      else if (size === 'small') outerPrefix = '-# '
+      else outerPrefix = ''
       return out
     },
 
@@ -67,6 +67,11 @@ export function text(...content: Array<string | { toString: () => string }>) {
         innerPrefix = innerPrefix + '~~'
         innerSuffix = '~~' + innerSuffix
       }
+      return out
+    },
+    quote: (val = true) => {
+      if (val)
+        outerPrefix = '> '
       return out
     },
     code: (val = true) => {

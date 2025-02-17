@@ -12,6 +12,7 @@ import {
 export { button } from './builtin/button'
 export { container } from './builtin/container'
 export { divider } from './builtin/divider'
+export { gallery } from './builtin/gallery'
 export { image } from './builtin/image'
 export { linkButton } from './builtin/link-button'
 export { row } from './builtin/row'

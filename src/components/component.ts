@@ -56,11 +56,11 @@ export function createComponent<Type extends StringComponentType>(
     [CordoComponent]: comp,
     visible(value: boolean) {
       comp.visible = value
-      return out
+      return this
     },
-    attributes: (attrs: Record<string, any>) => {
+    attributes(attrs: Record<string, any>) {
       comp.attributes = defu(attrs, comp.attributes)
-      return out
+      return this
     }
   }
   return out
