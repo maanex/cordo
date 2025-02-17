@@ -62,7 +62,13 @@ export namespace InteractionEnvironment {
     export function getRouteFromPath(path: string) {
       const { lockfile, currentRoute } = getCtx()
 
-      const start = resolvePathDots(path, currentRoute)
+      let startingPoint = currentRoute
+      if (startingPoint.endsWith(DefaultFileName))
+        startingPoint = startingPoint.slice(0, -DefaultFileName.length)
+      if (startingPoint.endsWith('/') && startingPoint.length > 1)
+        startingPoint = startingPoint.slice(0, -1)
+
+      const start = resolvePathDots(path, startingPoint)
       if (start === null) {
         console.log('Invalid route', path)
         return { routeId: '####', args: [] }
@@ -73,7 +79,7 @@ export namespace InteractionEnvironment {
         route: r,
         segments: r.path.split('/'),
         args: [] as string[],
-        specificity: 0
+        specificity: lockfile.$runtime.routeImpls.has(r.name!) ? 0 : -100 // penalize non-implemented routes
       }))
 
       for (let segmentIdx = 0; segmentIdx < segments.length; segmentIdx++) {

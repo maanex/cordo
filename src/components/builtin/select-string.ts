@@ -26,7 +26,9 @@ export function selectString() {
     return optionsVal.slice(0, 25).map(o => ({
       ...o,
       label: Hooks.callHook('transformUserFacingText', o.label, { component: 'StringSelect', position: 'option.label' }),
-      description: Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
+      description: o.description
+        ? Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
+        : undefined
     }))
   }
 

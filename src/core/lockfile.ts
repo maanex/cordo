@@ -110,11 +110,10 @@ export namespace LockfileInternals {
     await fs.writeFile(path, content.join('\n'))
 
     if (typeDest) {
-      const routes = data.routes.map(route => route.path!.replaceAll(/\[.+\]/g, '${string}'))
-      for (const route of routes) {
-        if (route.endsWith('/index'))
-          routes.push(route.slice(0, -'/index'.length))
-      }
+      const routes = data.routes
+        .filter(route => route.name && data.$runtime.routeImpls.has(route.name))
+        .map(route => route.path!.replaceAll(/\[.+\]/g, '${string}'))
+        .map(route => route.replace(/\/index$/, '') || '/')
 
       const types = [
         'declare module "cordo" {',

@@ -25,6 +25,8 @@ export { debugPrint } from './mods/debug-print'
 export { debugRoute } from './mods/debug-route'
 export { disableAllComponents } from './mods/disable-all-components'
 
+export type { CordoComponent, StringComponentType } from './component'
+
 export namespace Extend {
   export const createModifier = _createModifier
 
