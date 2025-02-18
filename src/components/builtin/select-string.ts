@@ -1,14 +1,19 @@
 import { type APISelectMenuOption } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
-import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/funct"
+import { FunctInternals, value, type CordoFunct, type CordoFunctRun } from "../../core/funct"
 import { Hooks } from "../../core/hooks"
 
+
+type SelectMenuOption<Value extends string = string> = Omit<APISelectMenuOption, 'value'> & ({
+  value?: Value
+  onClick?: CordoFunct | CordoFunctRun
+})
 
 export function selectString<Values extends string = string>() {
   let placeholderVal: string | undefined = undefined
   let minValues: number | undefined = undefined
   let maxValues: number | undefined = undefined
-  let optionsVal: APISelectMenuOption[] = []
+  let optionsVal: SelectMenuOption[] = []
   let disabledVal: boolean | undefined = undefined
   const functVal: CordoFunct[] = []
 
@@ -22,13 +27,22 @@ export function selectString<Values extends string = string>() {
     )
   }
 
-  function getOptions(): APISelectMenuOption[] {
+  function getOptions(): SelectMenuOption[] {
     return optionsVal.slice(0, 25).map(o => ({
       ...o,
       label: Hooks.callHook('transformUserFacingText', o.label, { component: 'StringSelect', position: 'option.label' }),
       description: o.description
         ? Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
-        : undefined
+        : undefined,
+      value: FunctInternals.compileFunctToCustomId([
+        ...(o.onClick
+          ? Array.isArray(o.onClick)
+            ? o.onClick
+            : [ o.onClick ]
+          : []
+        ),
+        o.value ? value(o.value) : null
+      ])
     }))
   }
 
@@ -63,11 +77,11 @@ export function selectString<Values extends string = string>() {
       functVal.push(...funct)
       return out
     },
-    setOptions(options: Array<APISelectMenuOption & { value: Values }>) {
+    setOptions(options: Array<SelectMenuOption<Values>>) {
       optionsVal = options
       return out
     },
-    addOption(o: APISelectMenuOption & { value: Values }) {
+    addOption(o: SelectMenuOption<Values>) {
       optionsVal.push(o)
       return out
     }

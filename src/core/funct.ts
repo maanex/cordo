@@ -1,5 +1,6 @@
 import type { DynamicTypes } from "cordo"
 import { LibIds } from "../lib/ids"
+import { LibUtils } from "../lib/utils"
 import { InteractionEnvironment } from "./interaction-environment"
 import { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
@@ -69,6 +70,19 @@ export function run(
   })
 }
 
+/** value will do as you think and just encode a value
+ * this is mostly used internally and you should not need to use this
+ */
+export function value(
+  value: string,
+): TypedCordoFunct<'value'> {
+  return FunctInternals.createFunct({
+    type: 'value',
+    path: value,
+    flags: 0
+  })
+}
+
 export namespace FunctInternals {
 
   /** the current version of custom ids. pick another non base64 character if you make breaking changes */
@@ -84,7 +98,8 @@ export namespace FunctInternals {
 
   export const Types = [
     'goto',
-    'run'
+    'run',
+    'value' // value is a runtime only type, if you add something here move it in front so we don't lose the 0b10 id
   ] as const
   export type Types = typeof Types[number]
 
@@ -100,15 +115,17 @@ export namespace FunctInternals {
     return funct[FunctSymbol]
   }
 
-  export function compileFunctToCustomId(funct: CordoFunct | CordoFunct[]): string {
+  export function compileFunctToCustomId(funct: CordoFunct | Array<CordoFunct | null>): string {
+    const list = (Array.isArray(funct) ? funct : [ funct ]).filter(Boolean) as CordoFunct[]
+
     const idc = InteractionEnvironment.Utils.requestNewId(true)
-    if (Array.isArray(funct) && funct.length === 0)
+    if (list.length === 0)
       return NoopIndicator + idc
 
-    const list = Array.isArray(funct) ? funct : [ funct ]
     const argus: string[] = []
     const command: string[] = []
     const flags: number[] = []
+    const extraValues: string[] = []
 
     for (const fun of list) {
       const arg = fun[FunctSymbol]
@@ -119,18 +136,20 @@ export namespace FunctInternals {
         command.push(routeId)
         argus.push(...args)
         flags.push(arg.flags << 2 | typeId)
+      } else if (arg.type === 'value') {
+        extraValues.push(arg.path)
       }
     }
 
     const lut = InteractionEnvironment.getCtx().lockfile.lut
     let argusStr = ''
     let counter = -1
-    for (const arg of argus) {
+    for (const arg of LibUtils.iterate(argus, extraValues)) {
       counter++
 
       // check if this argument has already been added so we can just refernce it
       const firstArrayPos = argus.indexOf(arg)
-      if (firstArrayPos < counter) {
+      if (firstArrayPos > 0 && firstArrayPos < counter) {
         argusStr += ReferenceArgumentIndicator + LibIds.stringify(firstArrayPos, 1)
         continue
       }
@@ -147,6 +166,19 @@ export namespace FunctInternals {
 
     const flagsStr = flags.map(f => LibIds.stringify(f, 1)).join('')
     return `${flagsStr}${FunctVersion}${command.join('')}${argusStr}${idc}`
+  }
+
+  function parseArg(arg: string, parsedArguments: string[]) {
+    if (arg[0] === PlainArgumentIndicator) 
+      return arg.slice(1)
+
+    if (arg[0] === LutArgumentIndicator) 
+      return InteractionEnvironment.getCtx().lockfile.lut[LibIds.parse(arg.slice(1))] ?? ''
+
+    if (arg[0] === ReferenceArgumentIndicator) 
+      return parsedArguments[LibIds.parseSingle(arg[1])] ?? ''
+
+    return ''
   }
 
   export function parseCustomId(id: string): CordoFunct[] {
@@ -185,48 +217,34 @@ export namespace FunctInternals {
     for (const fun of header) {
       const routeId = routesRaw.shift()!
       const route = InteractionEnvironment.Utils.getRouteFromId(routeId)!
-      const lut = InteractionEnvironment.getCtx().lockfile.lut
       const path = []
 
-      let catchAllMode = false
-      const parts = route.path.split('/')
-      while (true) {
-        if (!catchAllMode) {
-          if (parts.length <= 0)
-            break
-
-          const part = parts.shift()!
-          if (!part.startsWith('[') || !part.endsWith(']')) {
-            path.push(part)
-            continue
-          } else if (part.startsWith('[...')) {
-            catchAllMode = true
-          }
+      for (const part of route.path.split('/')) {
+        if (!part.startsWith('[') || !part.endsWith(']')) {
+          path.push(part)
+          continue
         }
 
         const argRaw = argsRaw.shift()!
-        if (argRaw[0] === PlainArgumentIndicator) {
-          const resolved = argRaw.slice(1)
-          path.push(resolved)
-          parsedArguments.push(resolved)
-        } else if (argRaw[0] === LutArgumentIndicator) {
-          const resolved = lut[LibIds.parse(argRaw.slice(1))] ?? ''
-          path.push(resolved)
-          parsedArguments.push(resolved)
-        } else if (argRaw[0] === ReferenceArgumentIndicator) {
-          const resolved = parsedArguments[LibIds.parseSingle(argRaw[1])] ?? ''
-          path.push(resolved)
-          parsedArguments.push(resolved)
-        }
-
-        if (catchAllMode && argsRaw.length <= 0) break
-        if (!catchAllMode && parts.length <= 0) break
+        const parsed = parseArg(argRaw, parsedArguments)
+        path.push(parsed)
+        parsedArguments.push(parsed)
       }
 
       out.push(createFunct({
         flags: fun.flags,
         type: fun.type,
         path: path.join('/')
+      }))
+    }
+
+    for (const remainingArg of argsRaw) {
+      const parsed = parseArg(remainingArg, parsedArguments)
+      parsedArguments.push(parsed)
+      out.push(createFunct({
+        type: 'value',
+        path: parsed,
+        flags: 0
       }))
     }
 
@@ -247,7 +265,15 @@ export namespace FunctInternals {
     } else if (type === 'run') {
       // TODO
       return Promise.resolve(null as unknown as RouteResponse)
+    } else if (type === 'value') {
+      return Promise.resolve(path)
     }
+  }
+
+  export function getValues(functs: CordoFunct[]): string[] {
+    return functs.map(f => readFunct(f))
+      .filter(f => f.type === 'value')
+      .map(f => f.path)
   }
 
 }

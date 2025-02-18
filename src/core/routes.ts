@@ -103,8 +103,8 @@ export namespace Routes {
 ): RouteRequest | null {
     const params = route.path
       .split('/')
-      .filter(p => /^\[\.{3}?\w+\]$/.test(p))
-      .map(p => p.slice(1, -1).replace(/^\.{3}/, ''))
+      .filter(p => /^\[\w+\]$/.test(p))
+      .map(p => p.slice(1, -1))
       .reduce((obj, name, idx) => ({ [name]: args[idx], ...obj }), {} as Record<string, string>)
 
     const location: RouteRequest['location'] | null = (interaction.context === InteractionContextType.Guild)

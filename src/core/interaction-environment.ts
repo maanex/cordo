@@ -97,7 +97,6 @@ export namespace InteractionEnvironment {
       let options = lockfile.routes.map(r => ({
         route: r,
         segments: r.path.split('/'),
-        catchAll: false,
         args: [] as string[],
         specificity: lockfile.$runtime.routeImpls.has(r.name!) ? 0 : -100 // penalize non-implemented routes
       }))
@@ -105,19 +104,12 @@ export namespace InteractionEnvironment {
       for (let segmentIdx = 0; segmentIdx < segments.length; segmentIdx++) {
         const seg = segments[segmentIdx]
         options = options.filter((o) => {
-          if (o.catchAll) {
-            o.args[o.args.length - 1] += '/' + seg
-            return true
-          } else if (o.segments.length <= segmentIdx) {
+          if (o.segments.length <= segmentIdx) {
             return false
           } else if (o.segments[segmentIdx] === seg) {
             o.specificity++
             return true
           } else if (o.segments[segmentIdx].startsWith('[') && o.segments[segmentIdx].endsWith(']')) {
-            if (o.segments[segmentIdx].startsWith('[...')) {
-              o.catchAll = true
-              o.specificity--
-            }
             o.args.push(seg)
             return true
           } else {
@@ -131,8 +123,6 @@ export namespace InteractionEnvironment {
       options = options.filter((o) => {
         if (o.segments.length === segments.length) {
           o.specificity++
-          return true
-        } else if (o.catchAll) {
           return true
         } else if (o.segments.length === segments.length + 1) {
           return (o.segments.at(-1) === DefaultFileName)

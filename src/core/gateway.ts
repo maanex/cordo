@@ -1,4 +1,4 @@
-import { ApplicationCommandType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
+import { ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
@@ -112,6 +112,15 @@ export namespace CordoGateway {
         return Routes.callRoute(route.routeId, route.args, i)
       }
     } else if (i.type === InteractionType.MessageComponent) {
+      if (i.data.component_type === ComponentType.StringSelect) {
+        const options = i.data.values.map(v => FunctInternals.parseCustomId(v))
+        for (const option of options) {
+          for (const action of option)
+            await FunctInternals.evalFunct(action, i)
+        }
+        i.data.values = options.map(o => FunctInternals.getValues(o)[0])
+      }
+
       const id = i.data.custom_id
       const actions = FunctInternals.parseCustomId(id)
       if (!actions.length)
