@@ -66,7 +66,7 @@ export namespace Routes {
       if (fromLockfile) {
         out.push({
           name: fromLockfile.name,
-          path: file.path.join('/').replace(/\..+$/, ''),
+          path: file.path.join('/').replace(/\.\w+$/, ''),
           realPath: file.path.join('/'),
           impl: file.route
         })
@@ -75,13 +75,13 @@ export namespace Routes {
         const strId = LibIds.stringify(id, LockfileInternals.Const.idLength)
         out.push({
           name: strId,
-          path: file.path.join('/').replace(/\..+$/, ''),
+          path: file.path.join('/').replace(/\.\w+$/, ''),
           realPath: file.path.join('/'),
           impl: file.route
         })
         lockfile.routes.push({
           name: strId,
-          path: file.path.join('/').replace(/\..+$/, ''),
+          path: file.path.join('/').replace(/\.\w+$/, ''),
           realPath: file.path.join('/')
         })
       }
@@ -103,8 +103,8 @@ export namespace Routes {
 ): RouteRequest | null {
     const params = route.path
       .split('/')
-      .filter(p => /^\[\w+\]$/.test(p))
-      .map(p => p.slice(1, -1))
+      .filter(p => /^\[\.{3}?\w+\]$/.test(p))
+      .map(p => p.slice(1, -1).replace(/^\.{3}/, ''))
       .reduce((obj, name, idx) => ({ [name]: args[idx], ...obj }), {} as Record<string, string>)
 
     const location: RouteRequest['location'] | null = (interaction.context === InteractionContextType.Guild)

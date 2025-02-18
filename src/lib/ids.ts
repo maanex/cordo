@@ -27,4 +27,11 @@ export namespace LibIds {
     return bitSet.indexOf(string)
   }
 
+  export function parse(string: string) {
+    let out = 0
+    for (let i = 0; i < string.length; i++)
+      out |= bitSet.indexOf(string[i]) << (size*i)
+    return out
+  }
+
 }

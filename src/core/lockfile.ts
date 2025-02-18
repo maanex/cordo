@@ -1,4 +1,5 @@
 import { promises as fs } from 'node:fs'
+import { LibIds } from '../lib/ids'
 import type { RouteInternals } from './files/route'
 
 
@@ -8,8 +9,10 @@ export namespace LockfileInternals {
     version: number
     reg: {
       idCounter: number
+      lutCounter: number
     }
     routes: Array<Omit<RouteInternals.ParsedRoute, 'impl'>>
+    lut: Array<string>
     $runtime: {
       routeImpls: Map<string, RouteInternals.ParsedRoute>
     }
@@ -23,9 +26,11 @@ export namespace LockfileInternals {
     return {
       version,
       reg: {
-        idCounter: 0
+        idCounter: 0,
+        lutCounter: 0
       },
       routes: [],
+      lut: [],
       $runtime: {
         routeImpls: new Map()
       }
@@ -75,15 +80,22 @@ export namespace LockfileInternals {
           const [ key, value ] = line.split(' ')
           if (key === 'idc')
             out.reg.idCounter = parseInt(value) ?? 0
+          else if (key === 'lutc')
+            out.reg.lutCounter = parseInt(value) ?? 0
         }
 
         if (block === 'routes') {
           const [ name, path ] = line.split(' ')
           out.routes.push({
             name,
-            path: path.replace(/\..+$/, ''),
+            path: path.replace(/\.\w+$/, ''),
             realPath: path
           })
+        }
+
+        if (block === 'lut') {
+          const [ id, value ] = line.split(' ')
+          out.lut[LibIds.parse(id)] = value
         }
       }
 
@@ -100,9 +112,13 @@ export namespace LockfileInternals {
       '',
       '[reg]',
       `idc ${data.reg.idCounter}`,
+      `lutc ${data.reg.lutCounter}`,
       '',
       '[routes]',
       ...data.routes.map(route => `${route.name} ${route.realPath}`),
+      '',
+      '[lut]',
+      ...data.lut.map((value, idx) => `${LibIds.stringify(idx, Const.idLength)} ${value}`),
       '',
       '# EOF'
     ]

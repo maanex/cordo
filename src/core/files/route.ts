@@ -156,8 +156,8 @@ export namespace RouteInternals {
     if (!content || !content.default)
       return null
 
-    // if (!content.default[CordoRouteSymbol])
-    //   return null
+    if (!content.default[CordoRouteSymbol])
+      return null
 
     return content.default
   }

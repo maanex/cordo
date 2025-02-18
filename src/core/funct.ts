@@ -122,16 +122,27 @@ export namespace FunctInternals {
       }
     }
 
+    const lut = InteractionEnvironment.getCtx().lockfile.lut
     let argusStr = ''
-    let counter = 0
+    let counter = -1
     for (const arg of argus) {
+      counter++
+
       // check if this argument has already been added so we can just refernce it
       const firstArrayPos = argus.indexOf(arg)
-      if (firstArrayPos < counter) 
+      if (firstArrayPos < counter) {
         argusStr += ReferenceArgumentIndicator + LibIds.stringify(firstArrayPos, 1)
-       else 
-        argusStr += PlainArgumentIndicator + arg
-      counter++
+        continue
+      }
+
+      // check if this argument is part of the lut
+      const lutIndex = lut.indexOf(arg)
+      if (lutIndex >= 0) {
+        argusStr += LutArgumentIndicator + LibIds.stringify(lutIndex, LockfileInternals.Const.idLength)
+        continue
+      }
+
+      argusStr += PlainArgumentIndicator + arg
     }
 
     const flagsStr = flags.map(f => LibIds.stringify(f, 1)).join('')
@@ -174,24 +185,42 @@ export namespace FunctInternals {
     for (const fun of header) {
       const routeId = routesRaw.shift()!
       const route = InteractionEnvironment.Utils.getRouteFromId(routeId)!
+      const lut = InteractionEnvironment.getCtx().lockfile.lut
       const path = []
-      for (const part of route.path.split('/')) {
-        if (part.startsWith('[') && part.endsWith(']')) {
-          const argRaw = argsRaw.shift()!
-          if (argRaw[0] === PlainArgumentIndicator) {
-            path.push(argRaw.slice(1))
-            parsedArguments.push(argRaw.slice(1))
-          } else if (argRaw[0] === LutArgumentIndicator) {
-            path.push('') // TODO: lookup
-            parsedArguments.push('')
-          } else if (argRaw[0] === ReferenceArgumentIndicator) {
-            const resolved = parsedArguments[LibIds.parseSingle(argRaw[1])] ?? ''
-            path.push(resolved)
-            parsedArguments.push(resolved)
+
+      let catchAllMode = false
+      const parts = route.path.split('/')
+      while (true) {
+        if (!catchAllMode) {
+          if (parts.length <= 0)
+            break
+
+          const part = parts.shift()!
+          if (!part.startsWith('[') || !part.endsWith(']')) {
+            path.push(part)
+            continue
+          } else if (part.startsWith('[...')) {
+            catchAllMode = true
           }
-        } else {
-          path.push(part)
         }
+
+        const argRaw = argsRaw.shift()!
+        if (argRaw[0] === PlainArgumentIndicator) {
+          const resolved = argRaw.slice(1)
+          path.push(resolved)
+          parsedArguments.push(resolved)
+        } else if (argRaw[0] === LutArgumentIndicator) {
+          const resolved = lut[LibIds.parse(argRaw.slice(1))] ?? ''
+          path.push(resolved)
+          parsedArguments.push(resolved)
+        } else if (argRaw[0] === ReferenceArgumentIndicator) {
+          const resolved = parsedArguments[LibIds.parseSingle(argRaw[1])] ?? ''
+          path.push(resolved)
+          parsedArguments.push(resolved)
+        }
+
+        if (catchAllMode && argsRaw.length <= 0) break
+        if (!catchAllMode && parts.length <= 0) break
       }
 
       out.push(createFunct({

@@ -61,11 +61,18 @@ export namespace InteractionEnvironment {
 
     /**
      * cordo allows for runtime variables in route paths
+     * these are inspired by bash
+     * - $@ is the full value of the first argument
+     * - $0, $1, $2, ... are the values of the first argument split by '/'
      */
     function substituteRuntimeVariables(args: string[], i: CordoInteraction) {
       return args.map((arg) => {
-        if (arg === '$0' && 'values' in i.data!)
-          return i.data!.values[0]
+        if (arg.startsWith('$') && 'values' in i.data!) {
+          if (arg === '$@')
+            return i.data!.values[0]
+          if (/^\$\d$/.test(arg))
+            return i.data!.values[0].split('/')[parseInt(arg[1])] ?? ''
+        }
         return arg
       })
 
@@ -90,6 +97,7 @@ export namespace InteractionEnvironment {
       let options = lockfile.routes.map(r => ({
         route: r,
         segments: r.path.split('/'),
+        catchAll: false,
         args: [] as string[],
         specificity: lockfile.$runtime.routeImpls.has(r.name!) ? 0 : -100 // penalize non-implemented routes
       }))
@@ -97,12 +105,19 @@ export namespace InteractionEnvironment {
       for (let segmentIdx = 0; segmentIdx < segments.length; segmentIdx++) {
         const seg = segments[segmentIdx]
         options = options.filter((o) => {
-          if (o.segments.length <= segmentIdx) {
+          if (o.catchAll) {
+            o.args[o.args.length - 1] += '/' + seg
+            return true
+          } else if (o.segments.length <= segmentIdx) {
             return false
           } else if (o.segments[segmentIdx] === seg) {
             o.specificity++
             return true
           } else if (o.segments[segmentIdx].startsWith('[') && o.segments[segmentIdx].endsWith(']')) {
+            if (o.segments[segmentIdx].startsWith('[...')) {
+              o.catchAll = true
+              o.specificity--
+            }
             o.args.push(seg)
             return true
           } else {
@@ -116,6 +131,8 @@ export namespace InteractionEnvironment {
       options = options.filter((o) => {
         if (o.segments.length === segments.length) {
           o.specificity++
+          return true
+        } else if (o.catchAll) {
           return true
         } else if (o.segments.length === segments.length + 1) {
           return (o.segments.at(-1) === DefaultFileName)

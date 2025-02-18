@@ -29,7 +29,8 @@ async function mountCordo(configOverrides?: PartialDeep<CordoConfig>) {
 function triggerInteraction(interaction: APIInteraction, opts: {
   httpCallback?: (payload: any) => any
 } = {}) {
-  if (!lockfile || !config) throw new Error('Cordo is not mounted')
+  if (!lockfile || !config)
+    throw new Error('Cordo is not mounted')
 
   CordoGateway.triggerInteraction({
     interaction,
@@ -39,10 +40,37 @@ function triggerInteraction(interaction: APIInteraction, opts: {
   })
 }
 
+/**
+ * you can provide constants you will commonly use in your routes to cordo
+ * cordo will then create a lookup table to more efficiently access these constants in internal routing
+ * you should not notice any difference but it will allow you to store more data on click or submit functions
+ */
+function registerConstants(constants: readonly string[]) {
+  if (!lockfile || !config)
+    throw new Error('Cordo is not mounted')
+
+  let changesMade = false
+  for (const entry of constants) {
+    if (entry.length <= LockfileInternals.Const.idLength) // too short to save any space
+      continue
+    if (lockfile!.lut.includes(entry))
+      continue
+
+    lockfile.lut[lockfile.reg.lutCounter++] = entry
+    changesMade = true
+  }
+
+  if (changesMade)
+    return LockfileInternals.writeLockfile(config!.lockfile, lockfile!, config!.typeDest)
+  else
+    return Promise.resolve()
+}
+
 //
 
 export const Cordo = {
   mountCordo,
+  registerConstants,
   triggerInteraction
 }
 Object.freeze(Cordo)

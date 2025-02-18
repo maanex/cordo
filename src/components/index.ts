@@ -11,6 +11,7 @@ import {
 
 export { button } from './builtin/button'
 export { container } from './builtin/container'
+export { collection } from './builtin/collection'
 export { divider } from './builtin/divider'
 export { gallery } from './builtin/gallery'
 export { image } from './builtin/image'
