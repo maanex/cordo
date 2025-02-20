@@ -1,7 +1,8 @@
 import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
+import type { CordoModifier } from "../modifier"
 
 
-type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'>
+type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'> | CordoModifier
 type AllowedComponentArray = Array<AllowedComponents | AllowedComponents[]>
 
 export function container(...components: AllowedComponentArray) {

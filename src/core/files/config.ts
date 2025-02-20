@@ -18,6 +18,8 @@ export type CordoConfig = {
   typeDest: string | null
   upstream: {
     baseUrl: string
+    /** if an interaction was not replied to within X millis, cordo will send the appropriate defer/ack response. Set to 0 to disable */
+    autoDeferMs: number
   }
   client: {
     id: string
@@ -60,7 +62,8 @@ export namespace ConfigInternals {
     lockfile: './cordo.lock',
     typeDest: null,
     upstream: {
-      baseUrl: 'https://discord.com/api/v10'
+      baseUrl: 'https://discord.com/api/v10',
+      autoDeferMs: 50
     },
     client: {
       id: '',

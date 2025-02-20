@@ -88,6 +88,13 @@ export type RouteRequest = {
   fullRoute: string
   rawInteraction: CordoInteraction
 
+  locals: {
+    get<T = any>(key: string): T | undefined
+    set(key: string, value: any): void
+    delete(key: string): void
+    has(key: string): boolean
+  }
+
   /** this has the prefix raw because a cleaner representation of this data is planned */
   rawEntitlements: APIEntitlement[]
 
@@ -95,13 +102,13 @@ export type RouteRequest = {
   ack: () => void
   /** render the provided components */
   render: (...response: RouteResponse) => void
-  /** run a different route. use await to await the call */
-  run: (...params: Parameters<typeof run>) => Promise<RouteResponse>
-  /** let a different route handle this */
-  goto: (...params: Parameters<typeof goto>) => void
+  /** run a different route. use await to await the call. Returns whether successful, null if not run */
+  run: (...params: Parameters<typeof run>) => Promise<boolean | null>
+  /** let a different route handle this. Returns whether successful, null if not run */
+  goto: (...params: Parameters<typeof goto>) => Promise<boolean | null>
 } & (RouteRequestInGuild | RouteRequestInDM) & (RouteRequestFromCommand | RouteRequestFromButton | RouteRequestFromSelect)
 
-export type AsyncInteractionHandler = (i: RouteRequest) => RouteResponse | Promise<RouteResponse> | void | Promise<void>
+export type AsyncInteractionHandler = (i: RouteRequest) => RouteResponse | Promise<RouteResponse> | void | Promise<void> | boolean | Promise<boolean>
 
 export type CordoRoute = {
   [CordoRouteSymbol]: typeof CordoRouteSymbol

@@ -24,12 +24,13 @@ function iterateComponents(c: any): any {
   return c
 }
 
-export function disableAllComponents() {
+export function disableAllComponents(disable = true) {
   return createModifier({
     name: 'disable-all-components',
     hooks: {
       postRender: (c) => {
-        iterateComponents(c)
+        if (disable)
+          iterateComponents(c)
         return c
       }
     }

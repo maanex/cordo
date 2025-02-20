@@ -86,8 +86,10 @@ export namespace CordoGateway {
       return null
 
     const config = InteractionEnvironment.getCtx().config
-    if (!config.client.id)
+    if (!config.client.id) {
+      console.warn(`No client id provided in config. Cannot respond to interactions.`)
       return null
+    }
 
     if (type === InteractionResponseType.ChannelMessageWithSource)
       return apiRequest('post', `/webhooks/${config.client.id}/${i.token}`, data)
@@ -104,6 +106,14 @@ export namespace CordoGateway {
     i = await Hooks.callHook('onBeforeHandle', i)
     if (!i) return
 
+    const deferAfter = InteractionEnvironment.getCtx().config.upstream.autoDeferMs
+    if (deferAfter) {
+      setTimeout(() => {
+        if (!InteractionInternals.get(i).answered)
+          respondTo(i, null)
+      }, deferAfter)
+    }
+
     if (i.type === InteractionType.ApplicationCommand) {
       if (i.data.type === ApplicationCommandType.ChatInput) {
         const name = i.data.name
@@ -115,19 +125,23 @@ export namespace CordoGateway {
       if (i.data.component_type === ComponentType.StringSelect) {
         const options = i.data.values.map(v => FunctInternals.parseCustomId(v))
         for (const option of options) {
-          for (const action of option)
-            await FunctInternals.evalFunct(action, i)
+          for (const action of option) {
+            const success = await FunctInternals.evalFunct(action, i)
+            if (!success) return
+          }
         }
         i.data.values = options.map(o => FunctInternals.getValues(o)[0])
       }
 
       const id = i.data.custom_id
       const actions = FunctInternals.parseCustomId(id)
-      if (!actions.length)
-        await respondTo(i, { type: InteractionResponseType.DeferredMessageUpdate })
+      if (!actions.length && !InteractionInternals.get(i).answered)
+        await respondTo(i, null)
 
-      for (const action of actions) 
-        await FunctInternals.evalFunct(action, i)
+      for (const action of actions) {
+        const success = await FunctInternals.evalFunct(action, i)
+        if (!success) return
+      }
     }
   }
 

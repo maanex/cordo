@@ -20,9 +20,13 @@ export namespace Routes {
     asReply?: boolean
     isPrivate?: boolean
     disableComponents?: boolean
+    /** this is set to true for `run` tasks, they cannot change the screen */
+    disableRendering?: boolean
   }
 
   export const supportedExtensions = [ 'js', 'ts' ]
+
+  const noOp = <T extends any> (response?: T) => (() => (response ?? {}) as T)
 
   export async function readFsTree(treeRoot: string, maxDepth = 20): Promise<{ path: string[]; route: CordoRoute }[]> {
     if (maxDepth <= 0) return []
@@ -139,13 +143,20 @@ export namespace Routes {
       rawInteraction: interaction,
       rawEntitlements: interaction.entitlements,
 
-      ack: () => CordoGateway.respondTo(interaction, null),
-      goto: (...args) => FunctInternals.evalFunct(goto(...args), interaction),
-      render: (...response) => {
+      locals: {
+        get: <T = any>(key: string) => interaction.locals[key] as T,
+        set: (key: string, value: any) => void (interaction.locals[key] = value),
+        delete: (key: string) => void (delete interaction.locals[key]),
+        has: (key: string) => key in interaction.locals
+      },
+
+      ack: opts.disableRendering ? noOp : () => CordoGateway.respondTo(interaction, null),
+      render: opts.disableRendering ? noOp : (...response) => {
         const rendered = renderRouteResponse(response, interaction, opts)
         CordoGateway.respondTo(interaction, rendered)
       },
-      run: (...args) => FunctInternals.evalFunct(run(...args), interaction) as Promise<RouteResponse>,
+      goto: opts.disableRendering ? noOp(Promise.resolve(null)) : (...args) => FunctInternals.evalFunct(goto(...args), interaction),
+      run: opts.disableRendering ? noOp(Promise.resolve(null)) : (...args) => FunctInternals.evalFunct(run(...args), interaction),
 
       // @ts-ignore
       location,
@@ -272,7 +283,7 @@ export namespace Routes {
     if (!input) return
 
     const built = await route.impl.handler(input)
-    if (!built) return
+    if (!built || typeof built === 'boolean') return
 
     const rendered = renderRouteResponse(built, i, opts)
     CordoGateway.respondTo(i, rendered)

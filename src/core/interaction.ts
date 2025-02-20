@@ -8,6 +8,7 @@ export type CordoInteraction = {
     answered: boolean
     httpCallback: ((payload: any) => any) | null
   }
+  locals: Record<string, any>
 } & APIInteraction
 
 export namespace InteractionInternals {
@@ -24,6 +25,7 @@ export namespace InteractionInternals {
     if (isCordoInteraction(i)) return i
     return {
       ...i,
+      locals: {},
       [Internals]: {
         answered: false,
         httpCallback: null

@@ -48,8 +48,9 @@ export function button() {
       else if (style === 'danger') styleVal = ButtonStyle.Danger
       return out
     },
-    disabled(disabled = true) {
+    disabled(disabled = true, opts?: { greyOut?: boolean }) {
       disabledVal = disabled
+      if (opts?.greyOut) styleVal = ButtonStyle.Secondary
       return out
     },
     onClick: (...funct: CordoFunctRun) => {

@@ -5,7 +5,6 @@ import { InteractionEnvironment } from "./interaction-environment"
 import { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
 import type { CordoInteraction } from "./interaction"
-import type { RouteResponse } from "./files/route"
 
 
 const FunctSymbol = Symbol('FunctSymbol')
@@ -34,7 +33,8 @@ export const Flags = {
     DisableComponents: 1 << 2,
   },
   Run: {
-    Wait: 1 << 0
+    Wait: 1 << 0,
+    ContinueOnError: 1 << 1
   }
 }
 
@@ -61,12 +61,15 @@ export function goto(
  */
 export function run(
   path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`,
-  opts?: { wait?: boolean }
+  opts?: {
+    wait?: boolean
+    continueOnError?: boolean
+  }
 ): TypedCordoFunct<'run'> {
   return FunctInternals.createFunct({
     type: 'run',
     path,
-    flags: (opts?.wait ? Flags.Run.Wait : 0)
+    flags: (opts?.wait ? Flags.Run.Wait : 0) | (opts?.continueOnError ? Flags.Run.ContinueOnError : 0)
   })
 }
 
@@ -217,8 +220,10 @@ export namespace FunctInternals {
     for (const fun of header) {
       const routeId = routesRaw.shift()!
       const route = InteractionEnvironment.Utils.getRouteFromId(routeId)!
-      const path = []
+      if (!route)
+        return []
 
+      const path = []
       for (const part of route.path.split('/')) {
         if (!part.startsWith('[') || !part.endsWith(']')) {
           path.push(part)
@@ -253,7 +258,8 @@ export namespace FunctInternals {
 
   //
 
-  export function evalFunct(funct: CordoFunct, i: CordoInteraction) {
+  /** returns whether to continue. False means abort execution of following functs */
+  export async function evalFunct(funct: CordoFunct, i: CordoInteraction): Promise<boolean> {
     const { type, path, flags } = readFunct(funct)
     if (type === 'goto') {
       const route = InteractionEnvironment.Utils.getRouteFromPath(path, true)
@@ -261,13 +267,26 @@ export namespace FunctInternals {
       const asReply = (flags & Flags.Goto.AsReply) !== 0
       const isPrivate = (flags & Flags.Goto.Private) !== 0
       const disableComponents = (flags & Flags.Goto.DisableComponents) !== 0
-      return Routes.callRoute(route.routeId, route.args, i, { asReply, isPrivate, disableComponents })
+      await Routes.callRoute(route.routeId, route.args, i, { asReply, isPrivate, disableComponents })
+      return true
     } else if (type === 'run') {
-      // TODO
-      return Promise.resolve(null as unknown as RouteResponse)
+      const route = InteractionEnvironment.Utils.getRouteFromPath(path, true)
+      const doWait = (flags & Flags.Run.Wait) !== 0
+      try {
+        const routeResponse = Routes.callRoute(route.routeId, route.args, i, { disableRendering: true })
+        if (doWait)
+          await routeResponse
+        return true
+      } catch (e) {
+        // TODO!
+        console.error(e)
+        return (flags & Flags.Run.ContinueOnError) !== 0
+      }
     } else if (type === 'value') {
-      return Promise.resolve(path)
+      return true
     }
+
+    return true
   }
 
   export function getValues(functs: CordoFunct[]): string[] {
