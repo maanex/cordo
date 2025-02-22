@@ -143,7 +143,8 @@ export namespace InteractionEnvironment {
         routeId: winner.route.name!,
         args: resolveRuntimeVars
           ? substituteRuntimeVariables(winner.args, invoker)
-          : winner.args
+          : winner.args,
+        routeFilePath: winner.route.filePath
       }
     }
 

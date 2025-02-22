@@ -124,13 +124,14 @@ export namespace CordoGateway {
     } else if (i.type === InteractionType.MessageComponent) {
       if (i.data.component_type === ComponentType.StringSelect) {
         const options = i.data.values.map(v => FunctInternals.parseCustomId(v))
+        i.data.values = options.map(o => FunctInternals.getValues(o)[0])
+
         for (const option of options) {
           for (const action of option) {
             const success = await FunctInternals.evalFunct(action, i)
             if (!success) return
           }
         }
-        i.data.values = options.map(o => FunctInternals.getValues(o)[0])
       }
 
       const id = i.data.custom_id

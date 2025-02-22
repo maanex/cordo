@@ -3,7 +3,7 @@ import type { CordoComponent, StringComponentType } from "../../components/compo
 import type { CordoInteraction } from "../interaction"
 import type { CordoModifier } from "../../components/modifier"
 import type { goto, run } from "../funct"
-import { CordoErrorRouteAssumptionFailed } from "../../errors"
+import { RouteAssumptionFailedError } from "../../errors"
 
 
 const CordoRouteSymbol = Symbol('CordoRoute')
@@ -142,9 +142,9 @@ export function assertCordoRequest<
       : RouteRequestFromSelect
 ) {
   if (assumptions.location && request.location !== assumptions.location)
-    throw new CordoErrorRouteAssumptionFailed(request, assumptions)
+    throw new RouteAssumptionFailedError(request, assumptions)
   if (assumptions.source && request.source !== assumptions.source)
-    throw new CordoErrorRouteAssumptionFailed(request, assumptions)
+    throw new RouteAssumptionFailedError(request, assumptions)
   return true
 }
 
@@ -153,7 +153,7 @@ export namespace RouteInternals {
   export type ParsedRoute = {
     name: string | null
     path: string
-    realPath: string
+    filePath: string
     impl: CordoRoute
   }
 

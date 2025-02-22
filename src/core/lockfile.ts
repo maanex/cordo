@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs'
 import { LibIds } from '../lib/ids'
 import type { RouteInternals } from './files/route'
+import type { ErrorBoundaryInternals } from './files/error-boundary'
 
 
 export namespace LockfileInternals {
@@ -15,6 +16,7 @@ export namespace LockfileInternals {
     lut: Array<string>
     $runtime: {
       routeImpls: Map<string, RouteInternals.ParsedRoute>
+      errorBoundaries: Array<ErrorBoundaryInternals.ParsedBoundary>
     }
   }
 
@@ -32,7 +34,8 @@ export namespace LockfileInternals {
       routes: [],
       lut: [],
       $runtime: {
-        routeImpls: new Map()
+        routeImpls: new Map(),
+        errorBoundaries: []
       }
     }
   }
@@ -89,7 +92,7 @@ export namespace LockfileInternals {
           out.routes.push({
             name,
             path: path.replace(/\.\w+$/, ''),
-            realPath: path
+            filePath: path
           })
         }
 
@@ -115,7 +118,7 @@ export namespace LockfileInternals {
       `lutc ${data.reg.lutCounter}`,
       '',
       '[routes]',
-      ...data.routes.map(route => `${route.name} ${route.realPath}`),
+      ...data.routes.map(route => `${route.name} ${route.filePath}`),
       '',
       '[lut]',
       ...data.lut.map((value, idx) => `${LibIds.stringify(idx, Const.idLength)} ${value}`),

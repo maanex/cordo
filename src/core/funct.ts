@@ -1,6 +1,8 @@
 import type { DynamicTypes } from "cordo"
 import { LibIds } from "../lib/ids"
 import { LibUtils } from "../lib/utils"
+import { CordoError } from "../errors"
+import { HandleErrors } from "../errors/handle"
 import { InteractionEnvironment } from "./interaction-environment"
 import { LockfileInternals } from "./lockfile"
 import { Routes } from "./routes"
@@ -9,21 +11,19 @@ import type { CordoInteraction } from "./interaction"
 
 const FunctSymbol = Symbol('FunctSymbol')
 
-export type CordoFunctRun
-  = [ TypedCordoFunct<'goto' | 'run'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
-  | [ TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'run'>, TypedCordoFunct<'goto' | 'run'> ]
+export type CordoFunctRun = CordoFunct[]
+  // = [ CordoFunct<'goto' | 'run'> ]
+  // | [ CordoFunct<'run'>, CordoFunct<'goto' | 'run'> ]
+  // | [ CordoFunct<'run'>, CordoFunct<'run'>, CordoFunct<'goto' | 'run'> ]
+  // | [ CordoFunct<'run'>, CordoFunct<'run'>, CordoFunct<'run'>, CordoFunct<'goto' | 'run'> ]
 
-export type TypedCordoFunct<Type extends FunctInternals.Types> = {
+export type CordoFunct<Type extends FunctInternals.Types = FunctInternals.Types> = {
   [FunctSymbol]: {
     type: Type
     path: string
     flags: number
   }
 }
-
-export type CordoFunct = TypedCordoFunct<FunctInternals.Types>
 
 
 export const Flags = {
@@ -40,36 +40,67 @@ export const Flags = {
 
 /** goto will open the route provided */
 export function goto(
-  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`,
+  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}` | CordoFunct<'goto'>,
   opts?: {
     asReply?: boolean,
     private?: boolean,
     disableComponents?: boolean
   }
-): TypedCordoFunct<'goto'> {
+): CordoFunct<'goto'> {
+  const usePath = FunctInternals.isFunct(path)
+    ? path[FunctSymbol].path
+    : path
+
+  let flags = FunctInternals.isFunct(path)
+    ? path[FunctSymbol].flags
+    : 0
+
+  if (opts?.asReply !== undefined)
+    flags = (flags & ~Flags.Goto.AsReply) | (opts.asReply ? Flags.Goto.AsReply : 0)
+  if (opts?.asReply !== undefined)
+    flags = (flags & ~Flags.Goto.AsReply) | (opts.asReply ? Flags.Goto.AsReply : 0)
+  if (opts?.disableComponents !== undefined)
+    flags = (flags & ~Flags.Goto.DisableComponents) | (opts.disableComponents ? Flags.Goto.DisableComponents : 0)
+
   return FunctInternals.createFunct({
     type: 'goto',
-    path,
-    flags: (opts?.asReply ? Flags.Goto.AsReply : 0) | (opts?.private ? Flags.Goto.Private : 0) | (opts?.disableComponents ? Flags.Goto.DisableComponents : 0)
+    path: usePath,
+    flags
   })
 }
 
 /** run will execute code on the route provided.
  * if wait is false, the code will be executed in the background and the next action is taken or the interaction is ack'd
  * if wait is true, the next action will wait for this route to finish running. if this route throws an error the error will be shown and the next action will not be taken
- * //TODO maybe we want to add an option to ignore errors or one to make errors show up in a reply
+ * 
+ * continueOnError is only relevant when wait is set to true
+ * if continueOnError is true, the next action will be taken even if the run route throws an error. the error will be presented in an emphemeral response
+ * if continueOnError is false, following actions will not execute and the error is rendered over the current route
  */
 export function run(
-  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}`,
+  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}` | CordoFunct<'run'>,
   opts?: {
     wait?: boolean
     continueOnError?: boolean
   }
-): TypedCordoFunct<'run'> {
+): CordoFunct<'run'> {
+  const usePath = FunctInternals.isFunct(path)
+    ? path[FunctSymbol].path
+    : path
+
+  let flags = FunctInternals.isFunct(path)
+    ? path[FunctSymbol].flags
+    : 0
+
+  if (opts?.wait !== undefined)
+    flags = (flags & ~Flags.Run.Wait) | (opts.wait ? Flags.Run.Wait : 0)
+  if (opts?.continueOnError !== undefined)
+    flags = (flags & ~Flags.Run.ContinueOnError) | (opts.continueOnError ? Flags.Run.ContinueOnError : 0)
+
   return FunctInternals.createFunct({
     type: 'run',
-    path,
-    flags: (opts?.wait ? Flags.Run.Wait : 0) | (opts?.continueOnError ? Flags.Run.ContinueOnError : 0)
+    path: usePath,
+    flags
   })
 }
 
@@ -78,7 +109,7 @@ export function run(
  */
 export function value(
   value: string,
-): TypedCordoFunct<'value'> {
+): CordoFunct<'value'> {
   return FunctInternals.createFunct({
     type: 'value',
     path: value,
@@ -107,10 +138,10 @@ export namespace FunctInternals {
   export type Types = typeof Types[number]
 
   export function isFunct(obj: any): obj is CordoFunct {
-    return obj && obj[FunctSymbol] === FunctSymbol
+    return obj && obj[FunctSymbol]
   }
 
-  export function createFunct<Type extends Types>(arg: TypedCordoFunct<Type>[typeof FunctSymbol]): TypedCordoFunct<Type> {
+  export function createFunct<Type extends Types>(arg: CordoFunct<Type>[typeof FunctSymbol]): CordoFunct<Type> {
     return { [FunctSymbol]: arg }
   }
 
@@ -278,8 +309,11 @@ export namespace FunctInternals {
           await routeResponse
         return true
       } catch (e) {
-        // TODO!
-        console.error(e)
+        if (e instanceof CordoError) 
+          HandleErrors.thrownOnRoute(e)
+         else 
+          console.error(e)
+        
         return (flags & Flags.Run.ContinueOnError) !== 0
       }
     } else if (type === 'value') {

@@ -12,6 +12,7 @@ import { InteractionEnvironment } from "./interaction-environment"
 import { CordoGateway } from "./gateway"
 import { FunctInternals, goto, run } from "./funct"
 import { Hooks } from "./hooks"
+import { ErrorBoundaryInternals, type CordoErrorBoundary } from "./files/error-boundary"
 
 
 export namespace Routes {
@@ -28,18 +29,34 @@ export namespace Routes {
 
   const noOp = <T extends any> (response?: T) => (() => (response ?? {}) as T)
 
-  export async function readFsTree(treeRoot: string, maxDepth = 20): Promise<{ path: string[]; route: CordoRoute }[]> {
-    if (maxDepth <= 0) return []
+  type ParsedFsTree = {
+    routes: Array<{ path: string[]; route: CordoRoute }>
+    errorBounds: Array<{ path: string[]; boundary: CordoErrorBoundary }>
+  }
 
-    const out: Awaited<ReturnType<typeof readFsTree>> = []
+  export async function readFsTree(treeRoot: string, maxDepth = 20): Promise<ParsedFsTree> {
+    const out: ParsedFsTree = {
+      routes: [],
+      errorBounds: []
+    }
+
+    if (maxDepth <= 0)
+      return out
+
     const dir = await fs.opendir(treeRoot)
     for await (const item of dir) {
       if (item.isDirectory()) {
         const subTree = await readFsTree(join(treeRoot, item.name), maxDepth - 1)
-        for (const child of subTree) {
-          out.push({
+        for (const child of subTree.routes) {
+          out.routes.push({
             path: [ item.name, ...child.path ],
             route: child.route
+          })
+        }
+        for (const child of subTree.errorBounds) {
+          out.errorBounds.push({
+            path: [ item.name, ...child.path ],
+            boundary: child.boundary
           })
         }
       } else if (item.isFile()) {
@@ -47,13 +64,22 @@ export namespace Routes {
           continue
 
         const route = await RouteInternals.readRoute(join(treeRoot, item.name))
-        if (!route)
+        if (route) {
+          out.routes.push({
+            path: [ item.name ],
+            route
+          })
           continue
+        }
 
-        out.push({
-          path: [ item.name ],
-          route
-        })
+        const errorBoundary = await ErrorBoundaryInternals.readHandler(join(treeRoot, item.name))
+        if (errorBoundary) {
+          out.errorBounds.push({
+            path: [ item.name ],
+            boundary: errorBoundary
+          })
+          continue
+        }
       }
     }
 
@@ -64,14 +90,14 @@ export namespace Routes {
     const files = await readFsTree(treeRoot)
 
     const out: RouteInternals.ParsedRoute[] = []
-    for (const file of files) {
-      const fromLockfile = lockfile.routes.find(route => route.realPath === file.path.join('/'))
+    for (const file of files.routes) {
+      const fromLockfile = lockfile.routes.find(route => route.filePath === file.path.join('/'))
 
       if (fromLockfile) {
         out.push({
           name: fromLockfile.name,
           path: file.path.join('/').replace(/\.\w+$/, ''),
-          realPath: file.path.join('/'),
+          filePath: file.path.join('/'),
           impl: file.route
         })
       } else {
@@ -80,19 +106,27 @@ export namespace Routes {
         out.push({
           name: strId,
           path: file.path.join('/').replace(/\.\w+$/, ''),
-          realPath: file.path.join('/'),
+          filePath: file.path.join('/'),
           impl: file.route
         })
         lockfile.routes.push({
           name: strId,
           path: file.path.join('/').replace(/\.\w+$/, ''),
-          realPath: file.path.join('/')
+          filePath: file.path.join('/')
         })
       }
     }
 
     for (const item of out)
       lockfile.$runtime.routeImpls.set(item.name!, item)
+
+    for (const file of files.errorBounds) {
+      lockfile.$runtime.errorBoundaries.push({
+        path: file.path.join('/').replace(/\.\w+$/, ''),
+        filePath: file.path.join('/'),
+        impl: file.boundary
+      })
+    }
 
     return out
   }
