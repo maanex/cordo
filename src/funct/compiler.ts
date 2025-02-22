@@ -28,11 +28,21 @@ export namespace FunctCompiler {
     if (list.length === 0)
       return NoopIndicator + idc
 
+    /** arguments including argument type prefix */
     const argus: string[] = []
+    /** commands, i.e. route ids */
     const command: string[] = []
+    /** flags, i.e. encoded functs + funct flags */
     const flags: number[] = []
+    /** arguments from value() functs, to be appended last */
     const extraValues: string[] = []
 
+    // encode cwd
+    const { routeId, args } = RoutingResolve.getRouteFromPath(CordoMagic.getCwd(), false)
+    command.push(routeId)
+    argus.push(...args)
+
+    // encode functs
     for (const fun of list) {
       const arg = FunctInternals.readFunct(fun)
       const typeId = FunctInternals.Types.indexOf(arg.type)
@@ -47,6 +57,7 @@ export namespace FunctCompiler {
       }
     }
 
+    // encode arguments
     const lut = CordoMagic.getLockfile().lut
     let argusStr = ''
     let counter = -1
@@ -70,6 +81,7 @@ export namespace FunctCompiler {
       argusStr += PlainArgumentIndicator + arg
     }
 
+    // build final id
     const flagsStr = flags.map(f => LibIds.stringify(f, 1)).join('')
     return `${flagsStr}${FunctVersion}${command.join('')}${argusStr}${idc}`
   }
@@ -87,9 +99,20 @@ export namespace FunctCompiler {
     return ''
   }
 
-  export function parseCustomId(id: string): CordoFunct[] {
-    if (id.startsWith(NoopIndicator)) return []
-    if (!id.includes(FunctVersion)) return []
+  type ParsedCustomId = {
+    functs: CordoFunct[]
+    values: string[]
+    cwd: string | null
+  }
+
+  export function parseCustomId(id: string): ParsedCustomId {
+    if (id.startsWith(NoopIndicator) || !id.includes(FunctVersion)) {
+      return {
+        functs: [],
+        values: [],
+        cwd: null
+      }
+    }
 
     const headerBoundary = id.indexOf(FunctVersion)
     const header: Array<{ flags: number, type: FunctInternals.Types }> = []
@@ -101,30 +124,35 @@ export namespace FunctCompiler {
         continue
 
       if (i < headerBoundary) {
+        // if i is smaller than the header boundary, we're still parsing the header
         const flags = LibIds.parseSingle(id[i]) >> 2
         const type = FunctInternals.Types[LibIds.parseSingle(id[i]) & 0b11]
         header.push({ flags, type })
-      } else if (i < headerBoundary + 1 + header.length * LockfileInternals.Const.idLength) {
+      } else if (i < headerBoundary + 1 + (header.length + 1) * LockfileInternals.Const.idLength) {
+        // if i is after header boundary but before the first argument, we're currently parsing the route ids
         routesRaw.push(id.slice(i, i + LockfileInternals.Const.idLength))
         i += LockfileInternals.Const.idLength - 1
       } else if (id[i] === PlainArgumentIndicator) {
+        // we found a plain argument indicator, we'll start a new plain argument
         argsRaw.push(PlainArgumentIndicator)
       } else if (id[i] === LutArgumentIndicator) {
+        // we found a lut argument indicator, we'll start a new lut argument
         argsRaw.push(LutArgumentIndicator)
       } else if (id[i] === ReferenceArgumentIndicator) {
+        // we found a reference argument indicator, we'll start a new reference argument
         argsRaw.push(ReferenceArgumentIndicator)
       } else {
+        // normal character in an argument, we'll add to the latest argument in the list
         argsRaw[argsRaw.length-1] = argsRaw[argsRaw.length-1] + id[i]
       }
     }
 
-    const out: CordoFunct[] = []
     const parsedArguments: string[] = []
-    for (const fun of header) {
+    const readNextRoute = () => {
       const routeId = routesRaw.shift()!
       const route = RoutingResolve.getRouteFromId(routeId)!
       if (!route)
-        return []
+        return null
 
       const path = []
       for (const part of route.path.split('/')) {
@@ -139,30 +167,40 @@ export namespace FunctCompiler {
         parsedArguments.push(parsed)
       }
 
-      out.push(FunctInternals.createFunct({
+      return path.join('/')
+    }
+
+    const out: ParsedCustomId = {
+      functs: [],
+      values: [],
+      cwd: null
+    }
+
+    const cwdRoute = readNextRoute()
+    if (!cwdRoute)
+      return out
+
+    out.cwd = cwdRoute
+
+    for (const fun of header) {
+      const path = readNextRoute()
+      if (!path)
+        break
+
+      out.functs.push(FunctInternals.createFunct({
         flags: fun.flags,
         type: fun.type,
-        path: path.join('/')
+        path
       }))
     }
 
     for (const remainingArg of argsRaw) {
       const parsed = parseArg(remainingArg, parsedArguments)
       parsedArguments.push(parsed)
-      out.push(FunctInternals.createFunct({
-        type: 'value',
-        path: parsed,
-        flags: 0
-      }))
+      out.values.push(parsed)
     }
 
     return out
-  }
-
-  export function getValues(functs: CordoFunct[]): string[] {
-    return functs.map(f => FunctInternals.readFunct(f))
-      .filter(f => f.type === 'value')
-      .map(f => f.path)
   }
 
 }

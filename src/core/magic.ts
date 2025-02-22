@@ -49,6 +49,7 @@ export namespace CordoMagic {
 
   export function setCwd(path: string) {
     Internals.getCtx().cwd = path
+    return path
   }
 
   export function resetIdCounter() {
