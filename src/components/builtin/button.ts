@@ -2,8 +2,8 @@ import { ButtonStyle, type APIEmoji } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
 import { LibEmoji } from "../../lib/emoji"
 import { Hooks } from "../../core/hooks"
-import type { CordoFunct, CordoFunctRun } from "../../funct"
-import { FunctCompiler } from "../../funct/compiler"
+import type { CordoFunct, CordoFunctRun } from "../../functions"
+import { FunctCompiler } from "../../functions/compiler"
 
 
 export function button() {

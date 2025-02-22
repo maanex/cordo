@@ -1,7 +1,7 @@
 import { type APIEntitlement, type APIInteractionGuildMember, type APIMessage, type APIPartialChannel, type APIPartialGuild, type APIUser } from "discord-api-types/v10"
 import type { CordoInteraction } from "../interaction"
 import { RouteAssumptionFailedError } from "../../errors"
-import type { goto, run } from "../../funct"
+import type { goto, run } from "../../functions"
 import type { CordoComponent } from "../../components/component"
 import type { CordoModifier } from "../../components/modifier"
 

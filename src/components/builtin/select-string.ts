@@ -1,8 +1,8 @@
 import { type APISelectMenuOption } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
-import { value, type CordoFunct, type CordoFunctRun } from "../../funct"
-import { FunctCompiler } from "../../funct/compiler"
+import { value, type CordoFunct, type CordoFunctRun } from "../../functions"
+import { FunctCompiler } from "../../functions/compiler"
 
 
 type SelectMenuOption<Value extends string = string> = Omit<APISelectMenuOption, 'value'> & ({

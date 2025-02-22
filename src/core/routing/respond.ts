@@ -5,8 +5,8 @@ import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route
 import { InteractionInternals, type CordoInteraction } from "../interaction"
 import { CordoMagic } from "../magic"
 import { CordoGateway } from "../gateway"
-import { FunctInternals } from "../../funct/funct"
-import { goto, run } from "../../funct"
+import { FunctInternals } from "../../functions/funct"
+import { goto, run } from "../../functions"
 import type { CordoModifier } from "../../components/modifier"
 import { RoutingResolve } from "./resolve"
 
