@@ -15,7 +15,7 @@ export namespace Hooks {
     config?: CordoConfig
   ): ReturnType<NonNullable<CordoConfig['hooks'][Name]>> {
     if (!config) 
-      config = CordoMagic.getCtx().config
+      config = CordoMagic.getConfig()
 
     const hook = config.hooks[hookName]
     if (!hook)
@@ -26,7 +26,7 @@ export namespace Hooks {
       // @ts-expect-error
       context = {
         ...(context || {}),
-        interaction: CordoMagic.getCtx().invoker
+        interaction: CordoMagic.getInvoker()
       }
     }
 
@@ -35,7 +35,7 @@ export namespace Hooks {
   }
 
   export function isDefined(name: keyof CordoConfig['hooks']) {
-    return !!CordoMagic.getCtx().config.hooks[name]
+    return !!CordoMagic.getConfig().hooks[name]
   }
 
 }
