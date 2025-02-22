@@ -1,4 +1,4 @@
-import { ComponentType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
+import { ApplicationCommandType, ComponentType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
 import { disableAllComponents } from "../../components"
 import { isComponent, renderComponentList } from "../../components/component"
 import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route"
