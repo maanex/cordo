@@ -1,5 +1,5 @@
-import { InteractionEnvironment } from "../core/interaction-environment"
-import type { LockfileInternals } from "../core/lockfile"
+import { CordoMagic } from "../core/magic"
+import type { LockfileInternals } from "../core/files/lockfile"
 import type { CordoError } from "./cordo-error"
 
 
@@ -17,7 +17,7 @@ export namespace HandleErrors {
   }
 
   export function thrownOnRoute(error: CordoError) {
-    const { lockfile, currentRoute } = InteractionEnvironment.getCtx()
+    const { lockfile, currentRoute } = CordoMagic.getCtx()
 
     console.error(`Error on route ${currentRoute}: ${error.message}`)
     console.error(error.stack)

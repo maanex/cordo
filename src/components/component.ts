@@ -3,7 +3,7 @@ import { row } from "./builtin/row"
 import { readModifier, type CordoModifier } from "./modifier"
 
 
-const CordoComponent = Symbol('CordoComponent')
+const CordoComponentSymbol = Symbol('CordoComponent')
 
 export const ComponentType = {
   ActionRow: 1,
@@ -26,7 +26,7 @@ export type StringComponentType = keyof typeof ComponentType
 export type ComponentIdFromName<Name extends StringComponentType> = typeof ComponentType[Name]
 
 export type CordoComponent<Type extends StringComponentType = StringComponentType> = {
-  [CordoComponent]: {
+  [CordoComponentSymbol]: {
     nativeName: Type
     nativeType: typeof ComponentType[Type]
     visible: boolean
@@ -39,7 +39,7 @@ export type CordoComponent<Type extends StringComponentType = StringComponentTyp
   visible: (value: boolean) => CordoComponent<Type>
   attributes: (attrs: Record<string, any>) => CordoComponent<Type>
 }
-export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponent]
+export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponentSymbol]
 
 export function createComponent<Type extends StringComponentType>(
   type: Type,
@@ -53,7 +53,7 @@ export function createComponent<Type extends StringComponentType>(
     render
   }
   const out = {
-    [CordoComponent]: comp,
+    [CordoComponentSymbol]: comp,
     visible(value: boolean) {
       comp.visible = value
       return this
@@ -66,12 +66,12 @@ export function createComponent<Type extends StringComponentType>(
   return out
 }
 
-export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponent] {
-  return comp[CordoComponent]!
+export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponentSymbol] {
+  return comp[CordoComponentSymbol]!
 }
 
 export function isComponent(t: Record<string, any>): t is CordoComponent<StringComponentType> {
-  return !!t && CordoComponent in t
+  return !!t && CordoComponentSymbol in t
 }
 
 export function renderComponent(
@@ -80,7 +80,7 @@ export function renderComponent(
   hirarchy: Array<StringComponentType> = [],
   inheritAttributes: Record<string, any> = {}
 ) {
-  const extracted = CordoComponent in c ? readComponent(c) : c
+  const extracted = CordoComponentSymbol in c ? readComponent(c) : c
   if (!extracted.visible)
     return null
   return extracted.render({

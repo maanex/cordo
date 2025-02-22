@@ -1,7 +1,8 @@
 import { type APISelectMenuOption } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
-import { FunctInternals, value, type CordoFunct, type CordoFunctRun } from "../../core/funct"
 import { Hooks } from "../../core/hooks"
+import { value, type CordoFunct, type CordoFunctRun } from "../../funct"
+import { FunctCompiler } from "../../funct/compiler"
 
 
 type SelectMenuOption<Value extends string = string> = Omit<APISelectMenuOption, 'value'> & ({
@@ -34,7 +35,7 @@ export function selectString<Values extends string = string>() {
       description: o.description
         ? Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
         : undefined,
-      value: FunctInternals.compileFunctToCustomId([
+      value: FunctCompiler.toCustomId([
         ...(o.onClick
           ? Array.isArray(o.onClick)
             ? o.onClick
@@ -54,7 +55,7 @@ export function selectString<Values extends string = string>() {
       max_values: maxValues ? Math.min(optionsVal.length, maxValues) : undefined,
       disabled: disabledVal,
       options: getOptions(),
-      custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
+      custom_id: FunctCompiler.toCustomId(disabledVal ? [] : functVal)
     })),
 
     placeholder: (text: string) => {

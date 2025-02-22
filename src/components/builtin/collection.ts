@@ -1,4 +1,4 @@
-import { type CordoComponent } from "../component"
+import type { CordoComponent } from "../component"
 
 
 export function collection(...components: CordoComponent[]) {

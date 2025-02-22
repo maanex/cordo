@@ -1,24 +1,25 @@
 import type { APIInteraction } from "discord-api-types/v10"
 
 
-const Internals = Symbol('Internals')
+const CordoInteractionSymbol = Symbol('CordoInteraction')
 
 export type CordoInteraction = {
-  [Internals]: {
+  [CordoInteractionSymbol]: {
     answered: boolean
     httpCallback: ((payload: any) => any) | null
   }
   locals: Record<string, any>
 } & APIInteraction
 
+
 export namespace InteractionInternals {
 
   export function isCordoInteraction(i: CordoInteraction | APIInteraction): i is CordoInteraction {
-    return Internals in i
+    return CordoInteractionSymbol in i
   }
 
   export function get(i: CordoInteraction) {
-    return i[Internals]
+    return i[CordoInteractionSymbol]
   }
 
   export function upgrade(i: APIInteraction | CordoInteraction): CordoInteraction {
@@ -26,7 +27,7 @@ export namespace InteractionInternals {
     return {
       ...i,
       locals: {},
-      [Internals]: {
+      [CordoInteractionSymbol]: {
         answered: false,
         httpCallback: null
       }

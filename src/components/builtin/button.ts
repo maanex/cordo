@@ -1,8 +1,9 @@
 import { ButtonStyle, type APIEmoji } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
-import { FunctInternals, type CordoFunct, type CordoFunctRun } from "../../core/funct"
 import { LibEmoji } from "../../lib/emoji"
 import { Hooks } from "../../core/hooks"
+import type { CordoFunct, CordoFunctRun } from "../../funct"
+import { FunctCompiler } from "../../funct/compiler"
 
 
 export function button() {
@@ -30,7 +31,7 @@ export function button() {
       emoji: emojiVal,
       style: styleVal,
       disabled: disabledVal,
-      custom_id: FunctInternals.compileFunctToCustomId(disabledVal ? [] : functVal)
+      custom_id: FunctCompiler.toCustomId(disabledVal ? [] : functVal)
     })),
 
     label: (text: string) => {

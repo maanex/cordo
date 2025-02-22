@@ -1,10 +1,10 @@
 import type { APIInteraction } from 'discord-api-types/v10'
 import defu from 'defu'
 import type { PartialDeep } from 'type-fest'
-import { Routes } from './routes'
 import { ConfigInternals, type CordoConfig } from './files/config'
-import { LockfileInternals } from './lockfile'
+import { LockfileInternals } from './files/lockfile'
 import { CordoGateway } from './gateway'
+import { RoutingFilesystem } from './routing/filesystem'
 
 export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
@@ -21,7 +21,7 @@ async function mountCordo(configOverrides?: PartialDeep<CordoConfig>) {
   config = configOverrides ? defu(configOverrides, fileConfig) as CordoConfig : fileConfig
 
   lockfile = await LockfileInternals.readOrCreateLockfile(config.lockfile)
-  await Routes.readFsTreeAndSyncLockfile(config.paths.routes, lockfile)
+  await RoutingFilesystem.readFsTreeAndSyncLockfile(config.paths.routes, lockfile)
 
   LockfileInternals.writeLockfile(config.lockfile, lockfile, config.typeDest)
 }

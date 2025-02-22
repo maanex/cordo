@@ -1,13 +1,15 @@
 import { ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
+import { FunctCompiler } from "../funct/compiler"
+import { FunctInternals } from "../funct/funct"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
-import { InteractionEnvironment } from "./interaction-environment"
-import type { LockfileInternals } from "./lockfile"
-import { Routes } from "./routes"
-import { FunctInternals } from "./funct"
+import { CordoMagic } from "./magic"
+import type { LockfileInternals } from "./files/lockfile"
 import type { CordoConfig } from "./files/config"
 import { Hooks } from "./hooks"
+import { RoutingResolve } from "./routing/resolve"
+import { RoutingRespond } from "./routing/respond"
 
 
 export namespace CordoGateway {
@@ -29,11 +31,11 @@ export namespace CordoGateway {
 
     if (opts.httpCallback) internals.httpCallback = opts.httpCallback
 
-    InteractionEnvironment.createNew(() => handleInteraction(interaction), {
+    CordoMagic.Internals.runWithCtx(() => handleInteraction(interaction), {
       invoker: interaction,
       lockfile: opts.lockfile,
       config: opts.config,
-      currentRoute: '',
+      cwd: '',
       idCounter: 0
     })
   }
@@ -43,7 +45,7 @@ export namespace CordoGateway {
   }
 
   function apiRequest(method: Method, url: string, body?: Record<string, any>) {
-    const config = InteractionEnvironment.getCtx().config
+    const config = CordoMagic.getConfig()
     return axios({
       method,
       url,
@@ -85,7 +87,7 @@ export namespace CordoGateway {
     if (!type || !data)
       return null
 
-    const config = InteractionEnvironment.getCtx().config
+    const config = CordoMagic.getConfig()
     if (!config.client.id) {
       console.warn(`No client id provided in config. Cannot respond to interactions.`)
       return null
@@ -106,7 +108,7 @@ export namespace CordoGateway {
     i = await Hooks.callHook('onBeforeHandle', i)
     if (!i) return
 
-    const deferAfter = InteractionEnvironment.getCtx().config.upstream.autoDeferMs
+    const deferAfter = CordoMagic.getConfig().upstream.autoDeferMs
     if (deferAfter) {
       setTimeout(() => {
         if (!InteractionInternals.get(i).answered)
@@ -114,35 +116,43 @@ export namespace CordoGateway {
       }, deferAfter)
     }
 
-    if (i.type === InteractionType.ApplicationCommand) {
-      if (i.data.type === ApplicationCommandType.ChatInput) {
-        const name = i.data.name
-        const { route, path } = Routes.getRouteForCommand(name)
-        InteractionEnvironment.getCtx().currentRoute = path
-        return Routes.callRoute(route.routeId, route.args, i)
-      }
-    } else if (i.type === InteractionType.MessageComponent) {
-      if (i.data.component_type === ComponentType.StringSelect) {
-        const options = i.data.values.map(v => FunctInternals.parseCustomId(v))
-        i.data.values = options.map(o => FunctInternals.getValues(o)[0])
+    if (i.type === InteractionType.ApplicationCommand) 
+      return handleCommandInteraction(i)
+     else if (i.type === InteractionType.MessageComponent) 
+      return handleComponentInteraction(i)
 
-        for (const option of options) {
-          for (const action of option) {
-            const success = await FunctInternals.evalFunct(action, i)
-            if (!success) return
-          }
+  }
+
+  function handleCommandInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommand }) {
+    if (i.data.type === ApplicationCommandType.ChatInput) {
+      const name = i.data.name
+      const { route, path } = RoutingResolve.getRouteForCommand(name)
+      CordoMagic.setCwd(path)
+      return RoutingRespond.callRoute(route.routeId, route.args, i)
+    }
+  }
+
+  async function handleComponentInteraction(i: CordoInteraction & { type: InteractionType.MessageComponent }) {
+    if (i.data.component_type === ComponentType.StringSelect) {
+      const options = i.data.values.map(v => FunctCompiler.parseCustomId(v))
+      i.data.values = options.map(o => FunctCompiler.getValues(o)[0])
+
+      for (const option of options) {
+        for (const action of option) {
+          const success = await FunctInternals.evalFunct(action, i)
+          if (!success) return
         }
       }
+    }
 
-      const id = i.data.custom_id
-      const actions = FunctInternals.parseCustomId(id)
-      if (!actions.length && !InteractionInternals.get(i).answered)
-        await respondTo(i, null)
+    const id = i.data.custom_id
+    const actions = FunctCompiler.parseCustomId(id)
+    if (!actions.length && !InteractionInternals.get(i).answered)
+      await respondTo(i, null)
 
-      for (const action of actions) {
-        const success = await FunctInternals.evalFunct(action, i)
-        if (!success) return
-      }
+    for (const action of actions) {
+      const success = await FunctInternals.evalFunct(action, i)
+      if (!success) return
     }
   }
 

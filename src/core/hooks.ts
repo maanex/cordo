@@ -1,5 +1,5 @@
 import type { CordoConfig } from "./files/config"
-import { InteractionEnvironment } from "./interaction-environment"
+import { CordoMagic } from "./magic"
 
 
 export namespace Hooks {
@@ -15,7 +15,7 @@ export namespace Hooks {
     config?: CordoConfig
   ): ReturnType<NonNullable<CordoConfig['hooks'][Name]>> {
     if (!config) 
-      config = InteractionEnvironment.getCtx().config
+      config = CordoMagic.getCtx().config
 
     const hook = config.hooks[hookName]
     if (!hook)
@@ -26,7 +26,7 @@ export namespace Hooks {
       // @ts-expect-error
       context = {
         ...(context || {}),
-        interaction: InteractionEnvironment.getCtx().invoker
+        interaction: CordoMagic.getCtx().invoker
       }
     }
 
@@ -35,7 +35,7 @@ export namespace Hooks {
   }
 
   export function isDefined(name: keyof CordoConfig['hooks']) {
-    return !!InteractionEnvironment.getCtx().config.hooks[name]
+    return !!CordoMagic.getCtx().config.hooks[name]
   }
 
 }

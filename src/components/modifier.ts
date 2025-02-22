@@ -1,10 +1,10 @@
 import type { CordoComponentPayload, renderComponentList, StringComponentType } from "./component"
 
 
-const CordoModifier = Symbol('CordoModifier')
+const CordoModifierSymbol = Symbol('CordoModifier')
 
 export type CordoModifier = {
-  [CordoModifier]: {
+  [CordoModifierSymbol]: {
     name: string
     hooks?: {
       onRender?: (c: CordoComponentPayload<StringComponentType>) => CordoComponentPayload<StringComponentType>
@@ -14,10 +14,10 @@ export type CordoModifier = {
   }
 }
 
-export function createModifier(value: CordoModifier[typeof CordoModifier]): CordoModifier {
-  return { [CordoModifier]: value }
+export function createModifier(value: CordoModifier[typeof CordoModifierSymbol]): CordoModifier {
+  return { [CordoModifierSymbol]: value }
 }
 
-export function readModifier(mod: CordoModifier): CordoModifier[typeof CordoModifier] {
-  return mod[CordoModifier]!
+export function readModifier(mod: CordoModifier): CordoModifier[typeof CordoModifierSymbol] {
+  return mod[CordoModifierSymbol]!
 }

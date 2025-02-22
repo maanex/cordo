@@ -1,14 +1,14 @@
 import { type APIEntitlement, type APIInteractionGuildMember, type APIMessage, type APIPartialChannel, type APIPartialGuild, type APIUser } from "discord-api-types/v10"
-import type { CordoComponent, StringComponentType } from "../../components/component"
 import type { CordoInteraction } from "../interaction"
-import type { CordoModifier } from "../../components/modifier"
-import type { goto, run } from "../funct"
 import { RouteAssumptionFailedError } from "../../errors"
+import type { goto, run } from "../../funct"
+import type { CordoComponent } from "../../components/component"
+import type { CordoModifier } from "../../components/modifier"
 
 
 const CordoRouteSymbol = Symbol('CordoRoute')
 
-export type RouteResponse = Array<CordoComponent<StringComponentType> | CordoModifier>
+export type RouteResponse = Array<CordoComponent | CordoModifier>
 
 type RouteRequestInGuild = {
   location: 'guild'

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs'
-import { LibIds } from '../lib/ids'
-import type { RouteInternals } from './files/route'
-import type { ErrorBoundaryInternals } from './files/error-boundary'
+import { LibIds } from '../../lib/ids'
+import type { RouteInternals } from './route'
+import type { ErrorBoundaryInternals } from './error-boundary'
 
 
 export namespace LockfileInternals {
@@ -21,7 +21,7 @@ export namespace LockfileInternals {
   }
 
   export const Const = {
-    idLength: 4
+    idLength: 3
   }
 
   function createEmptyLockfile(version: number): ParsedLockfile {

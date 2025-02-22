@@ -3,7 +3,6 @@ import { createModifier } from "../modifier"
 
 
 function searchForButton(c: any): any {
-  console.log('hui', c)
   if (!c) return c
   if (Array.isArray(c)) return c.map(searchForButton)
   if (typeof c !== 'object') return c
