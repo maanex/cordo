@@ -31,8 +31,8 @@ export function goto(
 
   if (opts?.asReply !== undefined)
     flags = (flags & ~Flags.AsReply) | (opts.asReply ? Flags.AsReply : 0)
-  if (opts?.asReply !== undefined)
-    flags = (flags & ~Flags.AsReply) | (opts.asReply ? Flags.AsReply : 0)
+  if (opts?.private !== undefined)
+    flags = (flags & ~Flags.Private) | (opts.private ? Flags.Private : 0)
   if (opts?.disableComponents !== undefined)
     flags = (flags & ~Flags.DisableComponents) | (opts.disableComponents ? Flags.DisableComponents : 0)
 

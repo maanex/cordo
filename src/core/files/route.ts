@@ -85,7 +85,10 @@ type RouteRequestFromSelect = {
 
 export type RouteRequest = {
   params: Record<string, string>
-  fullRoute: string
+  /** route path is the path to this route you are currently in */
+  routePath: string
+  /** current path is the path where the interaction is currently happening. this is usually the same as routePath but might be different when called using run() */
+  currentPath: string
   rawInteraction: CordoInteraction
 
   locals: {

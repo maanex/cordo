@@ -100,7 +100,8 @@ export namespace RoutingRespond {
 
     return {
       params,
-      fullRoute: route.path.replace(/(\/|^)index$/, '') || '/',
+      routePath: route.path.replace(/(\/|^)index$/, '') || '/',
+      currentPath: CordoMagic.getCwd().replace(/(\/|^)index$/, '') || '/',
       rawInteraction: interaction,
       rawEntitlements: interaction.entitlements,
 
