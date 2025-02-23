@@ -66,7 +66,7 @@ export namespace FunctCompiler {
 
       // check if this argument has already been added so we can just refernce it
       const firstArrayPos = argus.indexOf(arg)
-      if (firstArrayPos > 0 && firstArrayPos < counter) {
+      if (firstArrayPos >= 0 && firstArrayPos < counter) {
         argusStr += ReferenceArgumentIndicator + LibIds.stringify(firstArrayPos, 1)
         continue
       }

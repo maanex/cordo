@@ -133,23 +133,25 @@ export namespace CordoGateway {
   }
 
   async function handleComponentInteraction(i: CordoInteraction & { type: InteractionType.MessageComponent }) {
-    const id = i.data.custom_id
-    const parsedCustomId = FunctCompiler.parseCustomId(id)
-
-    if (parsedCustomId.cwd)
-      CordoMagic.setCwd(parsedCustomId.cwd)
-
     if (i.data.component_type === ComponentType.StringSelect) {
       const options = i.data.values.map(v => FunctCompiler.parseCustomId(v))
       i.data.values = options.map(o => o.values[0])
 
       for (const option of options) {
+        if (option.cwd)
+          CordoMagic.setCwd(option.cwd)
         for (const action of option.functs) {
           const success = await FunctInternals.evalFunct(action, i)
           if (!success) return
         }
       }
     }
+
+    const id = i.data.custom_id
+    const parsedCustomId = FunctCompiler.parseCustomId(id)
+
+    if (parsedCustomId.cwd)
+      CordoMagic.setCwd(parsedCustomId.cwd)
 
     if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
       await respondTo(i, null)

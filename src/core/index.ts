@@ -9,6 +9,7 @@ import { RoutingFilesystem } from './routing/filesystem'
 export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, type RouteRequest, defineCordoRoute, assertCordoRequest } from './files/route'
+export { type CordoErrorBoundary, defineCordoErrorBoundary } from './files/error-boundary'
 export { type CordoInteraction } from './interaction'
 
 //

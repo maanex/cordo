@@ -58,11 +58,18 @@ export async function evalRun(path: string, flags: number, i: CordoInteraction):
       await routeResponse
     return true
   } catch (e) {
-    if (e instanceof CordoError)
-      HandleErrors.thrownOnRoute(e)
-     else 
-      console.error(e)
+    if (e instanceof CordoError) {
+      const parsedRoute = RoutingResolve.getRouteFromId(route.routeId)
+      if (parsedRoute) {
+        const request = RoutingRespond.buildRouteRequest(parsedRoute, route.args, i)
+        if (request) {
+          HandleErrors.thrownOnRoute(e, request)
+          return continueOnError
+        }
+      }
+    }
 
+    HandleErrors.handleNonCordoError(e)
     return continueOnError
   }
 

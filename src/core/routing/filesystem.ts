@@ -103,7 +103,7 @@ export namespace RoutingFilesystem {
 
     for (const file of files.errorBounds) {
       lockfile.$runtime.errorBoundaries.push({
-        path: file.path.join('/').replace(/\.\w+$/, ''),
+        path: file.path.join('/').replace(/((\/|^)[^\/]+)?\.\w+$/, '') ?? '/',
         filePath: file.path.join('/'),
         impl: file.boundary
       })

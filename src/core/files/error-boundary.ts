@@ -1,4 +1,5 @@
 import { CordoError } from "../../errors"
+import type { RouteRequest } from "./route"
 
 
 const CordoErrorBoundarySymbol = Symbol('CordoErrorBoundary')
@@ -8,7 +9,7 @@ export type CordoErrorBoundary = {
   handler: CordoErrorHandler
 }
 
-export type CordoErrorHandler = (i: CordoError) => boolean
+export type CordoErrorHandler = (error: CordoError, request: RouteRequest) => any
 
 export function defineCordoErrorBoundary(handler: CordoErrorHandler): CordoErrorBoundary {
   return {
