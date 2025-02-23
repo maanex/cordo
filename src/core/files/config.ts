@@ -5,6 +5,8 @@ import type { APIInteraction } from 'discord-api-types/v10'
 import type { AxiosResponse } from 'axios'
 import type { CordoInteraction } from '../interaction'
 import type { StringComponentType } from '../../components/component'
+import { parseFlags as runParseFlags, type FlagOpts as RunFlagOpts } from '../../functions/impl/run'
+import { parseFlags as gotoParseFlags, type FlagOpts as GotoFlagOpts } from '../../functions/impl/goto'
 
 
 const CordoConfigSymbol = Symbol('CordoConfigSymbol')
@@ -46,6 +48,17 @@ export type CordoConfig = {
     /** gets called by all cordo builtin components that render user facing text. e.g. buttons, text components, selects, etc */
     transformUserFacingText: TransformHookFor<string, { component: StringComponentType, position: null | string, interaction?: CordoInteraction }>,
   }
+  functDefaultFlags: {
+    run: Required<RunFlagOpts>
+    goto: Required<GotoFlagOpts>
+  }
+}
+
+export type ParsedCordoConfig = CordoConfig & {
+  functDefaultFlags: {
+    runBits: number
+    gotoBits: number
+  }
 }
 
 export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}): PartialDeep<CordoConfig> & { [CordoConfigSymbol]: typeof CordoConfigSymbol } {
@@ -80,6 +93,18 @@ export namespace ConfigInternals {
       onNetworkError: null,
       transformCommandName: null,
       transformUserFacingText: null
+    },
+    functDefaultFlags: {
+      goto: {
+        asReply: false,
+        private: false,
+        disableComponents: false
+      },
+      run: {
+        wait: false,
+        continueOnError: false,
+        privateErrorMessage: false
+      }
     }
   }
 
@@ -111,9 +136,8 @@ export namespace ConfigInternals {
     return resolve(basePath, path)
   }
 
-  export async function readAndParseConfig(): Promise<CordoConfig> {
+  export async function readAndParseConfig(): Promise<ParsedCordoConfig> {
     const config = await readConfig()
-
 
     config.rootDir = resolveRelativePath(config.rootDir)
     config.lockfile = resolveRelativePath(config.lockfile)
@@ -123,7 +147,15 @@ export namespace ConfigInternals {
 
     config.paths.routes = resolveRelativePath(config.paths.routes, config.rootDir)
 
-    return config
+    return {
+      ...config,
+      functDefaultFlags: {
+        run: config.functDefaultFlags.run,
+        runBits: runParseFlags(config.functDefaultFlags.run),
+        goto: config.functDefaultFlags.goto,
+        gotoBits: gotoParseFlags(config.functDefaultFlags.goto)
+      }
+    }
   }
 
 }

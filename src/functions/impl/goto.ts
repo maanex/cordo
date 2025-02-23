@@ -12,29 +12,33 @@ export const Flags = {
   DisableComponents: 1 << 2,
 }
 
-/** goto will open the route provided */
-export function goto(
-  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}` | CordoFunct<'goto'>,
-  opts?: {
-    asReply?: boolean,
-    private?: boolean,
-    disableComponents?: boolean
-  }
-): CordoFunct<'goto'> {
-  const usePath = FunctInternals.isFunct(path)
-    ? FunctInternals.readFunct(path).path
-    : path
+export type FlagOpts = {
+  asReply?: boolean,
+  private?: boolean,
+  disableComponents?: boolean
+}
 
-  let flags = FunctInternals.isFunct(path)
-    ? FunctInternals.readFunct(path).flags
-    : 0
-
+export function parseFlags(opts: FlagOpts | undefined, defaultValue = 0) {
+  let flags = defaultValue
   if (opts?.asReply !== undefined)
     flags = (flags & ~Flags.AsReply) | (opts.asReply ? Flags.AsReply : 0)
   if (opts?.private !== undefined)
     flags = (flags & ~Flags.Private) | (opts.private ? Flags.Private : 0)
   if (opts?.disableComponents !== undefined)
     flags = (flags & ~Flags.DisableComponents) | (opts.disableComponents ? Flags.DisableComponents : 0)
+  return flags
+}
+
+/** goto will open the route provided */
+export function goto(
+  path: DynamicTypes['Route'] | `./${string}` | '.' | '..' | `../${string}` | CordoFunct<'goto'>,
+  opts?: FlagOpts
+): CordoFunct<'goto'> {
+  const usePath = FunctInternals.isFunct(path)
+    ? FunctInternals.readFunct(path).path
+    : path
+
+  const flags = parseFlags(opts, FunctInternals.readFunct(path as any)?.flags ?? CordoMagic.getConfig().functDefaultFlags.gotoBits)
 
   return FunctInternals.createFunct({
     type: 'goto',

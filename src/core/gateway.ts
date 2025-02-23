@@ -6,7 +6,7 @@ import { FunctInternals } from "../functions/funct"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
 import { CordoMagic } from "./magic"
 import type { LockfileInternals } from "./files/lockfile"
-import type { CordoConfig } from "./files/config"
+import type { ParsedCordoConfig } from "./files/config"
 import { Hooks } from "./hooks"
 import { RoutingResolve } from "./routing/resolve"
 import { RoutingRespond } from "./routing/respond"
@@ -18,7 +18,7 @@ export namespace CordoGateway {
     interaction: CordoInteraction | APIInteraction,
     httpCallback?: (payload: any) => any
     lockfile: LockfileInternals.ParsedLockfile
-    config: CordoConfig
+    config: ParsedCordoConfig
   }) {
     const rawInteraction = await Hooks.callHook('onRawInteraction', opts.interaction, undefined, opts.config)
     if (!rawInteraction) return

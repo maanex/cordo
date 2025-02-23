@@ -13,7 +13,7 @@ import { RoutingResolve } from "./resolve"
 
 export namespace RoutingRespond {
 
-  type RouteOpts = {
+  export type RouteOpts = {
     asReply?: boolean
     isPrivate?: boolean
     disableComponents?: boolean
