@@ -4,6 +4,9 @@ import { CordoMagic } from "../../core/magic"
 import { RoutingResolve } from "../../core/routing/resolve"
 import { RoutingRespond } from "../../core/routing/respond"
 import type { CordoInteraction } from "../../core"
+import { CordoError } from "../../errors"
+import { InteractionInternals } from "../../core/interaction"
+import { HandleErrors } from "../../errors/handle"
 
 
 export const Flags = {
@@ -55,7 +58,25 @@ export async function evalGoto(path: string, flags: number, i: CordoInteraction)
   const isPrivate = (flags & Flags.Private) !== 0
   const disableComponents = (flags & Flags.DisableComponents) !== 0
 
-  await RoutingRespond.callRoute(route.routeId, route.args, i, { asReply, isPrivate, disableComponents })
+  try {
+    await RoutingRespond.callRoute(route.routeId, route.args, i, { asReply, isPrivate, disableComponents })
+  } catch (e) {
+    if (e instanceof CordoError) {
+      const parsedRoute = RoutingResolve.getRouteFromId(route.routeId)
+      if (parsedRoute) {
+        const opts: RoutingRespond.RouteOpts = InteractionInternals.get(i).answered
+          ? {}
+          : { asReply: true, isPrivate: true }
+        const request = RoutingRespond.buildRouteRequest(parsedRoute, route.args, i, opts)
+        if (request) {
+          HandleErrors.thrownOnRoute(e, request)
+          return true
+        }
+      }
+    }
+
+    HandleErrors.handleNonCordoError(e)
+  }
 
   return true
 }

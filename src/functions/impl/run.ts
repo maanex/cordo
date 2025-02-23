@@ -12,7 +12,7 @@ import { CordoMagic } from "../../core/magic"
 export const Flags = {
   Wait: 1 << 0,
   ContinueOnError: 1 << 1,
-  PrivateErrorMessage: 1 << 2
+  PrivateErrorMessage: 1 << 2,
 }
 
 export type FlagOpts = {
