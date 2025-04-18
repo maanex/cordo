@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.0.0-rc1",
+  "version": "2.1.0",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -11,12 +11,8 @@
     "./http": "./src/http/index.ts"
   },
   "files": [
-    "src/index.ts",
-    "src/core/index.ts",
-    "src/components/index.ts",
-    "src/errors/index.ts",
-    "src/functions/index.ts",
-    "src/http/index.ts"
+    "src/*",
+    "tsconfig.json"
   ],
   "scripts": {
     "build": "tsc",
@@ -37,11 +33,11 @@
   },
   "homepage": "https://github.com/Maanex/cordo#readme",
   "dependencies": {
+    "@types/bun": "^1.2.10",
     "axios": "^0.21.4",
     "defu": "^6.1.4",
     "discord-api-types": "^0.37.119",
     "discord-interactions": "^2.4.1",
-    "express": "^4.17.3",
     "type-fest": "^4.34.1"
   },
   "devDependencies": {
@@ -52,6 +48,8 @@
     "@typescript-eslint/parser": "^4.28.3",
     "eslint": "^7.30.0",
     "eslint-config-maanex": "^1.1.2",
+    "express": "^4.17.3",
+    "hono": "^4.7.7",
     "reflect-metadata": "^0.1.13",
     "typescript": "^5.7.3"
   }
