@@ -30,7 +30,7 @@
       "@components/*": [ "./src/components/*" ],
       "@core": [ "./src/core/index.ts" ],
       "@core/*": [ "./src/core/*" ],
-      "@http/*": [ "./src/http/*" ],
+      "@plugin/*": [ "./src/plugin/*" ],
       "@lib/*": [ "./src/lib/*" ]
     }
   }
