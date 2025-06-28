@@ -19,6 +19,7 @@ export { linkButton } from './builtin/link-button'
 export { row } from './builtin/row'
 export { section } from './builtin/section'
 export { selectString } from './builtin/select-string'
+export { skuButton } from './builtin/sku-button'
 export { spacer } from './builtin/spacer'
 export { text } from './builtin/text'
 
