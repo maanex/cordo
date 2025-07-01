@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",

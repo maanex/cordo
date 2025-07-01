@@ -133,7 +133,7 @@ export function assertCordoRequest<
 >(request: RouteRequest, assumptions: {
   location: Location
   source: Source
-}): request is RouteRequest & (
+}): asserts request is RouteRequest & (
   Location extends 'guild'
     ? RouteRequestInGuild
     : RouteRequestInDM
@@ -148,7 +148,6 @@ export function assertCordoRequest<
     throw new RouteAssumptionFailedError(request, assumptions)
   if (assumptions.source && request.source !== assumptions.source)
     throw new RouteAssumptionFailedError(request, assumptions)
-  return true
 }
 
 export namespace RouteInternals {

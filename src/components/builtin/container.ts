@@ -17,8 +17,8 @@ export function container(...components: AllowedComponentArray) {
       spoiler
     })),
 
-    accentColor: (color: string | number) => {
-      accentColor = color
+    accentColor: (color: string | number | null) => {
+      accentColor = color ?? undefined
       return out
     },
     spoiler: (value: boolean = true) => {
