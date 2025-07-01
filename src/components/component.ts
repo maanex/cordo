@@ -38,7 +38,7 @@ export type CordoComponent<Type extends StringComponentType = StringComponentTyp
   }
   visible: (value: boolean) => CordoComponent<Type>
   attributes: (attrs: Record<string, any>) => CordoComponent<Type>
-}
+} & (Type extends 'Container' ? { [Symbol.iterator]: () => Iterator<CordoComponent<StringComponentType>> } : { [Symbol.iterator]: never })
 export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponentSymbol]
 
 export function createComponent<Type extends StringComponentType>(
@@ -63,7 +63,7 @@ export function createComponent<Type extends StringComponentType>(
       return this
     }
   }
-  return out
+  return out as any as CordoComponent<Type>
 }
 
 export function readComponent<T extends CordoComponent<StringComponentType>>(comp: T): T[typeof CordoComponentSymbol] {

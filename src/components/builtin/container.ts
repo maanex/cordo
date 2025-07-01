@@ -24,6 +24,15 @@ export function container(...components: AllowedComponentArray) {
     spoiler: (value: boolean = true) => {
       spoiler = value
       return out
+    },
+    *[Symbol.iterator]() {
+      for (const component of components) {
+        if (Array.isArray(component)) {
+          yield* component
+        } else {
+          yield component
+        }
+      }
     }
   }
 
