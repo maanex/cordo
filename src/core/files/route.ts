@@ -6,7 +6,7 @@ import type { CordoComponent } from "../../components/component"
 import type { CordoModifier } from "../../components/modifier"
 
 
-const CordoRouteSymbol = Symbol('CordoRoute')
+const CordoRouteSymbol = Symbol.for('CordoRoute')
 
 export type RouteResponse = Array<CordoComponent | CordoModifier>
 

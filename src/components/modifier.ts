@@ -1,7 +1,7 @@
 import type { CordoComponentPayload, renderComponentList, StringComponentType } from "./component"
 
 
-const CordoModifierSymbol = Symbol('CordoModifier')
+const CordoModifierSymbol = Symbol.for('CordoModifier')
 
 export type CordoModifier = {
   [CordoModifierSymbol]: {

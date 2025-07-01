@@ -1,7 +1,7 @@
 import type { APIInteraction } from "discord-api-types/v10"
 
 
-const CordoInteractionSymbol = Symbol('CordoInteraction')
+const CordoInteractionSymbol = Symbol.for('CordoInteraction')
 
 export type CordoInteraction = {
   [CordoInteractionSymbol]: {

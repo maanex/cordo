@@ -4,7 +4,7 @@ import { readModifier, type CordoModifier } from "./modifier"
 import type { AllowedComponents as ContainerAllowedComponents } from "./builtin/container"
 
 
-const CordoComponentSymbol = Symbol('CordoComponent')
+const CordoComponentSymbol = Symbol.for('CordoComponent')
 
 export const ComponentType = {
   ActionRow: 1,
@@ -112,7 +112,7 @@ export function renderComponentList(
 
     if (!isComponent(item)) {
       const mod = readModifier(item)
-      if (!modifiers.some(m => m.name === mod.name))
+      if (mod && !modifiers.some(m => m.name === mod.name))
         modifiers.push(mod)
       continue
     }

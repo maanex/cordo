@@ -3,7 +3,7 @@ import { evalGoto } from "./impl/goto"
 import { evalRun } from "./impl/run"
 
 
-const CordoFunctSymbol = Symbol('CordoFunct')
+const CordoFunctSymbol = Symbol.for('CordoFunct')
 
 export type CordoFunctRun = CordoFunct[]
 

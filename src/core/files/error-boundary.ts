@@ -2,7 +2,7 @@ import { CordoError } from "../../errors"
 import type { RouteRequest } from "./route"
 
 
-const CordoErrorBoundarySymbol = Symbol('CordoErrorBoundary')
+const CordoErrorBoundarySymbol = Symbol.for('CordoErrorBoundary')
 
 export type CordoErrorBoundary = {
   [CordoErrorBoundarySymbol]: typeof CordoErrorBoundarySymbol

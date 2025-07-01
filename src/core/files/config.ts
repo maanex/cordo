@@ -9,7 +9,7 @@ import { parseFlags as runParseFlags, type FlagOpts as RunFlagOpts } from '../..
 import { parseFlags as gotoParseFlags, type FlagOpts as GotoFlagOpts } from '../../functions/impl/goto'
 
 
-const CordoConfigSymbol = Symbol('CordoConfigSymbol')
+const CordoConfigSymbol = Symbol.for('CordoConfig')
 
 type HookFor<T, Context = never> = null | ((value: T, context: Context) => Promisable<T | null>)
 type TransformHookFor<T, Context = never> = null | ((value: T, context: Context) => T)
