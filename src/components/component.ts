@@ -1,6 +1,7 @@
 import defu from "defu"
 import { row } from "./builtin/row"
 import { readModifier, type CordoModifier } from "./modifier"
+import type { AllowedComponents as ContainerAllowedComponents } from "./builtin/container"
 
 
 const CordoComponentSymbol = Symbol('CordoComponent')
@@ -38,7 +39,11 @@ export type CordoComponent<Type extends StringComponentType = StringComponentTyp
   }
   visible: (value: boolean) => CordoComponent<Type>
   attributes: (attrs: Record<string, any>) => CordoComponent<Type>
-} & (Type extends 'Container' ? { [Symbol.iterator]: () => Iterator<CordoComponent<StringComponentType>> } : { [Symbol.iterator]: never })
+} & (
+  Type extends 'Container'
+    ? { [Symbol.iterator]: () => Iterator<ContainerAllowedComponents> }
+    : { [Symbol.iterator]: never }
+)
 export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponentSymbol]
 
 export function createComponent<Type extends StringComponentType>(

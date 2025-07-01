@@ -2,7 +2,7 @@ import { ComponentType, createComponent, renderComponentList, type CordoComponen
 import type { CordoModifier } from "../modifier"
 
 
-type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'> | CordoModifier
+export type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'> | CordoModifier
 type AllowedComponentArray = Array<AllowedComponents | AllowedComponents[]>
 
 export function container(...components: AllowedComponentArray) {
@@ -27,11 +27,10 @@ export function container(...components: AllowedComponentArray) {
     },
     *[Symbol.iterator]() {
       for (const component of components) {
-        if (Array.isArray(component)) {
+        if (Array.isArray(component))
           yield* component
-        } else {
+        else
           yield component
-        }
       }
     }
   }
