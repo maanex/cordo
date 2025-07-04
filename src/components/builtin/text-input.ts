@@ -40,7 +40,7 @@ export function textInput() {
       min_length: minLength,
       max_length: maxLength,
       required: requiredVal,
-      size: sizeVal ?? 1,
+      style: sizeVal ?? 1,
       value: currentVal,
       custom_id: ref
     })),
