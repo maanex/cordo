@@ -4,6 +4,7 @@ import { Hooks } from "../../core/hooks"
 
 export function textInput(name: string) {
   let placeholderVal: string | undefined = undefined
+  let labelVal: string | undefined = undefined
   let minLength: number | undefined = undefined
   let maxLength: number | undefined = undefined
   let requiredVal: boolean | undefined = undefined
@@ -19,10 +20,21 @@ export function textInput(name: string) {
     )
   }
 
+  function getLabel() {
+    if (!labelVal)
+      return undefined
+    return Hooks.callHook(
+      'transformUserFacingText',
+      labelVal,
+      { component: 'TextInput', position: 'label' }
+    )
+  }
+
   const out = {
     ...createComponent('TextInput', () => ({
       type: ComponentType.TextInput,
       placeholder: getPlaceholder(),
+      label: getLabel(),
       min_length: minLength,
       max_length: maxLength,
       required: requiredVal,
@@ -32,6 +44,10 @@ export function textInput(name: string) {
 
     placeholder: (text: string) => {
       placeholderVal = text
+      return out
+    },
+    label: (text: string) => {
+      labelVal = text
       return out
     },
     min: (num: number = 1) => {
