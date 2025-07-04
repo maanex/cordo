@@ -22,6 +22,7 @@ export { section } from './builtin/section'
 export { selectString } from './builtin/select-string'
 export { skuButton } from './builtin/sku-button'
 export { spacer } from './builtin/spacer'
+export { textInput } from './builtin/text-input'
 export { text } from './builtin/text'
 
 export { debugIdToLabel } from './mods/debug-id-to-label'
