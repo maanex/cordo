@@ -2,13 +2,15 @@ import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
 
 
-export function textInput(name: string) {
+export function textInput() {
   let placeholderVal: string | undefined = undefined
   let labelVal: string | undefined = undefined
   let minLength: number | undefined = undefined
   let maxLength: number | undefined = undefined
   let requiredVal: boolean | undefined = undefined
   let sizeVal: number | undefined = undefined
+  let currentVal: string | undefined = undefined
+  let ref: string | undefined = undefined
 
   function getPlaceholder() {
     if (!placeholderVal)
@@ -22,7 +24,7 @@ export function textInput(name: string) {
 
   function getLabel() {
     if (!labelVal)
-      return undefined
+      return 'Your response'
     return Hooks.callHook(
       'transformUserFacingText',
       labelVal,
@@ -39,9 +41,14 @@ export function textInput(name: string) {
       max_length: maxLength,
       required: requiredVal,
       size: sizeVal ?? 1,
-      custom_id: name
+      value: currentVal,
+      custom_id: ref
     })),
 
+    as: (id: string) => {
+      ref = id
+      return out
+    },
     placeholder: (text: string) => {
       placeholderVal = text
       return out
@@ -50,11 +57,19 @@ export function textInput(name: string) {
       labelVal = text
       return out
     },
-    min: (num: number = 1) => {
+    current: (text: string) => {
+      currentVal = text
+      return out
+    },
+    min: (num: number = 0) => {
+      if (num < 0) num = 0
+      if (num > 4000) num = 4000
       minLength = num
       return out
     },
-    max: (num: number = 25) => {
+    max: (num: number = 4000) => {
+      if (num < 1) num = 1
+      if (num > 4000) num = 4000
       maxLength = num
       return out
     },
