@@ -2,6 +2,7 @@ import defu from "defu"
 import { row } from "./builtin/row"
 import { readModifier, type CordoModifier } from "./modifier"
 import type { AllowedComponents as ContainerAllowedComponents } from "./builtin/container"
+import type { AllowedComponents as ModalAllowedComponents } from "./builtin/modal"
 
 
 const CordoComponentSymbol = Symbol.for('CordoComponent')
@@ -21,7 +22,9 @@ export const ComponentType = {
   MediaGallery: 12,
   File: 13,
   Seperator: 14,
-  Container: 17
+  Container: 17,
+
+  Modal: -1, // This is a special type that is not used in the API, but for Cordo's internal use
 } as const
 export type StringComponentType = keyof typeof ComponentType
 export type ComponentIdFromName<Name extends StringComponentType> = typeof ComponentType[Name]
@@ -42,7 +45,9 @@ export type CordoComponent<Type extends StringComponentType = StringComponentTyp
 } & (
   Type extends 'Container'
     ? { [Symbol.iterator]: () => Iterator<ContainerAllowedComponents> }
-    : { [Symbol.iterator]: never }
+    : Type extends 'Modal'
+      ? { [Symbol.iterator]: () => Iterator<ModalAllowedComponents> }
+      : { [Symbol.iterator]: never }
 )
 export type CordoComponentPayload<Type extends StringComponentType> = CordoComponent<Type>[typeof CordoComponentSymbol]
 

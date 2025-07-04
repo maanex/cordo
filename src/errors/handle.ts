@@ -68,6 +68,7 @@ export namespace HandleErrors {
   }
 
   export function handleNonCordoError(error: any) {
+    console.error('(dev) Non cordo error:')
     console.error(error)
   }
 

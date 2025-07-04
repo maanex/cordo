@@ -105,6 +105,8 @@ export type RouteRequest = {
   ack: () => void
   /** render the provided components */
   render: (...response: RouteResponse) => void
+  /** open a modal with the provided components */
+  prompt: (modal: CordoComponent<'Modal'>) => void
   /** run a different route. use await to await the call. Returns whether successful, null if not run */
   run: (...params: Parameters<typeof run>) => Promise<boolean | null>
   /** let a different route handle this. Returns whether successful, null if not run */

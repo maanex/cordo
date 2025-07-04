@@ -1,6 +1,6 @@
-import { ApplicationCommandType, ComponentType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
+import { ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
 import { disableAllComponents } from "../../components"
-import { isComponent, renderComponentList } from "../../components/component"
+import { ComponentType, isComponent, renderComponent, renderComponentList, type CordoComponent } from "../../components/component"
 import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route"
 import { InteractionInternals, type CordoInteraction } from "../interaction"
 import { CordoMagic } from "../magic"
@@ -60,6 +60,23 @@ export namespace RoutingRespond {
     }
   }
 
+  export function renderModal(modal: CordoComponent<'Modal'>) {
+    CordoMagic.resetIdCounter()
+    const rendered = renderComponent(modal, null)
+
+    if (!rendered || rendered.type !== ComponentType.Modal)
+      return null
+
+    return {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: rendered.custom_id,
+        title: rendered.title,
+        components: rendered.components,
+      }
+    }
+  }
+
   export function buildRouteRequest(
     route: RouteInternals.ParsedRoute,
     args: string[],
@@ -115,6 +132,10 @@ export namespace RoutingRespond {
       ack: opts.disableRendering ? noOp : () => CordoGateway.respondTo(interaction, null),
       render: opts.disableRendering ? noOp : (...response) => {
         const rendered = renderRouteResponse(response, interaction, opts)
+        CordoGateway.respondTo(interaction, rendered)
+      },
+      prompt: opts.disableRendering ? noOp : (modal) => {
+        const rendered = renderModal(modal)
         CordoGateway.respondTo(interaction, rendered)
       },
       goto: opts.disableRendering ? noOp(Promise.resolve(null)) : (...args) => FunctInternals.evalFunct(goto(...args), interaction),
