@@ -138,7 +138,7 @@ export function renderComponentList(
         continue
       }
 
-      if (parsed.nativeName === 'StringSelect') {
+      if (parsed.nativeName === 'StringSelect' || parsed.nativeName === 'TextInput') {
         if (rowBuilder.length > 0) {
           pipeline.push(readComponent(row(...rowBuilder as any)))
           rowBuilder.splice(0)
