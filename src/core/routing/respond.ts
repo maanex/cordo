@@ -45,7 +45,7 @@ export namespace RoutingRespond {
       type = (InteractionInternals.get(i).answered && !opts.asReply)
         ? InteractionResponseType.UpdateMessage
         : InteractionResponseType.ChannelMessageWithSource
-    } else if (i.type === InteractionType.MessageComponent) {
+    } else if (i.type === InteractionType.MessageComponent || i.type === InteractionType.ModalSubmit) {
       type = opts.asReply
         ? InteractionResponseType.ChannelMessageWithSource
         : InteractionResponseType.UpdateMessage
