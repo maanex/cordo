@@ -8,6 +8,7 @@ import { CordoGateway } from "../gateway"
 import { FunctInternals } from "../../functions/funct"
 import { goto, run } from "../../functions"
 import type { CordoModifier } from "../../components/modifier"
+import { FunctCompiler } from "../../functions/compiler"
 import { RoutingResolve } from "./resolve"
 
 
@@ -77,6 +78,19 @@ export namespace RoutingRespond {
     }
   }
 
+  function parseModalResponse(interaction: CordoInteraction & { type: InteractionType.ModalSubmit }) {
+    const out = new Map<string, string>()
+    for (const row of interaction.data.components) {
+      for (const item of row.components) {
+        if (item.custom_id.startsWith(FunctCompiler.NoopIndicator))
+          continue
+        if (item.type === ComponentType.TextInput)
+          out.set(item.custom_id, item.value)
+      }
+    }
+    return out
+  }
+
   export function buildRouteRequest(
     route: RouteInternals.ParsedRoute,
     args: string[],
@@ -102,13 +116,15 @@ export namespace RoutingRespond {
 
     const source: RouteRequest['source'] | null = (interaction.type === InteractionType.ApplicationCommand)
       ? 'command'
-      : (interaction.type === InteractionType.MessageComponent)
-        ? (interaction.data.component_type === ComponentType.Button)
-          ? 'button'
-          : (interaction.data.component_type === ComponentType.StringSelect)
-            ? 'select'
-            : null
-      : null
+      : (interaction.type === InteractionType.ModalSubmit)
+        ? 'modal'
+        : (interaction.type === InteractionType.MessageComponent)
+          ? (interaction.data.component_type === ComponentType.Button)
+            ? 'button'
+            : (interaction.data.component_type === ComponentType.StringSelect)
+              ? 'select'
+              : null
+          : null
 
     if (!source)
       return null
@@ -203,7 +219,9 @@ export namespace RoutingRespond {
       selected: (source === 'select')
         // @ts-ignore
         ? interaction.data.values
-        : null
+        : (source === 'modal')
+          ? parseModalResponse(interaction as CordoInteraction & { type: InteractionType.ModalSubmit })
+          : null
     }
   }
 

@@ -11,7 +11,7 @@ export namespace FunctCompiler {
   /** the current version of custom ids. pick another non base64 character if you make breaking changes */
   const FunctVersion = '$'
   /** customids starting with this will be ignored silently */
-  const NoopIndicator = '!'
+  export const NoopIndicator = '!'
   /** the following argument should be treated as is */
   const PlainArgumentIndicator = '/'
   /** the following argument should be infered from the lookup table */

@@ -83,6 +83,12 @@ type RouteRequestFromSelect = {
   selected: string[]
 }
 
+type RouteRequestFromModal = {
+  source: 'modal'
+  command: null
+  selected: Map<string, string>
+}
+
 export type RouteRequest = {
   params: Record<string, string>
   /** route path is the path to this route you are currently in */
@@ -111,7 +117,7 @@ export type RouteRequest = {
   run: (...params: Parameters<typeof run>) => Promise<boolean | null>
   /** let a different route handle this. Returns whether successful, null if not run */
   goto: (...params: Parameters<typeof goto>) => Promise<boolean | null>
-} & (RouteRequestInGuild | RouteRequestInDM) & (RouteRequestFromCommand | RouteRequestFromButton | RouteRequestFromSelect)
+} & (RouteRequestInGuild | RouteRequestInDM) & (RouteRequestFromCommand | RouteRequestFromButton | RouteRequestFromSelect | RouteRequestFromModal)
 
 export type AsyncInteractionHandler = (i: RouteRequest) => RouteResponse | Promise<RouteResponse> | void | Promise<void> | boolean | Promise<boolean>
 
@@ -144,7 +150,9 @@ export function assertCordoRequest<
     ? RouteRequestFromCommand
     : Source extends 'button'
       ? RouteRequestFromButton
-      : RouteRequestFromSelect
+      : Source extends 'select'
+        ? RouteRequestFromSelect
+        : RouteRequestFromModal
 ) {
   if (assumptions.location && request.location !== assumptions.location)
     throw new RouteAssumptionFailedError(request, assumptions)

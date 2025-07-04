@@ -120,7 +120,8 @@ export namespace CordoGateway {
       return handleCommandInteraction(i)
      else if (i.type === InteractionType.MessageComponent) 
       return handleComponentInteraction(i)
-
+     else if (i.type === InteractionType.ModalSubmit) 
+      return handleModalInteraction(i)
   }
 
   function handleCommandInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommand }) {
@@ -147,6 +148,22 @@ export namespace CordoGateway {
       }
     }
 
+    const id = i.data.custom_id
+    const parsedCustomId = FunctCompiler.parseCustomId(id)
+
+    if (parsedCustomId.cwd)
+      CordoMagic.setCwd(parsedCustomId.cwd)
+
+    if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
+      await respondTo(i, null)
+
+    for (const action of parsedCustomId.functs) {
+      const success = await FunctInternals.evalFunct(action, i)
+      if (!success) return
+    }
+  }
+  
+  async function handleModalInteraction(i: CordoInteraction & { type: InteractionType.ModalSubmit }) {
     const id = i.data.custom_id
     const parsedCustomId = FunctCompiler.parseCustomId(id)
 

@@ -1,5 +1,6 @@
 import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
+import { FunctCompiler } from "../../functions/compiler"
 
 
 export function textInput() {
@@ -24,7 +25,7 @@ export function textInput() {
 
   function getLabel() {
     if (!labelVal)
-      return 'Your response'
+      return 'Your Response'
     return Hooks.callHook(
       'transformUserFacingText',
       labelVal,
@@ -42,7 +43,7 @@ export function textInput() {
       required: requiredVal,
       style: sizeVal ?? 1,
       value: currentVal,
-      custom_id: ref
+      custom_id: ref ?? FunctCompiler.toCustomId([]) // get a noop if no ref
     })),
 
     as: (id: string) => {
