@@ -1,6 +1,6 @@
 import { verifyKey } from "discord-interactions"
-import { Cordo } from '@core'
 import { Hono } from "hono"
+import { Cordo } from "../core"
 
 
 export function useWithHono(clientPublicKey: string) {
@@ -12,6 +12,7 @@ export function useWithHono(clientPublicKey: string) {
   app.post('/', async (c) => {
     const signature = c.req.header('x-signature-ed25519')
     const timestamp = c.req.header('x-signature-timestamp')
+    // @ts-ignore
     const bodyStream = c.req.raw.body
     if (!signature || !timestamp || !bodyStream)
       return c.text('Bad Request', 400)

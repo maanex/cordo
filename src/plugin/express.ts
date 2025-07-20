@@ -1,5 +1,5 @@
 import { verifyKeyMiddleware } from "discord-interactions"
-import { Cordo } from '@core'
+import { Cordo } from "../core"
 
 
 type ExpressRequest = {

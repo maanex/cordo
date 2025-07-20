@@ -1,5 +1,5 @@
-import { Cordo } from '@core'
 import { Client, Events } from 'discord.js'
+import { Cordo } from '../core'
 
 
 export function useWithDiscordJs(client: Client) {
