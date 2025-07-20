@@ -1,4 +1,4 @@
-import type { RouteRequest } from "@core/files/route"
+import type { RouteRequest } from "../../core"
 import { CordoError } from "../cordo-error"
 
 
