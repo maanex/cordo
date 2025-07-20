@@ -72,6 +72,7 @@ function registerConstants(constants: readonly string[]) {
 export const Cordo = {
   mountCordo,
   registerConstants,
-  triggerInteraction
+  triggerInteraction,
+  respondToRawInteraction: CordoGateway.respondTo,
 }
 Object.freeze(Cordo)
