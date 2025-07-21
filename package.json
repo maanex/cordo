@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.3.10",
+  "version": "2.4.0",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -8,7 +8,9 @@
     "./components": "./src/components/index.ts",
     "./errors": "./src/errors/index.ts",
     "./functions": "./src/functions/index.ts",
-    "./plugin": "./src/plugin/index.ts"
+    "./plugin/djs": "./src/plugin/djs.ts",
+    "./plugin/express": "./src/plugin/express.ts",
+    "./plugin/hono": "./src/plugin/hono.ts"
   },
   "files": [
     "src/*",
