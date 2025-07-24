@@ -40,7 +40,7 @@ export namespace HandleErrors {
   }
 
   function useDefaultHandler(error: CordoError) {
-    console.error('No error handler found for', error.name)
+    console.trace('No error handler found for', error.name)
   }
 
   function handleErrorStack(initialError: CordoError, handlers: CordoErrorHandler[], request: RouteRequest) {
@@ -60,8 +60,6 @@ export namespace HandleErrors {
 
   export function thrownOnRoute(error: CordoError, request: RouteRequest) {
     const currentRoute = CordoMagic.getCwd()
-
-    console.error(`Error on route ${currentRoute}: ${error.name}`)
 
     const boundaries = findApplicableBoundaries(currentRoute)
     handleErrorStack(error, boundaries.map(b => b.impl.handler), request)
