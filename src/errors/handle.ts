@@ -43,13 +43,13 @@ export namespace HandleErrors {
     console.trace('No error handler found for', error.name)
   }
 
-  function handleErrorStack(initialError: CordoError, handlers: CordoErrorHandler[], request: RouteRequest) {
+  async function handleErrorStack(initialError: CordoError, handlers: CordoErrorHandler[], request: RouteRequest) {
     const handler = handlers.shift()
     if (!handler)
       return useDefaultHandler(initialError)
 
     try {
-      handler(initialError, request)
+      await handler(initialError, request)
     } catch (error) {
       if (error instanceof CordoError)
         handleErrorStack(error, handlers, request)

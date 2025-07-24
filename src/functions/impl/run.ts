@@ -77,6 +77,8 @@ export async function evalRun(path: string, flags: number, i: CordoInteraction):
     const routeResponse = RoutingRespond.callRoute(route.routeId, route.args, i, { disableRendering: true })
     if (doWait)
       await routeResponse
+    else
+      routeResponse.catch(() => {})
     return true
   } catch (e) {
     if (e instanceof CordoError) {
