@@ -58,13 +58,11 @@ export namespace RoutingResolve {
 
   export function getRouteFromPath(path: string, resolveRuntimeVars: boolean) {
     const lockfile = CordoMagic.getLockfile()
-    const currentRoute = CordoMagic.getCwd()
     const invoker = CordoMagic.getInvoker()
+    const currentRoute = CordoMagic.getCwd() ?? ''
 
     if (!lockfile)
       throw new MissingContextError('getRouteFromPath failed, no lockfile found in context.')
-    if (!currentRoute)
-      throw new MissingContextError('getRouteFromPath failed, no current route found in context.')
     if (!invoker)
       throw new MissingContextError('getRouteFromPath failed, no invoker found in context.')
 
