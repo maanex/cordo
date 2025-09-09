@@ -3,6 +3,7 @@ import type { Method } from "axios"
 import axios from "axios"
 import { FunctCompiler } from "../functions/compiler"
 import { FunctInternals } from "../functions/funct"
+import { MissingContextError } from "../errors/builtin/missing-context"
 import { InteractionInternals, type CordoInteraction } from "./interaction"
 import { CordoMagic } from "./magic"
 import type { LockfileInternals } from "./files/lockfile"
@@ -46,6 +47,8 @@ export namespace CordoGateway {
 
   function apiRequest(method: Method, url: string, body?: Record<string, any>) {
     const config = CordoMagic.getConfig()
+    if (!config)
+      throw new MissingContextError('Could not make API request, no config found in context.')
     return axios({
       method,
       url,
@@ -88,6 +91,8 @@ export namespace CordoGateway {
       return null
 
     const config = CordoMagic.getConfig()
+    if (!config)
+      throw new MissingContextError('Could not respond to interaction, no config found in context.')
     if (!config.client.id) {
       console.warn(`No client id provided in config. Cannot respond to interactions.`)
       return null
@@ -108,7 +113,10 @@ export namespace CordoGateway {
     i = await Hooks.callHook('onBeforeHandle', i)
     if (!i) return
 
-    const deferAfter = CordoMagic.getConfig().upstream.autoDeferMs
+    const config = CordoMagic.getConfig()
+    if (!config)
+      throw new MissingContextError('Could not handle interaction, no config found in context.')
+    const deferAfter = config.upstream.autoDeferMs
     if (deferAfter) {
       setTimeout(() => {
         if (!InteractionInternals.get(i).answered)

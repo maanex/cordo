@@ -12,10 +12,17 @@ export namespace Hooks {
     hookName: Name,
     value: Value,
     context?: Context,
-    config?: CordoConfig
+    config?: NonNullable<CordoConfig>
   ): ReturnType<NonNullable<CordoConfig['hooks'][Name]>> {
-    if (!config) 
-      config = CordoMagic.getConfig()
+    if (!config) {
+      const contextConfig = CordoMagic.getConfig()
+      if (!contextConfig) {
+        console.warn(`Calling hook '${hookName}' failed, no config provided and no config found in context.`)
+        return value as any
+      }
+
+      config = contextConfig
+    }
 
     const hook = config.hooks[hookName]
     if (!hook)
@@ -35,7 +42,7 @@ export namespace Hooks {
   }
 
   export function isDefined(name: keyof CordoConfig['hooks']) {
-    return !!CordoMagic.getConfig().hooks[name]
+    return !!CordoMagic.getConfig()?.hooks[name]
   }
 
 }

@@ -7,9 +7,9 @@ import type { ParsedCordoConfig } from './files/config'
 
 type Context = {
   cwd: string
-  lockfile: LockfileInternals.ParsedLockfile
-  config: ParsedCordoConfig
-  invoker: CordoInteraction
+  lockfile: LockfileInternals.ParsedLockfile | null
+  config: ParsedCordoConfig | null
+  invoker: CordoInteraction | null
   idCounter: number
 }
 

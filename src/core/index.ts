@@ -5,6 +5,8 @@ import { ConfigInternals, type CordoConfig, type ParsedCordoConfig } from './fil
 import { LockfileInternals } from './files/lockfile'
 import { CordoGateway } from './gateway'
 import { RoutingFilesystem } from './routing/filesystem'
+import { CordoMagic } from './magic'
+import type { CordoInteraction } from './interaction'
 
 export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
@@ -76,3 +78,25 @@ export const Cordo = {
   respondToRawInteraction: CordoGateway.respondTo,
 }
 Object.freeze(Cordo)
+
+
+export namespace Extend {
+
+  export function runInCordoContext(
+    fn: () => any,
+    ctx?: {
+      invoker?: CordoInteraction
+      lockfile?: LockfileInternals.ParsedLockfile
+      config?: ParsedCordoConfig
+    }
+  ) {
+    CordoMagic.Internals.runWithCtx(fn, {
+      invoker: ctx?.invoker ?? null,
+      lockfile: ctx?.lockfile ?? null,
+      config: ctx?.config ?? null,
+      cwd: '',
+      idCounter: 0
+    })
+  }
+
+}

@@ -1,3 +1,4 @@
+import { MissingContextError } from "../../errors/builtin/missing-context"
 import { Hooks } from "../hooks"
 import type { CordoInteraction } from "../interaction"
 import { CordoMagic } from "../magic"
@@ -59,6 +60,13 @@ export namespace RoutingResolve {
     const lockfile = CordoMagic.getLockfile()
     const currentRoute = CordoMagic.getCwd()
     const invoker = CordoMagic.getInvoker()
+
+    if (!lockfile)
+      throw new MissingContextError('getRouteFromPath failed, no lockfile found in context.')
+    if (!currentRoute)
+      throw new MissingContextError('getRouteFromPath failed, no current route found in context.')
+    if (!invoker)
+      throw new MissingContextError('getRouteFromPath failed, no invoker found in context.')
 
     let startingPoint = currentRoute
     if (startingPoint.endsWith(DefaultFileName))
@@ -139,7 +147,7 @@ export namespace RoutingResolve {
   }
 
   export function getRouteFromId(routeId: string) {
-    return CordoMagic.getLockfile().$runtime.routeImpls.get(routeId)
+    return CordoMagic.getLockfile()?.$runtime.routeImpls.get(routeId)
   }
 
 }
