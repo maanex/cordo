@@ -8,7 +8,10 @@ import { CordoError } from "./cordo-error"
 export namespace HandleErrors {
 
   function findApplicableBoundaries(startingPath: string) {
-    const errorBounds = CordoMagic.getLockfile().$runtime.errorBoundaries
+    const errorBounds = CordoMagic.getLockfile()?.$runtime.errorBoundaries
+    if (!errorBounds)
+      return []
+
     const routeFilePath = RoutingResolve.getRouteFromPath(startingPath, false).routeFilePath!
 
     const options = errorBounds.map(b => ({

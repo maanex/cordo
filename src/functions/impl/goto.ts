@@ -41,7 +41,7 @@ export function goto(
     ? FunctInternals.readFunct(path).path
     : path
 
-  const flags = parseFlags(opts, FunctInternals.readFunct(path as any)?.flags ?? CordoMagic.getConfig().functDefaultFlags.gotoBits)
+  const flags = parseFlags(opts, FunctInternals.readFunct(path as any)?.flags ?? CordoMagic.getConfig()?.functDefaultFlags.gotoBits ?? 0)
 
   return FunctInternals.createFunct({
     type: 'goto',

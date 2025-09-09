@@ -1,6 +1,7 @@
 import { LockfileInternals } from "../core/files/lockfile"
 import { CordoMagic } from "../core/magic"
 import { RoutingResolve } from "../core/routing/resolve"
+import { MissingContextError } from "../errors/builtin/missing-context"
 import { LibIds } from "../lib/ids"
 import { LibUtils } from "../lib/utils"
 import { FunctInternals, type CordoFunct } from "./funct"
@@ -58,7 +59,10 @@ export namespace FunctCompiler {
     }
 
     // encode arguments
-    const lut = CordoMagic.getLockfile().lut
+    const lut = CordoMagic.getLockfile()?.lut
+    if (!lut)
+      throw new MissingContextError('toCustomId failed, no lockfile found in context.')
+    
     let argusStr = ''
     let counter = -1
     for (const arg of LibUtils.iterate(argus, extraValues)) {
@@ -91,7 +95,7 @@ export namespace FunctCompiler {
       return arg.slice(1)
 
     if (arg[0] === LutArgumentIndicator) 
-      return CordoMagic.getLockfile().lut[LibIds.parse(arg.slice(1))] ?? ''
+      return CordoMagic.getLockfile()?.lut[LibIds.parse(arg.slice(1))] ?? ''
 
     if (arg[0] === ReferenceArgumentIndicator) 
       return parsedArguments[LibIds.parseSingle(arg[1])] ?? ''
