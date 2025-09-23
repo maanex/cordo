@@ -19,3 +19,5 @@ Cordo can be run as a standalone web-server (recommended) or integrated into exi
 ## Quick Start
 
 That's to do lol.
+
+If you wanna see how it looks like using cordo, check out the `./test` folder for some almost up to date demo project.
