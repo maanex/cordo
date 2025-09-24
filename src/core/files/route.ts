@@ -89,6 +89,13 @@ type RouteRequestFromModal = {
   selected: Map<string, string>
 }
 
+type InstallContext = {
+  /** true if the bot is installed in the current guild, non-exclusive */
+  isGuildInstalled: boolean
+  /** true if the bot is installed for the current user, non-exclusive */
+  isUserInstalled: boolean
+}
+
 export type RouteRequest = {
   params: Record<string, string>
   /** route path is the path to this route you are currently in */
@@ -96,6 +103,8 @@ export type RouteRequest = {
   /** current path is the path where the interaction is currently happening. this is usually the same as routePath but might be different when called using run() */
   currentPath: string
   rawInteraction: CordoInteraction
+
+  installContext: InstallContext
 
   locals: {
     get<T = any>(key: string): T | undefined

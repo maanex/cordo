@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
 import { FunctCompiler } from "../functions/compiler"
@@ -133,9 +133,26 @@ export namespace CordoGateway {
   }
 
   function handleCommandInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommand }) {
+    // slash commands: need to check for subcommands
     if (i.data.type === ApplicationCommandType.ChatInput) {
-      const name = i.data.name
-      const { route, path } = RoutingResolve.getRouteForCommand(name)
+      let name = i.data.name
+      let option = i.data.options?.[0]
+      while (option?.type === ApplicationCommandOptionType.Subcommand || option?.type === ApplicationCommandOptionType.SubcommandGroup) {
+        name += ` ${option.name}`
+        option = option.options?.[0]
+      }
+
+      const { route, path } = RoutingResolve.getRouteForCommand(name, 'slash')
+      CordoMagic.setCwd(path)
+      return RoutingRespond.callRoute(route.routeId, route.args, i)
+    }
+
+    // message/user commands: go ahead
+    if (i.data.type === ApplicationCommandType.Message || i.data.type === ApplicationCommandType.User) {
+      const { route, path } = RoutingResolve.getRouteForCommand(
+        i.data.name,
+        i.data.type === ApplicationCommandType.Message ? 'message' : 'user'
+      )
       CordoMagic.setCwd(path)
       return RoutingRespond.callRoute(route.routeId, route.args, i)
     }

@@ -44,7 +44,7 @@ export type CordoConfig = {
     onNetworkError: HookFor<any>,
 
     /** transforms the name of the invoked command to a file or route name */
-    transformCommandName: TransformHookFor<string>,
+    transformCommandName: TransformHookFor<string, { type: 'slash' | 'message' | 'user' }>,
     /** gets called by all cordo builtin components that render user facing text. e.g. buttons, text components, selects, etc */
     transformUserFacingText: TransformHookFor<string, { component: StringComponentType, position: null | string, interaction?: CordoInteraction }>,
   }

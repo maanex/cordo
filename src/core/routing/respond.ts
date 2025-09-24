@@ -138,6 +138,11 @@ export namespace RoutingRespond {
       rawInteraction: interaction,
       rawEntitlements: interaction.entitlements,
 
+      installContext: {
+        isGuildInstalled: Boolean(interaction.authorizing_integration_owners[0]),
+        isUserInstalled: Boolean(interaction.authorizing_integration_owners[1]),
+      },
+
       locals: {
         get: <T = any>(key: string) => interaction.locals[key] as T,
         set: (key: string, value: any) => void (interaction.locals[key] = value),

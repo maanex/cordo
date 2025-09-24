@@ -133,10 +133,12 @@ export namespace RoutingResolve {
     }
   }
 
-  export function getRouteForCommand(command: string) {
+  export function getRouteForCommand(command: string, type: 'slash' | 'message' | 'user') {
     const fileName = Hooks.isDefined('transformCommandName')
-      ? Hooks.callHook('transformCommandName', command)
-      : command.replaceAll(' ', '-').replace(/[^\w-]/g, '').toLowerCase()
+      ? Hooks.callHook('transformCommandName', command, { type })
+      : type === 'slash'
+        ? command.replaceAll(' ', '/').toLowerCase() // slash commands: subcommands become subfolders
+        : command.replaceAll(' ', '-').replace(/[^\w-]/g, '').toLowerCase() // message/user commands: just sanitize
     const routePath = `command/${fileName}`
     return {
       route: getRouteFromPath(routePath, false),
