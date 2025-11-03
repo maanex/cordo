@@ -4,6 +4,7 @@ import { LibEmoji } from "../../lib/emoji"
 import { Hooks } from "../../core/hooks"
 import type { CordoFunct, CordoFunctRun } from "../../functions"
 import { FunctCompiler } from "../../functions/compiler"
+import { MaxLengthConstants } from "../../lib/constants"
 
 
 export function button() {
@@ -21,7 +22,7 @@ export function button() {
       'transformUserFacingText',
       labelVal,
       { component: 'Button', position: 'label' }
-    )
+    )?.slice(0, MaxLengthConstants.BUTTON_LABEL)
   }
 
   const out = {

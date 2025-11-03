@@ -3,6 +3,7 @@ import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
 import { value, type CordoFunct, type CordoFunctRun } from "../../functions"
 import { FunctCompiler } from "../../functions/compiler"
+import { MaxLengthConstants } from "../../lib/constants"
 
 
 type SelectMenuOption<Value extends string = string> = Omit<APISelectMenuOption, 'value'> & ({
@@ -31,9 +32,9 @@ export function selectString<Values extends string = string>() {
   function getOptions(): SelectMenuOption[] {
     return optionsVal.slice(0, 25).map(o => ({
       ...o,
-      label: Hooks.callHook('transformUserFacingText', o.label, { component: 'StringSelect', position: 'option.label' }),
+      label: Hooks.callHook('transformUserFacingText', o.label, { component: 'StringSelect', position: 'option.label' })?.slice(0, MaxLengthConstants.SELECT_OPTION_LABEL),
       description: o.description
-        ? Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })
+        ? Hooks.callHook('transformUserFacingText', o.description, { component: 'StringSelect', position: 'option.description' })?.slice(0, MaxLengthConstants.SELECT_OPTION_DESCRIPTION)
         : undefined,
       value: FunctCompiler.toCustomId([
         ...(o.onClick
