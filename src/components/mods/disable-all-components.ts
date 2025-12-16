@@ -28,7 +28,7 @@ export function disableAllComponents(disable = true) {
   return createModifier({
     name: 'disable-all-components',
     hooks: {
-      postRender: (c) => {
+      afterRender: (c) => {
         if (disable)
           iterateComponents(c)
         return c

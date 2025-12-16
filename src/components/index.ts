@@ -29,6 +29,7 @@ export { debugIdToLabel } from './mods/debug-id-to-label'
 export { debugPrint } from './mods/debug-print'
 export { debugRoute } from './mods/debug-route'
 export { disableAllComponents } from './mods/disable-all-components'
+export { enforcePrivateResponse } from './mods/enforce-private-response'
 
 export type { CordoComponent, StringComponentType } from './component'
 

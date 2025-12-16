@@ -19,7 +19,7 @@ export function debugIdToLabel() {
   return createModifier({
     name: 'debug-id-to-label',
     hooks: {
-      postRender: (c) => {
+      afterRender: (c) => {
         searchForButton(c)
         return c
       }

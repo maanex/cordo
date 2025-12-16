@@ -1,13 +1,13 @@
 import { ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
 import { disableAllComponents } from "../../components"
-import { ComponentType, isComponent, renderComponent, renderComponentList, type CordoComponent } from "../../components/component"
+import { ComponentType, renderComponent, renderComponentList, type CordoComponent } from "../../components/component"
 import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route"
 import { InteractionInternals, type CordoInteraction } from "../interaction"
 import { CordoMagic } from "../magic"
 import { CordoGateway } from "../gateway"
 import { FunctInternals } from "../../functions/funct"
 import { goto, run } from "../../functions"
-import type { CordoModifier } from "../../components/modifier"
+import { isModifier, readModifier } from "../../components/modifier"
 import { FunctCompiler } from "../../functions/compiler"
 import { RoutingResolve } from "./resolve"
 
@@ -27,15 +27,10 @@ export namespace RoutingRespond {
   //
 
   export function renderRouteResponse(response: RouteResponse, i: CordoInteraction, opts: RouteOpts = {}) {
-    const modifiers: CordoModifier[] = []
-
     for (const item of response) {
-      if (!isComponent(item)) 
-        modifiers.push(item)
+      if (isModifier(item))
+        readModifier(item).hooks?.beforeRouteResponse?.(response, i, opts)
     }
-
-    //
-    // TODO modifiers
 
     if (opts.disableComponents)
       response.push(disableAllComponents())

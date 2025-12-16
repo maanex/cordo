@@ -8,7 +8,7 @@ export function debugRoute() {
   return createModifier({
     name: 'debug-route',
     hooks: {
-      preRender: (c) => {
+      beforeRender: (c) => {
         const routeText = text(CordoMagic.getCwd()).size('small')
         return [ ...c, readComponent(routeText) ]
       },

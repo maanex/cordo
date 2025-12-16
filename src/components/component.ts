@@ -163,8 +163,8 @@ export function renderComponentList(
   }
 
   for (const mod of modifiers) {
-    if (mod.hooks?.preRender)
-      pipeline = mod.hooks.preRender(pipeline)
+    if (mod.hooks?.beforeRender)
+      pipeline = mod.hooks.beforeRender(pipeline)
   }
 
   let output = pipeline
@@ -172,8 +172,8 @@ export function renderComponentList(
     .filter(Boolean)
 
   for (const mod of modifiers) {
-    if (mod.hooks?.postRender)
-      output = mod.hooks.postRender(output)
+    if (mod.hooks?.afterRender)
+      output = mod.hooks.afterRender(output)
   }
 
   return output
