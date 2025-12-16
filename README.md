@@ -249,8 +249,9 @@ export default defineCordoRoute((i) => {
     // Retreive the message from locals
     text(`A message: ${i.locals.get('message')}`)
       // Only show if there is a message in the locals
-      .visible(i.locals.has('message'))
+      .visible(i.locals.has('message')),
 
+    // The very button to trigger it all
     button()
       .label('Save preferences')
       .onClick(
@@ -264,7 +265,9 @@ export default defineCordoRoute((i) => {
 })
 ```
 
-This approach might take a second to get used to but allows for some very powerful composability and is highly scaleable.
+This almost recursive approach might take a second to get used to but it allows for some very powerful composability and is highly scaleable.
+
+Please note that cordo is stateless, this means the locals are only present for the single interaction they are written to and are not there once a follow up interaction happens. You can use route parameters to store dynamic information or use an external state management that works with your deployment.
 
 #### Parameters in routes
 
