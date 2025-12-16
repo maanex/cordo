@@ -29,7 +29,8 @@ Cordo should also be able to run on Deno.
 
 Cordo should also be able to run on Node with experimental native TypeScript support enabled.
 
-> [!NOTE] 
+> [!NOTE]
+>
 > The `plugin/hono` package uses Bun specific apis. This should not be an issue since the package must be explicitly imported but keep it in mind if you use hono in a non-bun environment.
 </details>
 
@@ -42,6 +43,7 @@ Second you need to pass incoming events to cordo, depending on the rest of your 
 
 <details>
 <summary>Using express (http)</summary>
+
 ```ts
 import useWithExpress from 'cordo/plugin/express'
 const app = express()
@@ -53,6 +55,7 @@ app.listen(5058, () => console.log('Cordo is running on port 5058'))
 
 <details>
 <summary>Using hono (http)</summary>
+
 ```ts
 import useWithHono from 'cordo/plugin/hono'
 const app = new Hono()
@@ -64,6 +67,7 @@ return app
 
 <details>
 <summary>Using discord.js</summary>
+
 ```ts
 import useWithDiscordJs from 'cordo/plugin/djs'
 const client = new Client({ ... })
@@ -74,6 +78,7 @@ client.login()
 
 <details>
 <summary>Manually triggering (not recommended)</summary>
+
 ```ts
 // Pass the raw body as a node buffer:
 Cordo.triggerInteraction(req.body, {
