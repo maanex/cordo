@@ -90,8 +90,10 @@ export namespace RoutingRespond {
     if (!options)
       return {}
 
-    if (options.length === 1 && options[0].type === ApplicationCommandOptionType.SubcommandGroup)
-      return parseCommandOptions(options[0].options)
+    if (options.length === 1) {
+      if (options[0].type === ApplicationCommandOptionType.Subcommand || options[0].type === ApplicationCommandOptionType.SubcommandGroup)
+        return parseCommandOptions(options[0].options)
+    }
     
     return (options as Record<string, any>[]).reduce((out, opt) => ({ [opt.name]: opt.value, ...out }), {})
   }
