@@ -1,4 +1,4 @@
-import { ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
 import { disableAllComponents } from "../../components"
 import { ComponentType, renderComponent, renderComponentList, type CordoComponent } from "../../components/component"
 import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route"
@@ -84,6 +84,16 @@ export namespace RoutingRespond {
       }
     }
     return out
+  }
+
+  function parseCommandOptions(options: any) {
+    if (!options)
+      return {}
+
+    if (options.length === 1 && options[0].type === ApplicationCommandOptionType.SubcommandGroup)
+      return parseCommandOptions(options[0].options)
+    
+    return (options as Record<string, any>[]).reduce((out, opt) => ({ [opt.name]: opt.value, ...out }), {})
   }
 
   export function buildRouteRequest(
@@ -194,7 +204,7 @@ export namespace RoutingRespond {
           // @ts-ignore
           id: interaction.data.id,
           // @ts-ignore
-          options: interaction.data.options?.reduce((out, opt) => ({ [opt.name]: opt.value, ...out }), {}) ?? {},
+          options: parseCommandOptions(interaction.data.options),
           // @ts-ignore
           type: (interaction.data.type === ApplicationCommandType.ChatInput)
             ? 'chat'
