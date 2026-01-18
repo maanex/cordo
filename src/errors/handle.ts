@@ -42,11 +42,14 @@ export namespace HandleErrors {
       .sort((a, b) => b.specificity - a.specificity)
   }
 
-  function useDefaultHandler(error: CordoError) {
-    console.trace('No error handler found for', error.name)
+  function useDefaultHandler(error: Error) {
+    if (error instanceof CordoError)
+      console.trace('No error handler found for', error.name)
+    else
+      console.error(error)
   }
 
-  async function handleErrorStack(initialError: CordoError, handlers: CordoErrorHandler[], request: RouteRequest) {
+  async function handleErrorStack(initialError: Error, handlers: CordoErrorHandler[], request: RouteRequest) {
     const handler = handlers.shift()
     if (!handler)
       return useDefaultHandler(initialError)
@@ -54,10 +57,8 @@ export namespace HandleErrors {
     try {
       await handler(initialError, request)
     } catch (error) {
-      if (error instanceof CordoError)
+      if (error instanceof Error)
         handleErrorStack(error, handlers, request)
-      else
-        handleNonCordoError(error)
     }
   }
 
@@ -66,11 +67,6 @@ export namespace HandleErrors {
 
     const boundaries = findApplicableBoundaries(currentRoute)
     handleErrorStack(error, boundaries.map(b => b.impl.handler), request)
-  }
-
-  export function handleNonCordoError(error: any) {
-    console.error('(dev) Non cordo error:')
-    console.error(error)
   }
 
 }

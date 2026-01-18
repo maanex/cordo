@@ -1,4 +1,3 @@
-import { CordoError } from "../../errors"
 import type { RouteRequest } from "./route"
 
 
@@ -9,7 +8,7 @@ export type CordoErrorBoundary = {
   handler: CordoErrorHandler
 }
 
-export type CordoErrorHandler = (error: CordoError, request: RouteRequest) => any
+export type CordoErrorHandler = (error: Error, request: RouteRequest) => any
 
 export function defineCordoErrorBoundary(handler: CordoErrorHandler): CordoErrorBoundary {
   return {
