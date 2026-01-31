@@ -92,7 +92,8 @@ export async function evalRun(path: string, flags: number, i: CordoInteraction):
       CordoGateway.respondTo(i, null) // we'll ack this so that any rendering done further down does not spill into the new error message
 
     const currentRoute = CordoMagic.getCwd()
-    const parsedRoute = RoutingResolve.getRouteFromId(currentRoute)
+    const currentRouteId = RoutingResolve.getRouteFromPath(currentRoute, false)?.routeId
+    const parsedRoute = currentRouteId ? RoutingResolve.getRouteFromId(currentRouteId) : null
     if (parsedRoute) {
       const request = RoutingRespond.buildRouteRequest(parsedRoute, route.args, i, opts)
       if (request) {
