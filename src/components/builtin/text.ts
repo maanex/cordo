@@ -10,7 +10,7 @@ export function text(...content: Array<string | { toString: () => string }>) {
 
   function toString(attributes: Record<string, any> = {}): string {
     const stringContent = content
-      .map(c => typeof c === 'string' ? c : c.toString())
+      .map(c => String(c))
       .map(c => Hooks.callHook('transformUserFacingText', c, { ...attributes, component: 'TextDisplay', position: null }))
     const innerContent = (innerPrefix ?? '') + stringContent.join(' ').replace(/^ +| +$/mg, '') + (innerSuffix ?? '')
     const outerContent = linkUrl
