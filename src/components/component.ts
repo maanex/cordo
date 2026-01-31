@@ -108,6 +108,7 @@ export function renderComponentList(
   inheritAttributes: Record<string, any> = {}
 ) {
   let pipeline: Array<CordoComponentPayload<StringComponentType>> = []
+  /* when we have buttons without a host row we use this to collect up to 5 and then create the row for it */
   const rowBuilder: Array<CordoComponent<StringComponentType>> = []
   const modifiers: Array<ReturnType<typeof readModifier>> = []
 
@@ -169,7 +170,23 @@ export function renderComponentList(
 
   let output = pipeline
     .map(c => renderComponent(c, parent, hirarchy, inheritAttributes))
-    .filter(Boolean)
+    .filter(Boolean) as Record<string | any, any>[]
+
+  // join adjacent text components
+  let previousTextComponent: Record<string, any> | null = null
+  output = output.filter((item) => {
+    if (item.type === ComponentType.TextDisplay) {
+      if (previousTextComponent) {
+        (previousTextComponent as any).content += '\n' + item.content
+        return false
+      } else {
+        previousTextComponent = item
+      }
+    } else {
+      previousTextComponent = null
+    }
+    return true
+  })
 
   for (const mod of modifiers) {
     if (mod.hooks?.afterRender)
