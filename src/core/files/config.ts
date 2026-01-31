@@ -7,6 +7,7 @@ import type { CordoInteraction } from '../interaction'
 import type { StringComponentType } from '../../components/component'
 import { parseFlags as runParseFlags, type FlagOpts as RunFlagOpts } from '../../functions/impl/run'
 import { parseFlags as gotoParseFlags, type FlagOpts as GotoFlagOpts } from '../../functions/impl/goto'
+import type { RouteRequest } from './route'
 
 
 const CordoConfigSymbol = Symbol.for('CordoConfig')
@@ -47,6 +48,11 @@ export type CordoConfig = {
     transformCommandName: TransformHookFor<string, { type: 'slash' | 'message' | 'user' }>,
     /** gets called by all cordo builtin components that render user facing text. e.g. buttons, text components, selects, etc */
     transformUserFacingText: TransformHookFor<string, { component: StringComponentType, position: null | string, interaction?: CordoInteraction }>,
+
+    /** capture errors that were produced while calling a funct yet could not be assigned a route and thus not be captured by a route error boundary */
+    captureUnroutableErrors: HookFor<Error, { invoker: { funct: 'goto' | 'run', path: string, flags: number, interaction: CordoInteraction } }>
+    /** capture errors that were not caught by any other error boundary */
+    captureUnhandledErrors: HookFor<Error, { request: RouteRequest | undefined }>
   }
   functDefaultFlags: {
     run: Required<RunFlagOpts>
@@ -92,7 +98,9 @@ export namespace ConfigInternals {
       onAfterRespond: null,
       onNetworkError: null,
       transformCommandName: null,
-      transformUserFacingText: null
+      transformUserFacingText: null,
+      captureUnroutableErrors: null,
+      captureUnhandledErrors: null
     },
     functDefaultFlags: {
       goto: {

@@ -1,7 +1,8 @@
 import { CordoMagic } from "../core/magic"
 import { RoutingResolve } from "../core/routing/resolve"
 import type { CordoErrorHandler } from "../core/files/error-boundary"
-import type { RouteRequest } from "../core"
+import type { CordoInteraction, RouteRequest } from "../core"
+import { Hooks } from "../core/hooks"
 import { CordoError } from "./cordo-error"
 
 
@@ -42,31 +43,57 @@ export namespace HandleErrors {
       .sort((a, b) => b.specificity - a.specificity)
   }
 
-  function useDefaultHandler(error: Error) {
+  function useDefaultHandler(error: Error, request?: RouteRequest) {
+    if (Hooks.isDefined('captureUnhandledErrors')) {
+      try {
+        Hooks.callHook('captureUnhandledErrors', error, { request })
+        return
+      } catch {}
+    }
+
     if (error instanceof CordoError)
       console.trace('No error handler found for', error.name)
     else
-      console.error(error)
+      throw error
   }
 
   async function handleErrorStack(initialError: Error, handlers: CordoErrorHandler[], request: RouteRequest) {
-    const handler = handlers.shift()
+    const handler = handlers[0]
     if (!handler)
-      return useDefaultHandler(initialError)
+      return useDefaultHandler(initialError, request)
 
     try {
       await handler(initialError, request)
     } catch (error) {
       if (error instanceof Error)
-        handleErrorStack(error, handlers, request)
+        handleErrorStack(error, handlers.slice(1), request)
     }
   }
 
-  export function thrownOnRoute(error: CordoError, request: RouteRequest) {
+  export async function thrownOnRoute(error: Error, request: RouteRequest) {
     const currentRoute = CordoMagic.getCwd()
 
     const boundaries = findApplicableBoundaries(currentRoute)
-    handleErrorStack(error, boundaries.map(b => b.impl.handler), request)
+    await handleErrorStack(error, boundaries.map(b => b.impl.handler), request)
+  }
+
+  export function handleUnroutableError(
+    error: Error,
+    invoker: {
+      funct: 'goto' | 'run',
+      path: string,
+      flags: number,
+      interaction: CordoInteraction
+    }
+  ) {
+    if (Hooks.isDefined('captureUnroutableErrors')) {
+      try {
+        Hooks.callHook('captureUnroutableErrors', error, { invoker })
+        return
+      } catch {}
+    }
+
+    return useDefaultHandler(error)
   }
 
 }

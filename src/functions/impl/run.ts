@@ -3,7 +3,6 @@ import { FunctInternals, type CordoFunct } from "../funct"
 import { RoutingResolve } from "../../core/routing/resolve"
 import { type CordoInteraction } from "../../core"
 import { RoutingRespond } from "../../core/routing/respond"
-import { CordoError } from "../../errors"
 import { HandleErrors } from "../../errors/handle"
 import { CordoGateway } from "../../core/gateway"
 import { CordoMagic } from "../../core/magic"
@@ -81,25 +80,34 @@ export async function evalRun(path: string, flags: number, i: CordoInteraction):
       routeResponse.catch(() => {})
     return true
   } catch (e) {
-    if (e instanceof CordoError) {
-      const parsedRoute = RoutingResolve.getRouteFromId(route.routeId)
-      if (parsedRoute) {
-        const opts: RoutingRespond.RouteOpts = privateErrorMessage
-          ? { asReply: true, isPrivate: true }
-          : continueOnError
-            ? { disableRendering: true }
-            : {}
-        if (privateErrorMessage && continueOnError)
-          CordoGateway.respondTo(i, null) // we'll ack this so that any rendering done further down does not spill into the new error message
-        const request = RoutingRespond.buildRouteRequest(parsedRoute, route.args, i, opts)
-        if (request) {
-          HandleErrors.thrownOnRoute(e, request)
-          return continueOnError
-        }
+    if (!(e instanceof Error))
+      throw e
+
+    const opts: RoutingRespond.RouteOpts = privateErrorMessage
+      ? { asReply: true, isPrivate: true }
+      : continueOnError
+        ? { disableRendering: true }
+        : {}
+    if (privateErrorMessage && continueOnError)
+      CordoGateway.respondTo(i, null) // we'll ack this so that any rendering done further down does not spill into the new error message
+
+    const currentRoute = CordoMagic.getCwd()
+    const parsedRoute = RoutingResolve.getRouteFromId(currentRoute)
+    if (parsedRoute) {
+      const request = RoutingRespond.buildRouteRequest(parsedRoute, route.args, i, opts)
+      if (request) {
+        HandleErrors.thrownOnRoute(e, request)
+        return continueOnError
       }
     }
 
-    HandleErrors.handleNonCordoError(e)
+    HandleErrors.handleUnroutableError(e, {
+      funct: 'run',
+      path,
+      flags,
+      interaction: i
+    })
+
     return continueOnError
   }
 
