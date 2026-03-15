@@ -80,11 +80,19 @@ export namespace CordoGateway {
       return null
     }
 
+    if (!internals.answered) {
+      if (payload)
+        return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, payload)
+
+      if (i.type === InteractionType.ApplicationCommand)
+        return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, { type: InteractionResponseType.DeferredChannelMessageWithSource })
+
+      if (i.type === InteractionType.MessageComponent)
+        return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, { type: InteractionResponseType.DeferredMessageUpdate })
+    }
+
     if (!payload)
       return null
-
-    if (!internals.answered) 
-      return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, payload)
 
     const { type, data } = payload
     if (!type || !data)
