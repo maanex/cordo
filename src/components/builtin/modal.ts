@@ -5,10 +5,10 @@ import { ComponentType, createComponent, renderComponent, renderComponentList, t
 import type { CordoModifier } from "../modifier"
 
 
-export type AllowedComponents = CordoComponent<'TextDisplay' | 'TextInput' | 'RoleSelect' | 'UserSelect' | 'StringSelect' | 'ChannelSelect' | 'MentionableSelect'> | CordoModifier
+export type AllowedComponents = CordoComponent<'TextDisplay' | 'TextInput' | 'RoleSelect' | 'UserSelect' | 'StringSelect' | 'ChannelSelect' | 'MentionableSelect' | 'Label' | 'FileUpload' | 'RadioGroup' | 'CheckboxGroup' | 'Checkbox'> | CordoModifier
 type AllowedComponentArray = Array<AllowedComponents | AllowedComponents[]>
 
-const componentsRequiringLabel: StringComponentType[] = [ 'TextInput', 'RoleSelect', 'UserSelect', 'StringSelect', 'ChannelSelect', 'MentionableSelect', 'ChannelSelect', 'FileUpload', 'RadioGroup', 'CheckboxGroup', 'Checkbox' ]
+const componentsRequiringLabel: StringComponentType[] = [ 'TextInput', 'RoleSelect', 'UserSelect', 'StringSelect', 'ChannelSelect', 'MentionableSelect', 'FileUpload', 'RadioGroup', 'CheckboxGroup', 'Checkbox' ]
 function labelize(component: CordoComponent<StringComponentType>, parsed: CordoComponentPayload<StringComponentType>): CordoComponent<StringComponentType> | null {
   if (!parsed.visible)
     return null

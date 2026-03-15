@@ -86,7 +86,7 @@ type RouteRequestFromSelect = {
 type RouteRequestFromModal = {
   source: 'modal'
   command: null
-  selected: Map<string, string>
+  selected: Map<string, string | boolean | string[]>
 }
 
 type InstallContext = {

@@ -73,19 +73,6 @@ export namespace RoutingRespond {
     }
   }
 
-  function parseModalResponse(interaction: CordoInteraction & { type: InteractionType.ModalSubmit }) {
-    const out = new Map<string, string>()
-    for (const row of interaction.data.components) {
-      for (const item of row.components) {
-        if (item.custom_id.startsWith(FunctCompiler.NoopIndicator))
-          continue
-        if (item.type === ComponentType.TextInput)
-          out.set(item.custom_id, item.value)
-      }
-    }
-    return out
-  }
-
   function parseCommandOptions(options: any) {
     if (!options)
       return {}
@@ -168,8 +155,12 @@ export namespace RoutingRespond {
         const rendered = renderModal(modal)
         CordoGateway.respondTo(interaction, rendered)
       },
-      goto: opts.disableRendering ? noOp(Promise.resolve(null)) : (...args) => FunctInternals.evalFunct(goto(...args), interaction),
-      run: opts.disableRendering ? noOp(Promise.resolve(null)) : (...args) => FunctInternals.evalFunct(run(...args), interaction),
+      goto: opts.disableRendering
+        ? noOp(Promise.resolve(null))
+        : (...args) => FunctInternals.evalFunct(goto(...args), interaction),
+      run: opts.disableRendering
+        ? noOp(Promise.resolve(null))
+        : (...args) => FunctInternals.evalFunct(run(...args), interaction),
 
       // @ts-ignore
       location,
@@ -230,12 +221,10 @@ export namespace RoutingRespond {
             : null
         }
         : null,
-      selected: (source === 'select')
+      selected: (source === 'select' || source === 'modal')
         // @ts-ignore
         ? interaction.data.values
-        : (source === 'modal')
-          ? parseModalResponse(interaction as CordoInteraction & { type: InteractionType.ModalSubmit })
-          : null
+        : null
     }
   }
 

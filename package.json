@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.10.0-rc.1",
+  "version": "2.10.0-rc.2",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -38,7 +38,7 @@
     "@types/bun": "^1.2.10",
     "axios": "^0.21.4",
     "defu": "^6.1.4",
-    "discord-api-types": "^0.37.119",
+    "discord-api-types": "^0.38.42",
     "discord-interactions": "^2.4.1",
     "type-fest": "^4.34.1"
   },

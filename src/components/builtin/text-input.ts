@@ -1,6 +1,7 @@
 import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
 import { FunctCompiler } from "../../functions/compiler"
+import { value } from "../../functions"
 
 
 export function textInput() {
@@ -9,7 +10,7 @@ export function textInput() {
   let descriptionVal: string | undefined = undefined
   let minLength: number | undefined = undefined
   let maxLength: number | undefined = undefined
-  let requiredVal: boolean | undefined = undefined
+  let requiredVal: boolean = false
   let sizeVal: number | undefined = undefined
   let currentVal: string | undefined = undefined
   let ref: string | undefined = undefined
@@ -53,7 +54,7 @@ export function textInput() {
       required: requiredVal,
       style: sizeVal ?? 1,
       value: currentVal,
-      custom_id: ref ?? FunctCompiler.toCustomId([]), // get a noop if no ref
+      custom_id: FunctCompiler.toCustomId(ref ? [ value(ref) ] : []), // get a noop if no ref
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),

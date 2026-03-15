@@ -110,7 +110,7 @@ export namespace FunctCompiler {
   }
 
   export function parseCustomId(id: string): ParsedCustomId {
-    if (id.startsWith(NoopIndicator) || !id.includes(FunctVersion)) {
+    if (!id || id.startsWith(NoopIndicator) || !id.includes(FunctVersion)) {
       return {
         functs: [],
         values: [],

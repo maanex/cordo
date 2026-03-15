@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction, type APIMessageStringSelectInteractionData, type APIModalComponent, type APIModalSubmissionComponent } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
 import { FunctCompiler } from "../functions/compiler"
@@ -168,48 +168,125 @@ export namespace CordoGateway {
 
   async function handleComponentInteraction(i: CordoInteraction & { type: InteractionType.MessageComponent }) {
     if (i.data.component_type === ComponentType.StringSelect) {
-      const options = i.data.values.map(v => FunctCompiler.parseCustomId(v))
-      i.data.values = options.map(o => o.values[0])
+      const success = await parseAndEvokeComponentWithValues(i.data, i)
+      if (!success)
+        return
+    }
 
-      for (const option of options) {
-        if (option.cwd)
-          CordoMagic.setCwd(option.cwd)
-        for (const action of option.functs) {
-          const success = await FunctInternals.evalFunct(action, i)
-          if (!success) return
-        }
+    const id = i.data.custom_id
+    const parsedCustomId = FunctCompiler.parseCustomId(id)
+
+    if (parsedCustomId.cwd)
+      CordoMagic.setCwd(parsedCustomId.cwd)
+
+    if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
+      await respondTo(i, null)
+
+    for (const action of parsedCustomId.functs) {
+      const success = await FunctInternals.evalFunct(action, i)
+      if (!success)
+        return
+    }
+  }
+
+  async function handleModalInteraction(i: CordoInteraction & { type: InteractionType.ModalSubmit }) {
+    const values = new Map<string, string>()
+    for (const component of i.data.components) {
+      const success = await parseAndEvokeModalLeafComponents(component, i, values)
+      if (!success)
+        return
+    }
+    // @ts-expect-error this type doesn't have a values property (yet)
+    i.data.values = values
+
+    const id = i.data.custom_id
+    const parsedCustomId = FunctCompiler.parseCustomId(id)
+
+    if (parsedCustomId.cwd)
+      CordoMagic.setCwd(parsedCustomId.cwd)
+
+    if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
+      await respondTo(i, null)
+
+    for (const action of parsedCustomId.functs) {
+      const success = await FunctInternals.evalFunct(action, i)
+      if (!success)
+        return
+    }
+  }
+
+  //
+
+  async function parseAndEvokeModalLeafComponents(c: any, i: CordoInteraction, collectedFormItems: Map<string, unknown>): Promise<boolean> {
+    if (c.type === ComponentType.ActionRow) {
+      for (const item of c.components) {
+        const success = await parseAndEvokeModalLeafComponents(item, i, collectedFormItems)
+        if (!success)
+          return false
+      }
+      return true
+    }
+    
+    if (c.type === ComponentType.Label) {
+      const success = await parseAndEvokeModalLeafComponents(c.component, i, collectedFormItems)
+      return success
+    }
+
+    const parsedCustomId = FunctCompiler.parseCustomId(c.custom_id)
+    if (!parsedCustomId.functs.length && !parsedCustomId.values.length)
+      return true
+
+    const formRef = parsedCustomId.values[0]
+
+    if ('values' in c && c.values.length > 0 && typeof c.values[0] === 'string') {
+      const success = await parseAndEvokeComponentWithValues(c, i)
+      if (!success)
+        return false
+
+      if (formRef)
+        collectedFormItems.set(formRef, c.values)
+    } else if ('value' in c && typeof c.value === 'string') {
+      const success = await parseAndEvokeComponentWithValue(c, i)
+      if (!success)
+        return false
+
+      if (formRef)
+        collectedFormItems.set(formRef, c.value)
+    }
+
+    return true
+  }
+
+  async function parseAndEvokeComponentWithValues(data: { values: string[] }, i: CordoInteraction): Promise<boolean> {
+    const options = data.values.map(v => FunctCompiler.parseCustomId(v))
+    data.values = options.flatMap(o => o.values)
+
+    for (const option of options) {
+      if (option.cwd)
+        CordoMagic.setCwd(option.cwd)
+      for (const action of option.functs) {
+        const success = await FunctInternals.evalFunct(action, i)
+        if (!success)
+          return false
       }
     }
 
-    const id = i.data.custom_id
-    const parsedCustomId = FunctCompiler.parseCustomId(id)
-
-    if (parsedCustomId.cwd)
-      CordoMagic.setCwd(parsedCustomId.cwd)
-
-    if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
-      await respondTo(i, null)
-
-    for (const action of parsedCustomId.functs) {
-      const success = await FunctInternals.evalFunct(action, i)
-      if (!success) return
-    }
+    return true
   }
-  
-  async function handleModalInteraction(i: CordoInteraction & { type: InteractionType.ModalSubmit }) {
-    const id = i.data.custom_id
-    const parsedCustomId = FunctCompiler.parseCustomId(id)
 
-    if (parsedCustomId.cwd)
-      CordoMagic.setCwd(parsedCustomId.cwd)
+  async function parseAndEvokeComponentWithValue(data: { value: string }, i: CordoInteraction): Promise<boolean> {
+    const option = FunctCompiler.parseCustomId(data.value)
+    data.value = option.values[0]
 
-    if (!parsedCustomId.functs.length && !InteractionInternals.get(i).answered)
-      await respondTo(i, null)
-
-    for (const action of parsedCustomId.functs) {
+    if (option.cwd)
+      CordoMagic.setCwd(option.cwd)
+    for (const action of option.functs) {
       const success = await FunctInternals.evalFunct(action, i)
-      if (!success) return
+      if (!success)
+        return false
     }
+
+    return true
   }
 
 }
