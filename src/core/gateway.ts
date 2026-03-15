@@ -15,6 +15,17 @@ import { RoutingRespond } from "./routing/respond"
 
 export namespace CordoGateway {
 
+  /**
+   * list of components that cannot have arbitrary user data in the response's value/values fields and thus can be safely parsed and evaluated
+   * IMPORTANT: never parse value/values of components not in this list as this would allow arbitrary code execution
+   */
+  const executeAllowedComponentTypes = [
+    ComponentType.RadioGroup,
+    ComponentType.Checkbox,
+    ComponentType.CheckboxGroup,
+    ComponentType.StringSelect
+  ]
+
   export async function triggerInteraction(opts: {
     interaction: CordoInteraction | APIInteraction,
     httpCallback?: (payload: any) => any
@@ -198,6 +209,7 @@ export namespace CordoGateway {
     }
     // @ts-expect-error this type doesn't have a values property (yet)
     i.data.values = values
+    console.log(values)
 
     const id = i.data.custom_id
     const parsedCustomId = FunctCompiler.parseCustomId(id)
@@ -218,6 +230,7 @@ export namespace CordoGateway {
   //
 
   async function parseAndEvokeModalLeafComponents(c: any, i: CordoInteraction, collectedFormItems: Map<string, unknown>): Promise<boolean> {
+    console.log(c)
     if (c.type === ComponentType.ActionRow) {
       for (const item of c.components) {
         const success = await parseAndEvokeModalLeafComponents(item, i, collectedFormItems)
@@ -233,22 +246,28 @@ export namespace CordoGateway {
     }
 
     const parsedCustomId = FunctCompiler.parseCustomId(c.custom_id)
+    console.log(parsedCustomId)
     if (!parsedCustomId.functs.length && !parsedCustomId.values.length)
       return true
 
     const formRef = parsedCustomId.values[0]
 
+    // 
     if ('values' in c && c.values.length > 0 && typeof c.values[0] === 'string') {
-      const success = await parseAndEvokeComponentWithValues(c, i)
-      if (!success)
-        return false
+      if (executeAllowedComponentTypes.includes(c.type)) {
+        const success = await parseAndEvokeComponentWithValues(c, i)
+        if (!success)
+          return false
+      }
 
       if (formRef)
         collectedFormItems.set(formRef, c.values)
     } else if ('value' in c && typeof c.value === 'string') {
-      const success = await parseAndEvokeComponentWithValue(c, i)
-      if (!success)
-        return false
+      if (executeAllowedComponentTypes.includes(c.type)) {
+        const success = await parseAndEvokeComponentWithValue(c, i)
+        if (!success)
+          return false
+      }
 
       if (formRef)
         collectedFormItems.set(formRef, c.value)
@@ -257,7 +276,13 @@ export namespace CordoGateway {
     return true
   }
 
-  async function parseAndEvokeComponentWithValues(data: { values: string[] }, i: CordoInteraction): Promise<boolean> {
+  async function parseAndEvokeComponentWithValues(
+    data: ({ type: number } | { component_type: number }) & { values: string[] },
+    i: CordoInteraction
+  ): Promise<boolean> {
+    if (!executeAllowedComponentTypes.includes('type' in data ? data.type : data.component_type)) // just to be sure
+      return true
+
     const options = data.values.map(v => FunctCompiler.parseCustomId(v))
     data.values = options.flatMap(o => o.values)
 
@@ -274,7 +299,13 @@ export namespace CordoGateway {
     return true
   }
 
-  async function parseAndEvokeComponentWithValue(data: { value: string }, i: CordoInteraction): Promise<boolean> {
+  async function parseAndEvokeComponentWithValue(
+    data: ({ type: number } | { component_type: number }) & { value: string },
+    i: CordoInteraction
+  ): Promise<boolean> {
+    if (!executeAllowedComponentTypes.includes('type' in data ? data.type : data.component_type)) // just to be sure
+      return true
+    
     const option = FunctCompiler.parseCustomId(data.value)
     data.value = option.values[0]
 

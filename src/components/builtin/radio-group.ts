@@ -18,6 +18,7 @@ export function radioGroup<Values extends string = string>() {
   let descriptionVal: string | undefined = undefined
   let optionsVal: RadioGroupOption[] = []
   let requiredVal: boolean = false
+  let ref: string | undefined = undefined
   const functVal: CordoFunct[] = []
 
   function getLabel() {
@@ -66,11 +67,18 @@ export function radioGroup<Values extends string = string>() {
       description: getDescription(),
       required: requiredVal,
       options: getOptions(),
-      custom_id: FunctCompiler.toCustomId(requiredVal ? [] : functVal),
+      custom_id: FunctCompiler.toCustomId([
+        ...functVal,
+        ...(ref ? [ value(ref) ] : [])
+      ]),
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),
 
+    as: (id: string) => {
+      ref = id
+      return out
+    },
     required(required = true) {
       requiredVal = required
       return out

@@ -1,6 +1,6 @@
 import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
-import { type CordoFunct, type CordoFunctRun } from "../../functions"
+import { value, type CordoFunct, type CordoFunctRun } from "../../functions"
 import { FunctCompiler } from "../../functions/compiler"
 
 
@@ -10,6 +10,7 @@ export function fileUpload() {
   let minValues: number | undefined = undefined
   let maxValues: number | undefined = undefined
   let requiredVal: boolean = false
+  let ref: string | undefined = undefined
   const functVal: CordoFunct[] = []
 
   function getLabel() {
@@ -40,11 +41,18 @@ export function fileUpload() {
       min_values: Math.max(minValues ?? 1, 0),
       max_values: Math.min(maxValues ?? minValues ?? 1, 10),
       required: requiredVal,
-      custom_id: FunctCompiler.toCustomId(functVal),
+      custom_id: FunctCompiler.toCustomId([
+        ...functVal,
+        ...(ref ? [ value(ref) ] : [])
+      ]),
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),
 
+    as: (id: string) => {
+      ref = id
+      return out
+    },
     min: (num: number = 1) => {
       minValues = num
       return out

@@ -19,6 +19,7 @@ export function selectString<Values extends string = string>() {
   let maxValues: number | undefined = undefined
   let optionsVal: SelectMenuOption[] = []
   let disabledVal: boolean | undefined = undefined
+  let ref: string | undefined = undefined
   const functVal: CordoFunct[] = []
 
   function getPlaceholder() {
@@ -78,11 +79,18 @@ export function selectString<Values extends string = string>() {
       max_values: maxValues ? Math.min(optionsVal.length, maxValues) : undefined,
       disabled: disabledVal,
       options: getOptions(),
-      custom_id: FunctCompiler.toCustomId(disabledVal ? [] : functVal),
+      custom_id: FunctCompiler.toCustomId([
+        ...(disabledVal ? [] : functVal),
+        ...(ref ? [ value(ref) ] : [])
+      ]),
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),
 
+    as: (id: string) => {
+      ref = id
+      return out
+    },
     placeholder: (text: string) => {
       placeholderVal = text
       return out

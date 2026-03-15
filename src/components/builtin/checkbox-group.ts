@@ -20,6 +20,7 @@ export function checkboxGroup<Values extends string = string>() {
   let minValues: number | undefined = undefined
   let maxValues: number | undefined = undefined
   let requiredVal: boolean = false
+  let ref: string | undefined = undefined
   const functVal: CordoFunct[] = []
 
   function getLabel() {
@@ -70,11 +71,18 @@ export function checkboxGroup<Values extends string = string>() {
       max_values: Math.min(maxValues ?? minValues ?? 1, optionsVal.length),
       required: requiredVal,
       options: getOptions(),
-      custom_id: FunctCompiler.toCustomId(requiredVal ? [] : functVal),
+      custom_id: FunctCompiler.toCustomId([
+        ...functVal,
+        ...(ref ? [ value(ref) ] : [])
+      ]),
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),
 
+    as: (id: string) => {
+      ref = id
+      return out
+    },
     required(required = true) {
       requiredVal = required
       return out
