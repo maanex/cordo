@@ -8,7 +8,6 @@ import { CordoGateway } from "../gateway"
 import { FunctInternals } from "../../functions/funct"
 import { goto, run } from "../../functions"
 import { isModifier, readModifier } from "../../components/modifier"
-import { FunctCompiler } from "../../functions/compiler"
 import { RoutingResolve } from "./resolve"
 
 
@@ -40,10 +39,12 @@ export namespace RoutingRespond {
       type = (InteractionInternals.get(i).answered && !opts.asReply)
         ? InteractionResponseType.UpdateMessage
         : InteractionResponseType.ChannelMessageWithSource
-    } else if (i.type === InteractionType.MessageComponent || i.type === InteractionType.ModalSubmit) {
+    } else if (i.type === InteractionType.MessageComponent) {
       type = opts.asReply
         ? InteractionResponseType.ChannelMessageWithSource
         : InteractionResponseType.UpdateMessage
+    } else if (i.type === InteractionType.ModalSubmit) {
+      type = InteractionResponseType.ChannelMessageWithSource
     }
 
     CordoMagic.resetIdCounter()

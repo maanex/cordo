@@ -209,7 +209,6 @@ export namespace CordoGateway {
     }
     // @ts-expect-error this type doesn't have a values property (yet)
     i.data.values = values
-    console.log(values)
 
     const id = i.data.custom_id
     const parsedCustomId = FunctCompiler.parseCustomId(id)
@@ -230,7 +229,6 @@ export namespace CordoGateway {
   //
 
   async function parseAndEvokeModalLeafComponents(c: any, i: CordoInteraction, collectedFormItems: Map<string, unknown>): Promise<boolean> {
-    console.log(c)
     if (c.type === ComponentType.ActionRow) {
       for (const item of c.components) {
         const success = await parseAndEvokeModalLeafComponents(item, i, collectedFormItems)
@@ -246,7 +244,6 @@ export namespace CordoGateway {
     }
 
     const parsedCustomId = FunctCompiler.parseCustomId(c.custom_id)
-    console.log(parsedCustomId)
     if (!parsedCustomId.functs.length && !parsedCustomId.values.length)
       return true
 
