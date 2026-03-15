@@ -13,6 +13,8 @@ type SelectMenuOption<Value extends string = string> = Omit<APISelectMenuOption,
 
 export function selectString<Values extends string = string>() {
   let placeholderVal: string | undefined = undefined
+  let labelVal: string | undefined = undefined
+  let descriptionVal: string | undefined = undefined
   let minValues: number | undefined = undefined
   let maxValues: number | undefined = undefined
   let optionsVal: SelectMenuOption[] = []
@@ -26,6 +28,26 @@ export function selectString<Values extends string = string>() {
       'transformUserFacingText',
       placeholderVal,
       { component: 'StringSelect', position: 'placeholder' }
+    )
+  }
+
+  function getLabel() {
+    if (!labelVal)
+      return 'Your Response'
+    return Hooks.callHook(
+      'transformUserFacingText',
+      labelVal,
+      { component: 'StringSelect', position: 'label' }
+    )
+  }
+
+  function getDescription() {
+    if (!descriptionVal)
+      return undefined
+    return Hooks.callHook(
+      'transformUserFacingText',
+      descriptionVal,
+      { component: 'StringSelect', position: 'description' }
     )
   }
 
@@ -56,7 +78,9 @@ export function selectString<Values extends string = string>() {
       max_values: maxValues ? Math.min(optionsVal.length, maxValues) : undefined,
       disabled: disabledVal,
       options: getOptions(),
-      custom_id: FunctCompiler.toCustomId(disabledVal ? [] : functVal)
+      custom_id: FunctCompiler.toCustomId(disabledVal ? [] : functVal),
+      'modal:label': getLabel(),
+      'modal:description': getDescription(),
     })),
 
     placeholder: (text: string) => {
@@ -86,7 +110,15 @@ export function selectString<Values extends string = string>() {
     addOption(o: SelectMenuOption<Values>) {
       optionsVal.push(o)
       return out
-    }
+    },
+    withLabel: (text: string) => {
+      labelVal = text
+      return out
+    },
+    withDescription: (text: string) => {
+      descriptionVal = text
+      return out
+    },
   }
 
   return out

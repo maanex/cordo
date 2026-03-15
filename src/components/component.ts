@@ -23,6 +23,11 @@ export const ComponentType = {
   File: 13,
   Seperator: 14,
   Container: 17,
+  Label: 18,
+  FileUpload: 19,
+  RadioGroup: 21,
+  CheckboxGroup: 22,
+  Checkbox: 23,
 
   Modal: -1, // This is a special type that is not used in the API, but for Cordo's internal use
 } as const
@@ -60,7 +65,7 @@ export function createComponent<Type extends StringComponentType>(
     nativeType: ComponentType[type],
     visible: true,
     attributes: {},
-    render
+    render,
   }
   const out = {
     [CordoComponentSymbol]: comp,
@@ -105,14 +110,15 @@ export function renderComponentList(
   list: Array<CordoComponent<StringComponentType> | CordoModifier>,
   parent: StringComponentType | null,
   hirarchy: Array<StringComponentType> = [],
-  inheritAttributes: Record<string, any> = {}
+  inheritAttributes: Record<string, any> = {},
+  transform?: (component: CordoComponent<StringComponentType>, parsed: CordoComponentPayload<StringComponentType>) => CordoComponent<StringComponentType> | null
 ) {
   let pipeline: Array<CordoComponentPayload<StringComponentType>> = []
   /* when we have buttons without a host row we use this to collect up to 5 and then create the row for it */
   const rowBuilder: Array<CordoComponent<StringComponentType>> = []
   const modifiers: Array<ReturnType<typeof readModifier>> = []
 
-  for (const item of list) {
+  for (let item of list) {
     if (!item)
       continue
 
@@ -127,6 +133,14 @@ export function renderComponentList(
     for (const mod of modifiers) {
       if (mod.hooks?.onRender)
         parsed = mod.hooks.onRender(parsed)
+    }
+
+    if (transform) {
+      const transformed = transform(item, parsed)
+      if (!transformed)
+        continue
+      item = transformed
+      parsed = readComponent(transformed)
     }
 
     if (parent !== 'ActionRow') {

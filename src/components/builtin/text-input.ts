@@ -6,6 +6,7 @@ import { FunctCompiler } from "../../functions/compiler"
 export function textInput() {
   let placeholderVal: string | undefined = undefined
   let labelVal: string | undefined = undefined
+  let descriptionVal: string | undefined = undefined
   let minLength: number | undefined = undefined
   let maxLength: number | undefined = undefined
   let requiredVal: boolean | undefined = undefined
@@ -33,17 +34,28 @@ export function textInput() {
     )
   }
 
+  function getDescription() {
+    if (!descriptionVal)
+      return undefined
+    return Hooks.callHook(
+      'transformUserFacingText',
+      descriptionVal,
+      { component: 'TextInput', position: 'description' }
+    )
+  }
+
   const out = {
     ...createComponent('TextInput', () => ({
       type: ComponentType.TextInput,
       placeholder: getPlaceholder(),
-      label: getLabel(),
       min_length: minLength,
       max_length: maxLength,
       required: requiredVal,
       style: sizeVal ?? 1,
       value: currentVal,
-      custom_id: ref ?? FunctCompiler.toCustomId([]) // get a noop if no ref
+      custom_id: ref ?? FunctCompiler.toCustomId([]), // get a noop if no ref
+      'modal:label': getLabel(),
+      'modal:description': getDescription(),
     })),
 
     as: (id: string) => {
@@ -54,8 +66,12 @@ export function textInput() {
       placeholderVal = text
       return out
     },
-    label: (text: string) => {
+    withLabel: (text: string) => {
       labelVal = text
+      return out
+    },
+    withDescription: (text: string) => {
+      descriptionVal = text
       return out
     },
     current: (text: string) => {

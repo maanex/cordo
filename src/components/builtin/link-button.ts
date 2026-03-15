@@ -1,3 +1,4 @@
+import { URL } from "node:url"
 import { ButtonStyle } from "discord-api-types/v10"
 import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
