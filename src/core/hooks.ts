@@ -15,6 +15,9 @@ export namespace Hooks {
     config?: NonNullable<CordoConfig>
   ): ReturnType<NonNullable<CordoConfig['hooks'][Name]>> {
     if (!config) {
+      if (!CordoMagic.inContext())
+        return value as any
+
       const contextConfig = CordoMagic.getConfig()
       if (!contextConfig) {
         console.warn(`Calling hook '${hookName}' failed, no config provided and no config found in context.`)
@@ -26,8 +29,7 @@ export namespace Hooks {
 
     const hook = config.hooks[hookName]
     if (!hook)
-      // @ts-expect-error
-      return value
+      return value as any
 
     if (hookName === 'transformUserFacingText') {
       // @ts-expect-error

@@ -31,6 +31,10 @@ export namespace CordoMagic {
 
   //
 
+  export function inContext() {
+    return !!als.getStore()
+  }
+
   export function getLockfile() {
     return Internals.getCtx().lockfile
   }
