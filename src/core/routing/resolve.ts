@@ -63,8 +63,8 @@ export namespace RoutingResolve {
 
     if (!lockfile)
       throw new MissingContextError('getRouteFromPath failed, no lockfile found in context.')
-    if (!invoker)
-      throw new MissingContextError('getRouteFromPath failed, no invoker found in context.')
+    if (!invoker && resolveRuntimeVars)
+      throw new MissingContextError('getRouteFromPath failed, no invoker found in context with resolveRuntimeVars enabled.')
 
     let startingPoint = currentRoute
     if (startingPoint.endsWith(DefaultFileName))
