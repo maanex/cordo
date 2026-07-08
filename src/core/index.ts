@@ -92,8 +92,8 @@ export namespace Extend {
   ) {
     CordoMagic.Internals.runWithCtx(fn, {
       invoker: ctx?.invoker ?? null,
-      lockfile: ctx?.lockfile ?? null,
-      config: ctx?.config ?? null,
+      lockfile: ctx?.lockfile ?? lockfile,
+      config: ctx?.config ?? config,
       cwd: '',
       idCounter: 0
     })
