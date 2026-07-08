@@ -1,4 +1,5 @@
 import { MissingContextError } from "../../errors/builtin/missing-context"
+import { FunctCompiler } from "../../functions/compiler"
 import { Hooks } from "../hooks"
 import type { CordoInteraction } from "../interaction"
 import { CordoMagic } from "../magic"
@@ -9,8 +10,10 @@ const DefaultFileName = 'index'
 export namespace RoutingResolve {
 
   function resolvePathDots(inputPath: string, startingPath: string) {
-    if (!inputPath.startsWith('.')) return inputPath
-    if (inputPath.startsWith('./')) return startingPath + inputPath.slice(1)
+    if (!inputPath.startsWith('.'))
+      return inputPath
+    if (inputPath.startsWith('./'))
+      return startingPath + inputPath.slice(1)
 
     const cwd = startingPath.split('/')
     if (cwd.at(-1) === DefaultFileName) cwd.pop()
@@ -75,7 +78,7 @@ export namespace RoutingResolve {
     const start = resolvePathDots(path, startingPoint)
     if (start === null) {
       console.log('Invalid route', path)
-      return { routeId: '####', args: [] }
+      return { routeId: FunctCompiler.InvalidRoutePlaceholderId, args: [] }
     }
 
     const segments = start.split('/').filter(Boolean)
@@ -118,7 +121,7 @@ export namespace RoutingResolve {
 
     if (options.length === 0) {
       console.log('Could not find route', path, '(', path, ')')
-      return { routeId: '####', args: [] }
+      return { routeId: FunctCompiler.InvalidRoutePlaceholderId, args: [] }
     }
 
     const maxSpecificity = Math.max(...options.map(o => o.specificity))
@@ -127,7 +130,7 @@ export namespace RoutingResolve {
     return {
       routeId: winner.route.name!,
       args: resolveRuntimeVars
-        ? substituteRuntimeVariables(winner.args, invoker)
+        ? substituteRuntimeVariables(winner.args, invoker!)
         : winner.args,
       routeFilePath: winner.route.filePath
     }

@@ -19,6 +19,8 @@ export namespace FunctCompiler {
   const LutArgumentIndicator = '\\'
   /** the following argument has the same value as an earlier argument */
   const ReferenceArgumentIndicator = '|'
+  /** placeholder route id for when the route could not be resolved */
+  export const InvalidRoutePlaceholderId = '#'.repeat(LockfileInternals.Const.idLength)
 
   //
 
@@ -39,9 +41,13 @@ export namespace FunctCompiler {
     const extraValues: string[] = []
 
     // encode cwd
-    const { routeId, args } = RoutingResolve.getRouteFromPath(CordoMagic.getCwd(), false)
-    command.push(routeId)
-    argus.push(...args)
+    if (CordoMagic.getCwd()) {
+      const { routeId, args } = RoutingResolve.getRouteFromPath(CordoMagic.getCwd(), false)
+      command.push(routeId)
+      argus.push(...args)
+    } else {
+      command.push(InvalidRoutePlaceholderId)
+    }
 
     // encode functs
     for (const fun of list) {
@@ -181,8 +187,6 @@ export namespace FunctCompiler {
     }
 
     const cwdRoute = readNextRoute()
-    if (!cwdRoute)
-      return out
 
     out.cwd = cwdRoute
 
