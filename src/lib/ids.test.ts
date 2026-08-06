@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "bun:test"
 import { LibIds } from "./ids"
 
 test("1000 random numbers with parse single", () => {

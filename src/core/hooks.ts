@@ -44,7 +44,7 @@ export namespace Hooks {
   }
 
   export function isDefined(name: keyof CordoConfig['hooks']) {
-    return !!CordoMagic.getConfig()?.hooks[name]
+    return !!CordoMagic.getConfig()?.hooks?.[name]
   }
 
 }

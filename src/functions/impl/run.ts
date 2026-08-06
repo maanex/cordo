@@ -57,7 +57,7 @@ export function run(
     ? FunctInternals.readFunct(path).path
     : path
 
-  const flags = parseFlags(opts, FunctInternals.readFunct(path as any)?.flags ?? CordoMagic.getConfig()?.functDefaultFlags.runBits ?? 0)
+  const flags = parseFlags(opts, FunctInternals.readFunct(path as any)?.flags ?? CordoMagic.getConfig()?.functDefaultFlags?.runBits ?? 0)
 
   return FunctInternals.createFunct({
     type: 'run',
