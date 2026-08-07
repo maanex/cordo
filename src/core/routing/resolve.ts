@@ -142,7 +142,7 @@ export namespace RoutingResolve {
       : type === 'slash'
         ? command.replaceAll(' ', '/').toLowerCase() // slash commands: subcommands become subfolders
         : command.replaceAll(' ', '-').replace(/[^\w-]/g, '').toLowerCase() // message/user commands: just sanitize
-    const routePath = `command/${fileName}`
+    const routePath = `${CordoMagic.getConfig()?.defaults.commandRoutePrefix ?? 'command'}/${fileName}`
     return {
       route: getRouteFromPath(routePath, false),
       path: routePath

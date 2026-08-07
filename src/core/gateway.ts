@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIInteraction, type APIMessageStringSelectInteractionData, type APIModalComponent, type APIModalSubmissionComponent } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
 import { FunctCompiler } from "../functions/compiler"
@@ -315,6 +315,15 @@ export namespace CordoGateway {
     }
 
     return true
+  }
+
+  export function upsertCommand(command: APIApplicationCommand, guild?: string) {
+    const config = CordoMagic.getConfig()
+    if (!config?.client.id)
+      throw new MissingContextError('Could not upsert command, no client id found in config context.')
+
+    const endpoint = guild ? `/applications/${config.client.id}/guilds/${guild}/commands` : `/applications/${config.client.id}/commands`
+    return apiRequest('post', endpoint, command)
   }
 
 }

@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs'
 import { LibIds } from '../../lib/ids'
 import type { RouteInternals } from './route'
 import type { ErrorBoundaryInternals } from './error-boundary'
+import type { CordoCommand } from './command'
 
 
 export namespace LockfileInternals {
@@ -17,6 +18,7 @@ export namespace LockfileInternals {
     $runtime: {
       routeImpls: Map<string, RouteInternals.ParsedRoute>
       errorBoundaries: Array<ErrorBoundaryInternals.ParsedBoundary>
+      registeredCommands: Map<string, CordoCommand>
     }
   }
 
@@ -35,7 +37,8 @@ export namespace LockfileInternals {
       lut: [],
       $runtime: {
         routeImpls: new Map(),
-        errorBoundaries: []
+        errorBoundaries: [],
+        registeredCommands: new Map()
       }
     }
   }

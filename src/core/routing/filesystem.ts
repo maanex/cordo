@@ -4,20 +4,24 @@ import { ErrorBoundaryInternals, type CordoErrorBoundary } from "../files/error-
 import { RouteInternals, type CordoRoute } from "../files/route"
 import { LockfileInternals } from "../files/lockfile"
 import { LibIds } from "../../lib/ids"
+import { CommandInternals, type CordoCommand } from "../files/command"
+import type { ParsedCordoConfig } from "../files/config"
 
 
 export namespace RoutingFilesystem {
 
-  export const supportedExtensions = [ 'js', 'ts' ]
+  export const supportedExtensions = [ 'js', 'ts', 'mjs', 'mts' ]
 
   export type ParsedFsTree = {
     routes: Array<{ path: string[]; route: CordoRoute }>
+    commands: Array<{ path: string[]; command: CordoCommand }>
     errorBounds: Array<{ path: string[]; boundary: CordoErrorBoundary }>
   }
 
-  export async function readFsTree(treeRoot: string, maxDepth = 20): Promise<ParsedFsTree> {
+  export async function readFsTree(treeRoot: string, config: ParsedCordoConfig, maxDepth = 20): Promise<ParsedFsTree> {
     const out: ParsedFsTree = {
       routes: [],
+      commands: [],
       errorBounds: []
     }
 
@@ -27,7 +31,7 @@ export namespace RoutingFilesystem {
     const dir = await fs.opendir(treeRoot)
     for await (const item of dir) {
       if (item.isDirectory()) {
-        const subTree = await readFsTree(join(treeRoot, item.name), maxDepth - 1)
+        const subTree = await readFsTree(join(treeRoot, item.name), config, maxDepth - 1)
         for (const child of subTree.routes) {
           out.routes.push({
             path: [ item.name, ...child.path ],
@@ -43,6 +47,25 @@ export namespace RoutingFilesystem {
       } else if (item.isFile()) {
         if (!supportedExtensions.some(ext => item.name.endsWith(`.${ext}`)))
           continue
+
+        const command = await CommandInternals.readCommand(join(treeRoot, item.name))
+        if (command) {
+          if (!treeRoot.startsWith(config.defaults.commandRoutePrefix ?? 'command'))
+            console.warn(`File ${join(treeRoot, item.name)} defined a command but is not in the command route prefix folder (${config.defaults.commandRoutePrefix ?? 'command'}). The command will probably not trigger the configured route when run.`)
+
+          out.commands.push({
+            path: [ item.name ],
+            command
+          })
+
+          if (typeof command.route !== 'string') {
+            out.routes.push({
+              path: [ item.name ],
+              route: command.route
+            })
+          }
+          continue
+        }
 
         const route = await RouteInternals.readRoute(join(treeRoot, item.name))
         if (route) {
@@ -67,8 +90,8 @@ export namespace RoutingFilesystem {
     return out
   }
 
-  export async function readFsTreeAndSyncLockfile(treeRoot: string, lockfile: LockfileInternals.ParsedLockfile): Promise<RouteInternals.ParsedRoute[]> {
-    const files = await readFsTree(treeRoot)
+  export async function readFsTreeAndSyncLockfile(treeRoot: string, lockfile: LockfileInternals.ParsedLockfile, config: ParsedCordoConfig): Promise<RouteInternals.ParsedRoute[]> {
+    const files = await readFsTree(treeRoot, config)
 
     const out: RouteInternals.ParsedRoute[] = []
     for (const file of files.routes) {
@@ -108,6 +131,16 @@ export namespace RoutingFilesystem {
         impl: file.boundary
       })
     }
+
+    const commandRoutePrefix = config?.defaults.commandRoutePrefix ?? 'command'
+    for (const file of files.commands) {
+      const filePath = file.path.join('/').startsWith(`${commandRoutePrefix}/`)
+        ? file.path.join('/').slice(commandRoutePrefix.length + 1)
+        : file.path.join('/')
+
+      lockfile.$runtime.registeredCommands.set(filePath, file.command)
+    }
+    
 
     return out
   }

@@ -6,5 +6,6 @@ export namespace MaxLengthConstants {
   export const BUTTON_URL = 512
   export const SELECT_OPTION_LABEL = 100
   export const SELECT_OPTION_DESCRIPTION = 100
+  export const COMMAND_NAME = 32
 
 }

@@ -16,9 +16,15 @@ type HookFor<T, Context = never> = null | ((value: T, context: Context) => Promi
 type TransformHookFor<T, Context = never> = null | ((value: T, context: Context) => T)
 
 export type CordoConfig = {
-  rootDir: string
-  lockfile: string
-  typeDest: string | null
+  paths: {
+    root: string
+    routes: string
+    lockfile: string
+    types: string | null
+  }
+  defaults: {
+    commandRoutePrefix?: string
+  }
   upstream: {
     baseUrl: string
     /** if an interaction was not replied to within X millis, cordo will send the appropriate defer/ack response. Set to 0 to disable */
@@ -27,9 +33,6 @@ export type CordoConfig = {
   client: {
     id: string
     publicKey: string
-  }
-  paths: {
-    routes: string
   }
   /** hooks allow you to process certain data at certain points during cordo's internals. you can always return null to stop the flow of data at that point. */
   hooks: {
@@ -77,9 +80,15 @@ export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}): PartialD
 export namespace ConfigInternals {
 
   const defaultConfig: CordoConfig = {
-    rootDir: '.',
-    lockfile: './cordo.lock',
-    typeDest: null,
+    paths: {
+      root: '.',
+      routes: './routes',
+      lockfile: './cordo.lock',
+      types: null,
+    },
+    defaults: {
+      commandRoutePrefix: 'command'
+    },
     upstream: {
       baseUrl: 'https://discord.com/api/v10',
       autoDeferMs: 50
@@ -87,9 +96,6 @@ export namespace ConfigInternals {
     client: {
       id: '',
       publicKey: ''
-    },
-    paths: {
-      routes: './routes'
     },
     hooks: {
       onRawInteraction: null,
@@ -147,13 +153,14 @@ export namespace ConfigInternals {
   export async function readAndParseConfig(): Promise<ParsedCordoConfig> {
     const config = await readConfig()
 
-    config.rootDir = resolveRelativePath(config.rootDir)
-    config.lockfile = resolveRelativePath(config.lockfile)
-    config.typeDest = config.typeDest
-      ? resolveRelativePath(config.typeDest)
+    config.paths.root = resolveRelativePath(config.paths.root)
+
+    config.paths.lockfile = resolveRelativePath(config.paths.lockfile, config.paths.root)
+    config.paths.types = config.paths.types
+      ? resolveRelativePath(config.paths.types, config.paths.root)
       : null
 
-    config.paths.routes = resolveRelativePath(config.paths.routes, config.rootDir)
+    config.paths.routes = resolveRelativePath(config.paths.routes, config.paths.root)
 
     return {
       ...config,

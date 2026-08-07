@@ -7,10 +7,12 @@ import { CordoGateway } from './gateway'
 import { RoutingFilesystem } from './routing/filesystem'
 import { CordoMagic } from './magic'
 import type { CordoInteraction } from './interaction'
+import { CommandInternals } from './files/command'
 
 export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, type RouteRequest, defineCordoRoute, assertCordoRequest } from './files/route'
+export { type CordoCommand, defineCordoCommand } from './files/command'
 export { type CordoErrorBoundary, defineCordoErrorBoundary } from './files/error-boundary'
 export { type CordoInteraction } from './interaction'
 
@@ -23,10 +25,10 @@ async function mountCordo(configOverrides?: PartialDeep<CordoConfig>) {
   const fileConfig = await ConfigInternals.readAndParseConfig()
   config = configOverrides ? defu(configOverrides, fileConfig) as ParsedCordoConfig : fileConfig
 
-  lockfile = await LockfileInternals.readOrCreateLockfile(config.lockfile)
-  await RoutingFilesystem.readFsTreeAndSyncLockfile(config.paths.routes, lockfile)
+  lockfile = await LockfileInternals.readOrCreateLockfile(config.paths.lockfile)
+  await RoutingFilesystem.readFsTreeAndSyncLockfile(config.paths.routes, lockfile, config)
 
-  LockfileInternals.writeLockfile(config.lockfile, lockfile, config.typeDest)
+  LockfileInternals.writeLockfile(config.paths.lockfile, lockfile, config.paths.types)
 }
 
 function triggerInteraction(interaction: APIInteraction, opts: {
@@ -64,7 +66,7 @@ function registerConstants(constants: readonly string[]) {
   }
 
   if (changesMade)
-    return LockfileInternals.writeLockfile(config!.lockfile, lockfile!, config!.typeDest)
+    return LockfileInternals.writeLockfile(config!.paths.lockfile, lockfile!, config!.paths.types)
   else
     return Promise.resolve()
 }
@@ -76,6 +78,7 @@ export const Cordo = {
   registerConstants,
   triggerInteraction,
   respondToRawInteraction: CordoGateway.respondTo,
+  syncCommands: (opts?: { maxRetries?: number }) => CommandInternals.syncCommands(lockfile!.$runtime.registeredCommands, undefined, opts)
 }
 Object.freeze(Cordo)
 
