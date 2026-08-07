@@ -72,7 +72,7 @@ export namespace CordoGateway {
   }
 
   /** if the payload is null the interaction will be defered if not done already */
-  export async function respondTo(i: CordoInteraction, payload: Record<string, any> | null) {
+  export async function respondTo(i: CordoInteraction, payload: Record<string, any> | null, opts?: { ephemeral?: boolean }) {
     payload = await Hooks.callHook('onBeforeRespond', payload, { interaction: i })
 
     const internals = InteractionInternals.get(i)
@@ -83,7 +83,7 @@ export namespace CordoGateway {
         return internals.httpCallback(payload)
 
       if (i.type === InteractionType.ApplicationCommand)
-        return internals.httpCallback({ type: InteractionResponseType.DeferredChannelMessageWithSource })
+        return internals.httpCallback({ type: InteractionResponseType.DeferredChannelMessageWithSource, data: { flags: opts?.ephemeral ? 1 << 6 : 0 } })
 
       if (i.type === InteractionType.MessageComponent)
         return internals.httpCallback({ type: InteractionResponseType.DeferredMessageUpdate })
@@ -96,7 +96,7 @@ export namespace CordoGateway {
         return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, payload)
 
       if (i.type === InteractionType.ApplicationCommand)
-        return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, { type: InteractionResponseType.DeferredChannelMessageWithSource })
+        return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, { type: InteractionResponseType.DeferredChannelMessageWithSource, data: { flags: opts?.ephemeral ? 1 << 6 : 0 } })
 
       if (i.type === InteractionType.MessageComponent)
         return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, { type: InteractionResponseType.DeferredMessageUpdate })

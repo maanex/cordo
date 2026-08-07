@@ -145,8 +145,8 @@ export namespace RoutingRespond {
         has: (key: string) => key in interaction.locals
       },
 
-      ack: opts.disableRendering ? noOp : () => {
-        CordoGateway.respondTo(interaction, null)
+      ack: opts.disableRendering ? noOp : (ackOpts?: { private?: boolean }) => {
+        CordoGateway.respondTo(interaction, null, { ephemeral: ackOpts?.private })
       },
       render: opts.disableRendering ? noOp : (...response) => {
         const rendered = renderRouteResponse(response, interaction, opts)

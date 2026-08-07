@@ -117,7 +117,7 @@ export type RouteRequest = {
   rawEntitlements: APIEntitlement[]
 
   /** acknowledge the request but only provide a reply later */
-  ack: () => void
+  ack: (opts?: { private?: boolean }) => void
   /** render the provided components */
   render: (...response: RouteResponse) => void
   /** open a modal with the provided components */
