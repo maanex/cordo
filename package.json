@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -17,6 +17,9 @@
     "tsconfig.json"
   ],
   "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "build": "tsc",
     "lint": "eslint --ext .ts --ignore-path .gitignore src/**/*.ts",
     "tunnel": "cloudflared tunnel --config ~/.cloudflared/config.yml run fsb",
@@ -54,6 +57,8 @@
     "express": "^4.17.3",
     "hono": "^4.7.7",
     "reflect-metadata": "^0.1.13",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.41"
   }
 }

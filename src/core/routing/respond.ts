@@ -34,6 +34,11 @@ export namespace RoutingRespond {
     if (opts.disableComponents)
       response.push(disableAllComponents())
 
+    if (opts.isPrivate === undefined) {
+      const commandPrivate = InteractionInternals.get(i).commandEntrypoint?.private
+      opts.isPrivate = typeof commandPrivate === 'function' ? commandPrivate(i) : Boolean(commandPrivate)
+    }
+
     let type: InteractionResponseType = InteractionResponseType.Pong
     if (i.type === InteractionType.ApplicationCommand) {
       type = (InteractionInternals.get(i).answered && !opts.asReply)

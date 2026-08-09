@@ -77,11 +77,8 @@ export namespace CordoGateway {
 
     // if not specifically set, check if it's triggered by a command and if so -> is that command private?
     if (opts?.ephemeral === undefined) {
-      const isPrivate = InteractionInternals.get(i).commandEntrypoint?.private
-      if (typeof isPrivate === 'boolean')
-        opts.ephemeral = isPrivate
-      else if (typeof isPrivate === 'function')
-        opts.ephemeral = isPrivate(i)
+      const commandPrivate = InteractionInternals.get(i).commandEntrypoint?.private
+      opts.ephemeral = typeof commandPrivate === 'function' ? commandPrivate(i) : Boolean(commandPrivate)
     }
 
     const internals = InteractionInternals.get(i)
@@ -101,6 +98,8 @@ export namespace CordoGateway {
     }
 
     if (!internals.answered) {
+      internals.answered = true
+
       if (payload)
         return apiRequest('post', `/interactions/${i.id}/${i.token}/callback`, payload)
 
@@ -173,8 +172,8 @@ export namespace CordoGateway {
       const { route, path } = RoutingResolve.getRouteForCommand(name, 'slash')
 
       CordoMagic.setCwd(path)
-      if (CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeId))
-        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeId)!
+      if (route.routeFilePath && CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeFilePath))
+        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeFilePath)!
 
       return RoutingRespond.callRoute(route.routeId, route.args, i)
     }
@@ -187,8 +186,8 @@ export namespace CordoGateway {
       )
 
       CordoMagic.setCwd(path)
-      if (CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeId))
-        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeId)!
+      if (route.routeFilePath && CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeFilePath))
+        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeFilePath)!
 
       return RoutingRespond.callRoute(route.routeId, route.args, i)
     }

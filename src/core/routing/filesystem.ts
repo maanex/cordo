@@ -44,13 +44,19 @@ export namespace RoutingFilesystem {
             boundary: child.boundary
           })
         }
+        for (const child of subTree.commands) {
+          out.commands.push({
+            path: [ item.name, ...child.path ],
+            command: child.command
+          })
+        }
       } else if (item.isFile()) {
         if (!supportedExtensions.some(ext => item.name.endsWith(`.${ext}`)))
           continue
 
         const command = await CommandInternals.readCommand(join(treeRoot, item.name))
         if (command) {
-          if (!treeRoot.startsWith(config.defaults.commandRoutePrefix ?? 'command'))
+          if (!treeRoot.includes(config.defaults.commandRoutePrefix ?? 'command'))
             console.warn(`File ${join(treeRoot, item.name)} defined a command but is not in the command route prefix folder (${config.defaults.commandRoutePrefix ?? 'command'}). The command will probably not trigger the configured route when run.`)
 
           out.commands.push({
@@ -132,15 +138,10 @@ export namespace RoutingFilesystem {
       })
     }
 
-    const commandRoutePrefix = config?.defaults.commandRoutePrefix ?? 'command'
     for (const file of files.commands) {
-      const filePath = file.path.join('/').startsWith(`${commandRoutePrefix}/`)
-        ? file.path.join('/').slice(commandRoutePrefix.length + 1)
-        : file.path.join('/')
-
+      const filePath = file.path.join('/')
       lockfile.$runtime.registeredCommands.set(filePath, file.command)
     }
-    
 
     return out
   }
