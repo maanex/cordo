@@ -72,8 +72,17 @@ export namespace CordoGateway {
   }
 
   /** if the payload is null the interaction will be defered if not done already */
-  export async function respondTo(i: CordoInteraction, payload: Record<string, any> | null, opts?: { ephemeral?: boolean }) {
+  export async function respondTo(i: CordoInteraction, payload: Record<string, any> | null, opts: { ephemeral?: boolean } = {}) {
     payload = await Hooks.callHook('onBeforeRespond', payload, { interaction: i })
+
+    // if not specifically set, check if it's triggered by a command and if so -> is that command private?
+    if (opts?.ephemeral === undefined) {
+      const isPrivate = InteractionInternals.get(i).commandEntrypoint?.private
+      if (typeof isPrivate === 'boolean')
+        opts.ephemeral = isPrivate
+      else if (typeof isPrivate === 'function')
+        opts.ephemeral = isPrivate(i)
+    }
 
     const internals = InteractionInternals.get(i)
     if (internals.httpCallback && !internals.answered) {
@@ -162,7 +171,11 @@ export namespace CordoGateway {
       }
 
       const { route, path } = RoutingResolve.getRouteForCommand(name, 'slash')
+
       CordoMagic.setCwd(path)
+      if (CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeId))
+        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeId)!
+
       return RoutingRespond.callRoute(route.routeId, route.args, i)
     }
 
@@ -172,7 +185,11 @@ export namespace CordoGateway {
         i.data.name,
         i.data.type === ApplicationCommandType.Message ? 'message' : 'user'
       )
+
       CordoMagic.setCwd(path)
+      if (CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeId))
+        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeId)!
+
       return RoutingRespond.callRoute(route.routeId, route.args, i)
     }
   }

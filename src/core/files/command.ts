@@ -3,7 +3,9 @@ import { ChannelType, ApplicationCommandOptionType, ApplicationCommandType, type
 import type { LocalizedString } from '../../lib/localization'
 import { CordoGateway } from '../gateway'
 import { RoutingResolve } from '../routing/resolve'
+import type { CordoInteraction } from '../interaction'
 import type { CordoRoute } from './route'
+
 
 type CommandOption = {
   name: string | LocalizedString
@@ -61,10 +63,9 @@ type CommandInput = {
   nsfw?: boolean
   limitInstallTypes?: Array<'guild' | 'user'>
   limitContexts?: Array<'guild' | 'dm' | 'group'>
-
-  options: CommandOption[]
-
+  options?: CommandOption[]
   route: CordoRoute | 'launch_activity'
+  private?: boolean | ((r: CordoInteraction) => boolean)
 }
 
 export type CordoCommand = {
