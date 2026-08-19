@@ -172,6 +172,12 @@ export namespace FunctCompiler {
         }
 
         const argRaw = argsRaw.shift()!
+        if (!argRaw) {
+          console.warn('Monkey alert!')
+          console.log(JSON.stringify({ id, header, routesRaw, argsRaw, parsedArguments }))
+          console.log(`>> ${id} <<`)
+          return path.join('/')
+        }
         const parsed = parseArg(argRaw, parsedArguments)
         path.push(parsed)
         parsedArguments.push(parsed)
