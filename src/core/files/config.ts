@@ -16,6 +16,17 @@ type HookFor<T, Context = never> = null | ((value: T, context: Context) => Promi
 type TransformHookFor<T, Context = never> = null | ((value: T, context: Context) => T)
 
 export type CordoConfig = {
+  /**
+   * Mounting cordo in headless mode will have the following effects:
+   * - Cordo will not read the filesystem for config, lockfile, or routes.
+   * - Cordo will not write to the lockfile or generate types.
+   * - Cordo will not generate custom_ids for components.
+   * - Cordo will not be able to route.
+   * 
+   * Use headless mode if you want to use cordo exclusively to render components without using cordo as your framework.
+   */
+  headless: boolean
+
   paths: {
     root: string
     routes: string
@@ -25,14 +36,17 @@ export type CordoConfig = {
   defaults: {
     commandRoutePrefix?: string
   }
-  upstream: {
-    baseUrl: string
-    /** if an interaction was not replied to within X millis, cordo will send the appropriate defer/ack response. Set to 0 to disable */
-    autoDeferMs: number
-  }
+  /** The Discord client you are operating as */
   client: {
     id: string
     publicKey: string
+  }
+  /** Upstream describes the Discord API */
+  upstream: {
+    /** The Discord API base URL, e.g. https://discord.com/api/v10 */
+    baseUrl: string
+    /** If an interaction was not replied to within X millis, cordo will send the appropriate defer/ack response. Set to 0 to disable. */
+    autoDeferMs: number
   }
   /** hooks allow you to process certain data at certain points during cordo's internals. you can always return null to stop the flow of data at that point. */
   hooks: {
@@ -61,6 +75,16 @@ export type CordoConfig = {
     run: Required<RunFlagOpts>
     goto: Required<GotoFlagOpts>
   }
+
+  /** Cordo prints warnings for certain issues. You can omit specific warnings by adding them to this array. It is **not** recommended to blindly add warnings here without fully being aware what you are doing. */
+  omitWarnings: Array<
+    /** A component was assigned functs while also having a custom id override. This means the functs won't trigger */
+    'customIdOverride' |
+    /** A custom id had to be generated in headless mode. This means you rendered a component with functs assigned while in headless mode, resulting in the functs to not trigger. */
+    'headlessCustomIdGeneration' |
+    /** A an component attribute required by discord was not provided. Cordo filled in a default text for it to not break the component. */
+    'placeholderTextAppearance'
+  >
 }
 
 export type ParsedCordoConfig = CordoConfig & {
@@ -80,6 +104,7 @@ export function defineCordoConfig(conf: PartialDeep<CordoConfig> = {}): PartialD
 export namespace ConfigInternals {
 
   const defaultConfig: CordoConfig = {
+    headless: false,
     paths: {
       root: '.',
       routes: './routes',
@@ -119,7 +144,8 @@ export namespace ConfigInternals {
         continueOnError: false,
         privateErrorMessage: false
       }
-    }
+    },
+    omitWarnings: []
   }
 
   function locatePath() {
@@ -153,14 +179,16 @@ export namespace ConfigInternals {
   export async function readAndParseConfig(): Promise<ParsedCordoConfig> {
     const config = await readConfig()
 
-    config.paths.root = resolveRelativePath(config.paths.root)
-
-    config.paths.lockfile = resolveRelativePath(config.paths.lockfile, config.paths.root)
-    config.paths.types = config.paths.types
-      ? resolveRelativePath(config.paths.types, config.paths.root)
-      : null
-
-    config.paths.routes = resolveRelativePath(config.paths.routes, config.paths.root)
+    if (!config.headless) {
+      config.paths.root = resolveRelativePath(config.paths.root)
+  
+      config.paths.lockfile = resolveRelativePath(config.paths.lockfile, config.paths.root)
+      config.paths.types = config.paths.types
+        ? resolveRelativePath(config.paths.types, config.paths.root)
+        : null
+  
+      config.paths.routes = resolveRelativePath(config.paths.routes, config.paths.root)
+    }
 
     return {
       ...config,

@@ -3,6 +3,7 @@ import { Hooks } from "../../core/hooks"
 import { value, type CordoFunct, type CordoFunctRun } from "../../functions"
 import { FunctCompiler } from "../../functions/compiler"
 import { MaxLengthConstants } from "../../lib/constants"
+import { CordoMagic } from "../../core/magic"
 
 
 type RadioGroupOption<Value extends string = string> = ({
@@ -20,10 +21,14 @@ export function radioGroup<Values extends string = string>() {
   let requiredVal: boolean = false
   let ref: string | undefined = undefined
   const functVal: CordoFunct[] = []
+  let overrideCustomIdVal: string | undefined = undefined
 
   function getLabel() {
-    if (!labelVal)
+    if (!labelVal) {
+      if (!CordoMagic.getConfig()?.omitWarnings.includes('placeholderTextAppearance'))
+        console.warn('A radio group was rendered without a label provided. Cordo will use a placeholder label.')
       return 'Pick one'
+    }
     return Hooks.callHook(
       'transformUserFacingText',
       labelVal,
@@ -48,16 +53,33 @@ export function radioGroup<Values extends string = string>() {
       description: o.description
         ? Hooks.callHook('transformUserFacingText', o.description, { component: 'RadioGroup', position: 'option.description' })?.slice(0, MaxLengthConstants.SELECT_OPTION_DESCRIPTION)
         : undefined,
-      value: FunctCompiler.toCustomId([
-        ...(o.onSelect
-          ? Array.isArray(o.onSelect)
-            ? o.onSelect
-            : [ o.onSelect ]
-          : []
-        ),
-        o.value ? value(o.value) : null
-      ])
+      /** If the custom_id is overriden, use the override value (or an empty custom_id) - otherwise compile the custom_ids and values into the value field */
+      value: overrideCustomIdVal
+        ? (o.value ?? FunctCompiler.toCustomId([]))
+        : FunctCompiler.toCustomId([
+          ...(o.onSelect
+            ? Array.isArray(o.onSelect)
+              ? o.onSelect
+              : [ o.onSelect ]
+            : []
+          ),
+          o.value ? value(o.value) : null
+        ])
     }))
+  }
+
+  const advanced = {
+    /** Will override cordo's custom_id generation. Not compatible with onClick handlers */
+    overrideCustomId(customId: string) {
+      if (!CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride')) {
+        if (functVal.length > 0)
+          console.warn('You are overriding the custom_id of a radio group that has onSubmit handlers. This will prevent the onSubmit handlers from working.')
+        if (ref)
+          console.warn('You are overriding the custom_id of a radio group that has an as() id. Your as() id will be overridden.')
+      }
+      overrideCustomIdVal = customId
+      return out
+    }
   }
 
   const out = {
@@ -67,7 +89,7 @@ export function radioGroup<Values extends string = string>() {
       description: getDescription(),
       required: requiredVal,
       options: getOptions(),
-      custom_id: FunctCompiler.toCustomId([
+      custom_id: overrideCustomIdVal ?? FunctCompiler.toCustomId([
         ...functVal,
         ...(ref ? [ value(ref) ] : [])
       ]),
@@ -76,6 +98,8 @@ export function radioGroup<Values extends string = string>() {
     })),
 
     as: (id: string) => {
+      if (overrideCustomIdVal && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
+        console.warn('You are assigning an as() id to a radio group that already has an overridden custom_id. Your provided id will be ignored.')
       ref = id
       return out
     },
@@ -84,6 +108,8 @@ export function radioGroup<Values extends string = string>() {
       return out
     },
     onSubmit: (...funct: CordoFunctRun) => {
+      if (overrideCustomIdVal && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
+        console.warn('You are adding onSubmit handlers to a radio group that already has an overridden custom_id. These handlers will not be called.')
       functVal.push(...funct)
       return out
     },
@@ -103,6 +129,8 @@ export function radioGroup<Values extends string = string>() {
       descriptionVal = text
       return out
     },
+    /** This namespace contains advanced features you normally do not need */
+    advanced
   }
 
   return out

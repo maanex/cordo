@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto"
 import { LockfileInternals } from "../core/files/lockfile"
 import { CordoMagic } from "../core/magic"
 import { RoutingResolve } from "../core/routing/resolve"
@@ -25,6 +26,12 @@ export namespace FunctCompiler {
 
   export function toCustomId(funct: CordoFunct | Array<CordoFunct | null>): string {
     const list = (Array.isArray(funct) ? funct : [ funct ]).filter(Boolean) as CordoFunct[]
+
+    if (CordoMagic.getConfig()?.headless) {
+      if (list.length > 0 && !CordoMagic.getConfig()?.omitWarnings.includes('headlessCustomIdGeneration'))
+        console.warn('You are rendering a component with functs assigned while in headless mode. Your functs will not register.')
+      return NoopIndicator + '_headless_' + randomBytes(6).toHex()
+    }
 
     const idc = CordoMagic.requestNewId(true)
     if (list.length === 0)
@@ -68,7 +75,7 @@ export namespace FunctCompiler {
     if (!lut)
       console.warn('toCustomId called without a lockfile.')
       // throw new MissingContextError('toCustomId failed, no lockfile found in context.')
-    
+
     let argusStr = ''
     let counter = -1
     for (const arg of LibUtils.iterate(argus, extraValues)) {

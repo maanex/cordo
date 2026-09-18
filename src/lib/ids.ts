@@ -16,7 +16,8 @@ export namespace LibIds {
   const maxId = (1<<31 - 1) * 2 - 1
 
   export function stringify(id: number, length: number) {
-    if (id > maxId) throw new Error(`Id ${id} is larger than 31 bits`)
+    if (id > maxId)
+      throw new Error(`Id ${id} is larger than 31 bits`)
     let out = ''
     for (let i = 0; i < length; i++)
       out += bitSet[(id >> (size*i)) & bitMap]

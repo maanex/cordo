@@ -2,6 +2,7 @@ import { ComponentType, createComponent } from "../component"
 import { Hooks } from "../../core/hooks"
 import { FunctCompiler } from "../../functions/compiler"
 import { value } from "../../functions"
+import { CordoMagic } from "../../core/magic"
 
 
 export function textInput() {
@@ -14,6 +15,7 @@ export function textInput() {
   let sizeVal: number | undefined = undefined
   let currentVal: string | undefined = undefined
   let ref: string | undefined = undefined
+  let overrideCustomIdVal: string | undefined = undefined
 
   function getPlaceholder() {
     if (!placeholderVal)
@@ -26,8 +28,11 @@ export function textInput() {
   }
 
   function getLabel() {
-    if (!labelVal)
+    if (!labelVal) {
+      if (!CordoMagic.getConfig()?.omitWarnings.includes('placeholderTextAppearance'))
+        console.warn('A text input was rendered without a label provided. Cordo will use a placeholder label.')
       return 'Your Response'
+    }
     return Hooks.callHook(
       'transformUserFacingText',
       labelVal,
@@ -45,6 +50,16 @@ export function textInput() {
     )
   }
 
+  const advanced = {
+    /** Will override cordo's custom_id generation. Not compatible with onClick handlers */
+    overrideCustomId(customId: string) {
+      if (ref && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
+        console.warn('You are overriding the custom_id of a text input that has an as() id. Your as() id will be overridden.')
+      overrideCustomIdVal = customId
+      return out
+    }
+  }
+
   const out = {
     ...createComponent('TextInput', () => ({
       type: ComponentType.TextInput,
@@ -54,12 +69,14 @@ export function textInput() {
       required: requiredVal,
       style: sizeVal ?? 1,
       value: currentVal,
-      custom_id: FunctCompiler.toCustomId(ref ? [ value(ref) ] : []), // get a noop if no ref
+      custom_id: overrideCustomIdVal ?? FunctCompiler.toCustomId(ref ? [ value(ref) ] : []), // get a noop if no ref
       'modal:label': getLabel(),
       'modal:description': getDescription(),
     })),
 
     as: (id: string) => {
+      if (overrideCustomIdVal && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
+        console.warn('You are assigning an as() id to a text input that already has an overridden custom_id. Your provided id will be ignored.')
       ref = id
       return out
     },
@@ -102,7 +119,9 @@ export function textInput() {
           ? 2
           : undefined
       return out
-    }
+    },
+    /** This namespace contains advanced features you normally do not need */
+    advanced
   }
 
   return out
