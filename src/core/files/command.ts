@@ -250,10 +250,13 @@ export namespace CommandInternals {
       const apiCmd: any = {
         name,
         name_localizations: nameLocalizations,
-        description,
-        description_localizations: descriptionLocalizations,
         type: cmdType,
         options: apiOptions.length > 0 ? apiOptions : undefined
+      }
+
+      if (cmdType === ApplicationCommandType.ChatInput) {
+        apiCmd.description = description
+        apiCmd.description_localizations = descriptionLocalizations
       }
 
       if (tree.command) {

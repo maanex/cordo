@@ -124,7 +124,8 @@ export namespace ConfigInternals {
     },
     client: {
       id: '',
-      publicKey: ''
+      publicKey: '',
+      token: ''
     },
     hooks: {
       onRawInteraction: null,
