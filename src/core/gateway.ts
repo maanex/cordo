@@ -345,4 +345,15 @@ export namespace CordoGateway {
     return apiRequest('post', endpoint, command)
   }
 
+  export function bulkUpsertCommands(commands: APIApplicationCommand[], guild?: string) {
+    const config = CordoMagic.getConfig()
+    if (!config?.client.id)
+      throw new MissingContextError('Could not bulk upsert commands, no client id found in config context.')
+    if (!config?.client.token)
+      throw new MissingContextError('Could not bulk upsert commands, no bot token found in config context (client.token).')
+
+    const endpoint = guild ? `/applications/${config.client.id}/guilds/${guild}/commands` : `/applications/${config.client.id}/commands`
+    return apiRequest('put', endpoint, commands)
+  }
+
 }

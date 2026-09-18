@@ -1,10 +1,10 @@
 import { Client, Events } from 'discord.js'
 import { Cordo } from '../core'
-
+import { PluginConfigurationError } from '../errors'
 
 export function useWithDiscordJs(client: Client) {
   if (!client)
-    throw new Error('You must provide a discord.js client object');
+    throw new PluginConfigurationError('You must provide a discord.js client object');
 
   client.on(Events.Raw, (event) => {
     if (event.t === 'INTERACTION_CREATE')

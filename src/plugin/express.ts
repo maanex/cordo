@@ -1,5 +1,6 @@
 import { verifyKeyMiddleware } from "discord-interactions"
 import { Cordo } from "../core"
+import { PluginConfigurationError } from "../errors"
 
 
 type ExpressRequest = {
@@ -14,7 +15,7 @@ type ExpressResponse = {
 
 export function useWithExpress(clientPublicKey: string) {
   if (!clientPublicKey)
-    throw new Error('You must specify a Discord client public key');
+    throw new PluginConfigurationError('You must specify a Discord client public key');
 
   const checkKey = verifyKeyMiddleware(clientPublicKey)
 

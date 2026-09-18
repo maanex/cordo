@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks'
+import { MissingContextError } from "../errors"
 import { LibIds } from '../lib/ids'
 import type { CordoInteraction } from './interaction'
 import type { LockfileInternals } from './files/lockfile'
@@ -77,7 +78,7 @@ export namespace CordoMagic {
   /** request a new id, if in a context */
   export function requestNewId<T extends boolean>(asString: T): T extends true ? string : number {
     if (!Internals.getCtx())
-      throw new Error('Not in a Cordo context')
+      throw new MissingContextError('Not in a Cordo context')
 
     const id = ++Internals.getCtx().idCounter
     if (!asString)

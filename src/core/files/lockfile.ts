@@ -12,6 +12,7 @@ export namespace LockfileInternals {
     reg: {
       idCounter: number
       lutCounter: number
+      commandSyncHash?: string
     }
     routes: Array<Omit<RouteInternals.ParsedRoute, 'impl'>>
     lut: Array<string>
@@ -88,6 +89,8 @@ export namespace LockfileInternals {
             out.reg.idCounter = parseInt(value) ?? 0
           else if (key === 'lutc')
             out.reg.lutCounter = parseInt(value) ?? 0
+          else if (key === 'csync')
+            out.reg.commandSyncHash = value
         }
 
         if (block === 'routes') {
@@ -119,6 +122,7 @@ export namespace LockfileInternals {
       '[reg]',
       `idc ${data.reg.idCounter}`,
       `lutc ${data.reg.lutCounter}`,
+      ...(data.reg.commandSyncHash ? [ `csync ${data.reg.commandSyncHash}` ] : []),
       '',
       '[routes]',
       ...data.routes.map(route => `${route.name} ${route.filePath}`),

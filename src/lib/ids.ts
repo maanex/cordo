@@ -1,3 +1,4 @@
+import { InvalidIdError } from "../errors"
 
 
 export namespace LibIds {
@@ -17,7 +18,7 @@ export namespace LibIds {
 
   export function stringify(id: number, length: number) {
     if (id > maxId)
-      throw new Error(`Id ${id} is larger than 31 bits`)
+      throw new InvalidIdError(`Id ${id} is larger than 31 bits`)
     let out = ''
     for (let i = 0; i < length; i++)
       out += bitSet[(id >> (size*i)) & bitMap]

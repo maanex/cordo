@@ -1,3 +1,4 @@
+import crypto from "node:crypto"
 import type { Permissions } from 'discord-api-types/globals'
 import { ChannelType, ApplicationCommandOptionType, ApplicationCommandType, type APIApplicationCommandOption } from 'discord-api-types/v10'
 import type { LocalizedString } from '../../lib/localization'
@@ -5,6 +6,7 @@ import { CordoGateway } from '../gateway'
 import { RoutingResolve } from '../routing/resolve'
 import { CordoMagic } from '../magic'
 import type { CordoInteraction } from '../interaction'
+import { LockfileInternals } from "./lockfile"
 import type { CordoRoute } from './route'
 
 
@@ -186,7 +188,7 @@ export namespace CommandInternals {
       console.warn('No commands to sync. Is cordo initialized and commands defined?')
       return
     }
-    
+
     const rootCommands = new Map<string, CommandTree>()
 
     const config = CordoMagic.getConfig()
@@ -271,44 +273,47 @@ export namespace CommandInternals {
 
     const maxRetries = options?.maxRetries ?? 3
 
-    for (const apiCmd of apiCommands.values()) {
-      let retries = 0
+    const hash = crypto.createHash('sha256').update(JSON.stringify(apiCommands)).digest('hex')
+    if (CordoMagic.globalLockfile && CordoMagic.globalLockfile.reg.commandSyncHash === hash) 
+      return
+    
+    console.log(`[Cordo.syncCommands] Syncing ${apiCommands.length} command(s) to Discord...`)
 
-      while (true) {
-        const res = await CordoGateway.upsertCommand(apiCmd, guild)
+    let retries = 0
 
-        if (res.status === 429) {
-          const retryAfter = res.headers['retry-after'] || res.data?.retry_after
-          const waitTime = retryAfter ? parseFloat(retryAfter) * 1000 : 5000
-          console.warn(`Rate limited (429) when syncing command '${apiCmd.name}'. Waiting ${waitTime}ms...`)
-          await new Promise(resolve => setTimeout(resolve, waitTime))
-          continue
-        }
+    while (true) {
+      const res = await CordoGateway.bulkUpsertCommands(apiCommands, guild)
 
-        if (res.status >= 400) {
-          console.error(`Error syncing command '${apiCmd.name}' [HTTP ${res.status}]: ${JSON.stringify(res.data)}`)
-          if (retries < maxRetries) {
-            retries++
-            const backoffTime = 1000 * retries
-            console.log(`Retrying (${retries}/${maxRetries}) in ${backoffTime}ms...`)
-            await new Promise(resolve => setTimeout(resolve, backoffTime))
-            continue
-          } else {
-            console.error(`Max retries reached for command '${apiCmd.name}'. Skipping.`)
-            break
-          }
-        }
-
-        const remaining = res.headers['x-ratelimit-remaining']
-        const resetAfter = res.headers['x-ratelimit-reset-after']
-        if (remaining !== undefined && parseInt(remaining, 10) === 0 && resetAfter) {
-          const waitTime = parseFloat(resetAfter) * 1000
-          console.log(`Rate limit bucket depleted. Waiting ${waitTime}ms before next command...`)
-          await new Promise(resolve => setTimeout(resolve, waitTime))
-        }
-
-        break
+      if (res.status === 429) {
+        const retryAfter = res.headers['retry-after'] || res.data?.retry_after
+        const waitTime = retryAfter ? parseFloat(retryAfter) * 1000 : 5000
+        console.warn(`Rate limited (429) when bulk syncing commands. Waiting ${waitTime}ms...`)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+        continue
       }
+
+      if (res.status >= 400) {
+        console.error(`Error bulk syncing commands [HTTP ${res.status}]: ${JSON.stringify(res.data)}`)
+        if (retries < maxRetries) {
+          retries++
+          const backoffTime = 1000 * retries
+          console.log(`Retrying (${retries}/${maxRetries}) in ${backoffTime}ms...`)
+          await new Promise(resolve => setTimeout(resolve, backoffTime))
+          continue
+        } else {
+          console.error(`Max retries reached for bulk command sync. Skipping.`)
+          break
+        }
+      }
+
+      if (CordoMagic.globalLockfile && CordoMagic.globalConfig && !CordoMagic.globalConfig.headless) {
+        CordoMagic.globalLockfile.reg.commandSyncHash = hash
+        await LockfileInternals.writeLockfile(CordoMagic.globalConfig.paths.lockfile, CordoMagic.globalLockfile, CordoMagic.globalConfig.paths.types)
+      }
+
+      console.log(`[Cordo.syncCommands] Successfully synced ${apiCommands.length} command(s) to Discord.`)
+      break
     }
   }
 }
+

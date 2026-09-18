@@ -1,11 +1,12 @@
 import { verifyKey } from "discord-interactions"
 import { Hono } from "hono"
 import { Cordo } from "../core"
+import { PluginConfigurationError } from "../errors"
 
 
 export function useWithHono(clientPublicKey: string) {
   if (!clientPublicKey)
-    throw new Error('You must specify a Discord client public key');
+    throw new PluginConfigurationError('You must specify a Discord client public key');
 
   const app = new Hono()
 

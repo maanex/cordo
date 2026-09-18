@@ -1,6 +1,7 @@
 import type { APIInteraction } from 'discord-api-types/v10'
 import defu from 'defu'
 import type { PartialDeep } from 'type-fest'
+import { HeadlessModeError, NotMountedError } from "../errors"
 import { ConfigInternals, type CordoConfig, type ParsedCordoConfig } from './files/config'
 import { LockfileInternals } from './files/lockfile'
 import { CordoGateway } from './gateway'
@@ -37,9 +38,9 @@ function triggerInteraction(interaction: APIInteraction, opts: {
 } = {}) {
   if (!CordoMagic.globalLockfile || !CordoMagic.globalConfig) {
     if (CordoMagic.globalConfig?.headless)
-      throw new Error('[Cordo.triggerInteraction] Cordo is mounted in headless mode and cannot process interactions')
+      throw new HeadlessModeError('[Cordo.triggerInteraction] Cordo is mounted in headless mode and cannot process interactions')
     else
-      throw new Error('[Cordo.triggerInteraction] Cordo is not mounted')
+      throw new NotMountedError('[Cordo.triggerInteraction] Cordo is not mounted')
   }
 
   CordoGateway.triggerInteraction({
@@ -58,9 +59,9 @@ function triggerInteraction(interaction: APIInteraction, opts: {
 function registerConstants(constants: readonly string[]) {
   if (!CordoMagic.globalLockfile || !CordoMagic.globalConfig) {
     if (CordoMagic.globalConfig?.headless)
-      throw new Error('[Cordo.registerConstants] Cordo is mounted in headless mode and cannot register constants')
+      throw new HeadlessModeError('[Cordo.registerConstants] Cordo is mounted in headless mode and cannot register constants')
     else
-      throw new Error('[Cordo.registerConstants] Cordo is not mounted')
+      throw new NotMountedError('[Cordo.registerConstants] Cordo is not mounted')
   }
 
   let changesMade = false
