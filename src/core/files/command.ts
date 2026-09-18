@@ -196,7 +196,7 @@ export namespace CommandInternals {
       let cleanRoute = route
       if (cleanRoute.startsWith(prefix))
         cleanRoute = cleanRoute.slice(prefix.length)
-      cleanRoute = cleanRoute.replace(/\\.\\w+$/, '')
+      cleanRoute = cleanRoute.replace(/\.\w+$/, '')
 
       const parts = cleanRoute.split('/')
       let currentLevel = rootCommands

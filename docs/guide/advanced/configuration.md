@@ -41,8 +41,12 @@ export default defineCordoConfig({
   rootDir: './src',
   typeDest: './src/types/cordo.ts',
   
+  // Set to true if you want to use Cordo just for UI rendering without routing, safely omit and ignore this otherwise
+  headless: false,
+
   client: {
-    id: '123456789'
+    id: '123456789',
+    token: process.env.DISCORD_TOKEN // Only required for Cordo.syncCommands()
   },
   
   functDefaultFlags: {
@@ -51,6 +55,9 @@ export default defineCordoConfig({
       continueOnError: false
     }
   },
+
+  // Suppress specific warnings from Cordo
+  omitWarnings: ['onlyIfYouKnowWhatYouAreDoing'],
   
   hooks: {
     // Advanced: Intercept the raw command name and transform it before Cordo tries to route it

@@ -64,6 +64,7 @@ export namespace CordoGateway {
       method,
       url,
       baseURL: config.upstream.baseUrl,
+      headers: config.client.token ? { Authorization: `Bot ${config.client.token}` } : undefined,
       data: body,
       validateStatus: null
     })
@@ -337,6 +338,8 @@ export namespace CordoGateway {
     const config = CordoMagic.getConfig()
     if (!config?.client.id)
       throw new MissingContextError('Could not upsert command, no client id found in config context.')
+    if (!config?.client.token)
+      throw new MissingContextError('Could not upsert command, no bot token found in config context (client.token).')
 
     const endpoint = guild ? `/applications/${config.client.id}/guilds/${guild}/commands` : `/applications/${config.client.id}/commands`
     return apiRequest('post', endpoint, command)

@@ -21,6 +21,21 @@ function backgroundWorker(interaction: CordoInteraction) {
 }
 ```
 
+Note that calling `runInCordoContext` is **not required** if you don't need interaction-specific functionality (like responding) or if you are running in `headless` mode. Code running outside a context will automatically fall back to using the global configuration.
+
+## Global State Access
+
+You can access the active configuration anywhere using `Cordo.getConfig()`. It resolves the config from the current active interaction context if one exists, or falls back to the global configuration if called outside a route.
+
+```ts
+import { Cordo } from 'cordo/core'
+
+const config = Cordo.getConfig()
+if (config) {
+  console.log('Bot ID:', config.client.id)
+}
+```
+
 ## Component Compilation
 
 If you are building complex wrappers, you might need to convert Cordo's declarative component trees back into Discord's raw JSON component structure manually.

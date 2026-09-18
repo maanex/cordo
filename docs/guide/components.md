@@ -69,3 +69,13 @@ i.prompt(
 
 > [!TIP]
 > See the **Components** sidebar section for detailed reference pages on Buttons, Selects, Inputs, and Structural components!
+
+## Advanced
+
+In some very specific use cases, you might want to bypass Cordo's internal state management. Interactive components (like buttons, selects, and text inputs) provide an `.advanced` namespace with methods that let you take raw control over how they are generated.
+
+### `overrideCustomId(customId: string)`
+Normally, Cordo generates a `custom_id` dynamically to embed the `onClick`/`onSubmit` functs or `as()` referencing. If you use `overrideCustomId`, you can explicitly set the `custom_id` that is sent to Discord. 
+
+> [!WARNING]
+> Using `overrideCustomId` will break Cordo's standard event bindings. Any `.onClick()` or `.onSubmit()` handlers attached to the component will not execute, and `.as()` values will be ignored. Additionally interactions you receive in cordo with custom custom_id values will not be parsed properly by cordo and throw an error. Use with cation and only if you know what you are doing.

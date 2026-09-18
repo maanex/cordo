@@ -40,7 +40,10 @@ export default defineCordoCommand({
 
 When `Cordo.mountCordo()` scans your routing tree, it looks for any file exporting a `CordoCommand`. 
 - Cordo's **Router** unwraps the object, finding the attached `route` handler, and registers it so it can be executed.
-- Cordo's **Command Sync** (`Cordo.syncCommands()`) reads the metadata (`type`, `name`, `options`) and registers the command with Discord's API.
+- Cordo's **Command Sync** (`Cordo.syncCommands()`) reads the metadata (`type`, `name`, `options`) and registers the command with Discord's API. 
+
+> [!IMPORTANT]
+> To use `Cordo.syncCommands()`, you must configure `client.token` in your `cordo.config.ts`. Cordo requires your bot token to authenticate the API request that registers the commands to Discord.
 
 ## What it can do
 

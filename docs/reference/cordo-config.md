@@ -34,6 +34,16 @@ Defines the file structure of your app.
 Defines your Discord application credentials.
 - `id`: Your Discord Application ID.
 - `publicKey`: Your Discord Public Key (used for verifying incoming HTTP interactions).
+- `token`: Your Discord Bot Token (used to authenticate API calls like syncing commands).
+
+### `headless`
+Mounting Cordo in headless mode (set to `true`) disables file system operations. It will not read the filesystem for configs, lockfiles, or routes, and will not write to the lockfile or generate types. This is useful if you only want to use Cordo for rendering component UI without full routing capabilities.
+
+### `omitWarnings`
+An array of specific warnings that Cordo should suppress. Use this carefully. Available flags:
+- `'customIdOverride'`: Suppresses warnings when assigning an explicit `custom_id` alongside existing action handlers (which causes them not to fire).
+- `'headlessCustomIdGeneration'`: Suppresses warnings about generating unusable custom IDs in headless mode.
+- `'placeholderTextAppearance'`: Suppresses warnings when Cordo auto-fills required text fields (like empty labels).
 
 ### `upstream`
 Defines connection settings to Discord's API.
