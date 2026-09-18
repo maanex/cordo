@@ -53,12 +53,12 @@ export namespace CordoMagic {
 
   /** get the current evoker, if in a context */
   export function getInvoker() {
-    return Internals.getCtx().invoker
+    return Internals.getCtx()?.invoker ?? null
   }
 
   /** get the current working directory, if in a context */
   export function getCwd() {
-    return Internals.getCtx().cwd
+    return Internals.getCtx()?.cwd ?? ''
   }
 
   /** set the current working directory, if in a context */

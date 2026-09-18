@@ -69,7 +69,7 @@ export function radioGroup<Values extends string = string>() {
   }
 
   const advanced = {
-    /** Will override cordo's custom_id generation. Not compatible with onClick handlers */
+    /** Will override cordo's custom_id generation. Not compatible with onSubmit handlers */
     overrideCustomId(customId: string) {
       if (!CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride')) {
         if (functVal.length > 0)

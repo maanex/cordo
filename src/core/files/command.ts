@@ -3,6 +3,7 @@ import { ChannelType, ApplicationCommandOptionType, ApplicationCommandType, type
 import type { LocalizedString } from '../../lib/localization'
 import { CordoGateway } from '../gateway'
 import { RoutingResolve } from '../routing/resolve'
+import { CordoMagic } from '../magic'
 import type { CordoInteraction } from '../interaction'
 import type { CordoRoute } from './route'
 
@@ -180,7 +181,7 @@ export namespace CommandInternals {
     } as any
   }
 
-  export async function syncCommands(commands: Map<string, CordoCommand>, guild?: string, options?: { maxRetries?: number }) {
+  export async function syncCommands(commands: Map<string, CordoCommand> | undefined, guild?: string, options?: { maxRetries?: number }) {
     if (!commands || commands.size === 0) {
       console.warn('No commands to sync. Is cordo initialized and commands defined?')
       return
@@ -188,8 +189,16 @@ export namespace CommandInternals {
     
     const rootCommands = new Map<string, CommandTree>()
 
+    const config = CordoMagic.getConfig()
+    const prefix = (config?.defaults?.commandRoutePrefix ?? 'command') + '/'
+
     for (const [ route, command ] of commands.entries()) {
-      const parts = route.split('/')
+      let cleanRoute = route
+      if (cleanRoute.startsWith(prefix))
+        cleanRoute = cleanRoute.slice(prefix.length)
+      cleanRoute = cleanRoute.replace(/\\.\\w+$/, '')
+
+      const parts = cleanRoute.split('/')
       let currentLevel = rootCommands
 
       for (let i = 0; i < parts.length; i++) {

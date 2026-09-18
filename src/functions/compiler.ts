@@ -30,7 +30,7 @@ export namespace FunctCompiler {
     if (CordoMagic.getConfig()?.headless) {
       if (list.length > 0 && !CordoMagic.getConfig()?.omitWarnings.includes('headlessCustomIdGeneration'))
         console.warn('You are rendering a component with functs assigned while in headless mode. Your functs will not register.')
-      return NoopIndicator + '_headless_' + randomBytes(6).toHex()
+      return NoopIndicator + '_headless_' + randomBytes(6).toString('hex')
     }
 
     const idc = CordoMagic.requestNewId(true)
@@ -179,12 +179,9 @@ export namespace FunctCompiler {
         }
 
         const argRaw = argsRaw.shift()!
-        if (!argRaw) {
-          console.warn('Monkey alert!')
-          console.log(JSON.stringify({ id, header, routesRaw, argsRaw, parsedArguments }))
-          console.log(`>> ${id} <<`)
+        if (!argRaw) 
           return path.join('/')
-        }
+
         const parsed = parseArg(argRaw, parsedArguments)
         path.push(parsed)
         parsedArguments.push(parsed)

@@ -58,9 +58,9 @@ function triggerInteraction(interaction: APIInteraction, opts: {
 function registerConstants(constants: readonly string[]) {
   if (!CordoMagic.globalLockfile || !CordoMagic.globalConfig) {
     if (CordoMagic.globalConfig?.headless)
-      throw new Error('[Cordo.triggerInteraction] Cordo is mounted in headless mode and cannot register constants')
+      throw new Error('[Cordo.registerConstants] Cordo is mounted in headless mode and cannot register constants')
     else
-      throw new Error('[Cordo.triggerInteraction] Cordo is not mounted')
+      throw new Error('[Cordo.registerConstants] Cordo is not mounted')
   }
 
   let changesMade = false
@@ -87,7 +87,7 @@ export const Cordo = {
   registerConstants,
   triggerInteraction,
   respondToRawInteraction: CordoGateway.respondTo,
-  syncCommands: (opts?: { maxRetries?: number }) => CommandInternals.syncCommands(CordoMagic.globalLockfile!.$runtime.registeredCommands, undefined, opts),
+  syncCommands: (opts?: { maxRetries?: number }) => CommandInternals.syncCommands(CordoMagic.globalLockfile?.$runtime?.registeredCommands, undefined, opts),
   getConfig: () => CordoMagic.globalConfig,
 }
 Object.freeze(Cordo)

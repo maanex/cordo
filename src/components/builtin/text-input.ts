@@ -51,7 +51,7 @@ export function textInput() {
   }
 
   const advanced = {
-    /** Will override cordo's custom_id generation. Not compatible with onClick handlers */
+    /** Will override cordo's custom_id generation. Not compatible with as() ids */
     overrideCustomId(customId: string) {
       if (ref && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
         console.warn('You are overriding the custom_id of a text input that has an as() id. Your as() id will be overridden.')

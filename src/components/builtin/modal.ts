@@ -54,10 +54,10 @@ export function modal(...components: AllowedComponentArray) {
   }
 
   const advanced = {
-    /** Will override cordo's custom_id generation. Not compatible with onClick handlers */
+    /** Will override cordo's custom_id generation. Not compatible with onSubmit handlers */
     overrideCustomId(customId: string) {
       if (functVal.length > 0 && !CordoMagic.getConfig()?.omitWarnings.includes('customIdOverride'))
-        console.warn('You are overriding the custom_id of a button that has onClick handlers. This will prevent the onClick handlers from working.')
+        console.warn('You are overriding the custom_id of a modal that has onSubmit handlers. This will prevent the onSubmit handlers from working.')
       overrideCustomIdVal = customId
       return out
     }
