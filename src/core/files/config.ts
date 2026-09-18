@@ -43,7 +43,7 @@ export type CordoConfig = {
     /** The app's public key. Only required if you are receiving interactions via HTTP */
     publicKey: string
     /** The bot token. Only required for actions that call Discord proactively like syncing commands, not required for handling interactions. */
-    token?: string
+    token: string
   }
   /** Upstream describes the Discord API */
   upstream: {
