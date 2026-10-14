@@ -18,7 +18,7 @@ type CommandOption = {
   type: 'string'
   minLength?: number
   maxLength?: number
-  choices: Array<{
+  choices?: Array<{
     name: string | LocalizedString
     value: string
   }>
@@ -47,7 +47,7 @@ type CommandOption = {
   minValue?: number
   maxValue?: number
   autocomplete?: boolean
-  choices: Array<{
+  choices?: Array<{
     name: string | LocalizedString
     value: number
   }>
