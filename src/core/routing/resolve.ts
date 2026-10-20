@@ -1,3 +1,4 @@
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionType } from "discord.js"
 import { MissingContextError } from "../../errors/builtin/missing-context"
 import { FunctCompiler } from "../../functions/compiler"
 import { Hooks } from "../hooks"
@@ -134,6 +135,25 @@ export namespace RoutingResolve {
         : winner.args,
       routeFilePath: winner.route.filePath
     }
+  }
+
+  export function getRouteForCommandObject(command: (CordoInteraction & { type: InteractionType.ApplicationCommand | InteractionType.ApplicationCommandAutocomplete })['data']) {
+    if (command.type === ApplicationCommandType.ChatInput) {
+      let name = command.name
+      let option = command.options?.[0]
+      while (option?.type === ApplicationCommandOptionType.Subcommand || option?.type === ApplicationCommandOptionType.SubcommandGroup) {
+        name += ` ${option.name}`
+        option = option.options?.[0]
+      }
+      return getRouteForCommand(name, 'slash')
+    }
+    if (command.type === ApplicationCommandType.Message || command.type === ApplicationCommandType.User) {
+      return getRouteForCommand(
+        command.name,
+        command.type === ApplicationCommandType.Message ? 'message' : 'user'
+      )
+    }
+    return null
   }
 
   export function getRouteForCommand(command: string, type: 'slash' | 'message' | 'user') {

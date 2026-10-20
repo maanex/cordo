@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from "discord-api-types/v10"
+import { ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from "discord-api-types/v10"
 import type { Method } from "axios"
 import axios from "axios"
 import { FunctCompiler } from "../functions/compiler"
@@ -154,44 +154,23 @@ export namespace CordoGateway {
 
     if (i.type === InteractionType.ApplicationCommand) 
       return handleCommandInteraction(i)
-     else if (i.type === InteractionType.MessageComponent) 
+    else if (i.type === InteractionType.MessageComponent) 
       return handleComponentInteraction(i)
-     else if (i.type === InteractionType.ModalSubmit) 
+    else if (i.type === InteractionType.ModalSubmit) 
       return handleModalInteraction(i)
+    else if (i.type === InteractionType.ApplicationCommandAutocomplete)
+      return handleAutocompleteInteraction(i)
   }
 
   function handleCommandInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommand }) {
-    // slash commands: need to check for subcommands
-    if (i.data.type === ApplicationCommandType.ChatInput) {
-      let name = i.data.name
-      let option = i.data.options?.[0]
-      while (option?.type === ApplicationCommandOptionType.Subcommand || option?.type === ApplicationCommandOptionType.SubcommandGroup) {
-        name += ` ${option.name}`
-        option = option.options?.[0]
-      }
+    const res = RoutingResolve.getRouteForCommandObject(i.data)
+    if (!res)
+      return
+    CordoMagic.setCwd(res.path)
+    if (res.route.routeFilePath && CordoMagic.getLockfile()?.$runtime.registeredCommands.has(res.route.routeFilePath))
+      InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(res.route.routeFilePath)!
 
-      const { route, path } = RoutingResolve.getRouteForCommand(name, 'slash')
-
-      CordoMagic.setCwd(path)
-      if (route.routeFilePath && CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeFilePath))
-        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeFilePath)!
-
-      return RoutingRespond.callRoute(route.routeId, route.args, i)
-    }
-
-    // message/user commands: go ahead
-    if (i.data.type === ApplicationCommandType.Message || i.data.type === ApplicationCommandType.User) {
-      const { route, path } = RoutingResolve.getRouteForCommand(
-        i.data.name,
-        i.data.type === ApplicationCommandType.Message ? 'message' : 'user'
-      )
-
-      CordoMagic.setCwd(path)
-      if (route.routeFilePath && CordoMagic.getLockfile()?.$runtime.registeredCommands.has(route.routeFilePath))
-        InteractionInternals.get(i).commandEntrypoint = CordoMagic.getLockfile()!.$runtime.registeredCommands.get(route.routeFilePath)!
-
-      return RoutingRespond.callRoute(route.routeId, route.args, i)
-    }
+    return RoutingRespond.callRoute(res.route.routeId, res.route.args, i)
   }
 
   async function handleComponentInteraction(i: CordoInteraction & { type: InteractionType.MessageComponent }) {
@@ -241,6 +220,27 @@ export namespace CordoGateway {
       if (!success)
         return
     }
+  }
+
+  function handleAutocompleteInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommandAutocomplete }) {
+    const res = RoutingResolve.getRouteForCommandObject(i.data)
+    if (!res)
+      return
+    
+    const command = CordoMagic.getLockfile()?.$runtime.registeredCommands.get(res.route.routeFilePath ?? res.path)
+    if (!command)
+      return
+
+    const commandAutocompletes = CordoMagic.getLockfile()?.$runtime.registeredCommandAutocompletes.get(command)
+    if (!commandAutocompletes)
+      return
+
+    const focusedOption = i.data.options?.find(opt => opt.focused)
+    if (!focusedOption)
+      return
+
+    const handler = commandAutocompletes.get(focusedOption.name)
+    return handler?.(focusedOption.value, i)
   }
 
   //

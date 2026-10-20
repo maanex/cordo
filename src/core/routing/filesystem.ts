@@ -6,6 +6,7 @@ import { LockfileInternals } from "../files/lockfile"
 import { LibIds } from "../../lib/ids"
 import { CommandInternals, type CordoCommand } from "../files/command"
 import type { ParsedCordoConfig } from "../files/config"
+import { AutocompleteInternals, type CordoAutocomplete } from "../files/command-autocomplete"
 
 
 export namespace RoutingFilesystem {
@@ -141,6 +142,17 @@ export namespace RoutingFilesystem {
     for (const file of files.commands) {
       const filePath = file.path.join('/')
       lockfile.$runtime.registeredCommands.set(filePath, file.command)
+
+      const autocompleteOptions = file.command.options
+        ?.filter(opt => 'choices' in opt && AutocompleteInternals.isAutocomplete(opt.choices))
+      if (autocompleteOptions?.length) {
+        const map = new Map<string, CordoAutocomplete<any>>()
+        for (const option of autocompleteOptions) {
+          // @ts-ignore we know choices are there and are autocomplete!
+          map.set(option.name, option.choices)
+        }
+        lockfile.$runtime.registeredCommandAutocompletes.set(file.command, map)
+      }
     }
 
     return out

@@ -8,7 +8,13 @@ import { CordoMagic } from '../magic'
 import type { CordoInteraction } from '../interaction'
 import { LockfileInternals } from "./lockfile"
 import type { CordoRoute } from './route'
+import type { CordoAutocomplete } from "./command-autocomplete"
 
+
+type CommandChoices<T extends string | number> = Array<{
+  name: string | LocalizedString
+  value: T
+}> | CordoAutocomplete<T>
 
 type CommandOption = {
   name: string | LocalizedString
@@ -18,19 +24,13 @@ type CommandOption = {
   type: 'string'
   minLength?: number
   maxLength?: number
-  choices?: Array<{
-    name: string | LocalizedString
-    value: string
-  }>
+  choices?: CommandChoices<string>
 } | {
   type: 'integer'
   minValue?: number
   maxValue?: number
   autocomplete?: boolean
-  choices?: Array<{
-    name: string | LocalizedString
-    value: number
-  }>
+  choices?: CommandChoices<number>
 } | {
   type: 'boolean'
 } | {
@@ -47,10 +47,7 @@ type CommandOption = {
   minValue?: number
   maxValue?: number
   autocomplete?: boolean
-  choices?: Array<{
-    name: string | LocalizedString
-    value: number
-  }>
+  choices?: CommandChoices<number>
 } | {
   type: 'attachment'
   fileTypes?: Array<'image' | 'video' | 'audio' | `.${string}`>

@@ -14,6 +14,7 @@ export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, type RouteRequest, defineCordoRoute, assertCordoRequest } from './files/route'
 export { type CordoCommand, defineCordoCommand } from './files/command'
+export { type CordoAutocomplete, defineCordoAutocomplete } from './files/command-autocomplete'
 export { type CordoErrorBoundary, defineCordoErrorBoundary } from './files/error-boundary'
 export { type CordoInteraction } from './interaction'
 

@@ -3,6 +3,7 @@ import { LibIds } from '../../lib/ids'
 import type { RouteInternals } from './route'
 import type { ErrorBoundaryInternals } from './error-boundary'
 import type { CordoCommand } from './command'
+import type { CordoAutocomplete } from './command-autocomplete'
 
 
 export namespace LockfileInternals {
@@ -20,6 +21,7 @@ export namespace LockfileInternals {
       routeImpls: Map<string, RouteInternals.ParsedRoute>
       errorBoundaries: Array<ErrorBoundaryInternals.ParsedBoundary>
       registeredCommands: Map<string, CordoCommand>
+      registeredCommandAutocompletes: WeakMap<CordoCommand, Map<string, CordoAutocomplete<any>>>
     }
   }
 
@@ -39,7 +41,8 @@ export namespace LockfileInternals {
       $runtime: {
         routeImpls: new Map(),
         errorBoundaries: [],
-        registeredCommands: new Map()
+        registeredCommands: new Map(),
+        registeredCommandAutocompletes: new WeakMap()
       }
     }
   }
