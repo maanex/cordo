@@ -235,11 +235,13 @@ export namespace CordoGateway {
     if (!commandAutocompletes)
       return
 
+    // @ts-ignore for now
     const focusedOption = i.data.options?.find(opt => opt.focused)
     if (!focusedOption)
       return
 
     const handler = commandAutocompletes.get(focusedOption.name)
+    // @ts-ignore for now
     return handler?.(focusedOption.value, i)
   }
 

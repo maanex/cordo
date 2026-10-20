@@ -2,7 +2,7 @@
 
 Cordo is a developer-experience-first Discord App and UI library for TypeScript.
 
-Cordo is built for and used in production with over 700k discord servers at https://freestuffbot.xyz/.
+Cordo is built for and used in production with over 900k discord servers at https://freestuffbot.xyz/.
 
 
 ## Concepts
