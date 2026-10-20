@@ -110,3 +110,6 @@ export default defineCordoRoute((i) => {
 ```
 
 When a user executes the `/ping` slash command, Cordo routes the interaction directly to this file!
+
+> [!TIP]
+> To define command arguments, descriptions, permissions, and dynamic autocomplete handlers, wrap your route with `defineCordoCommand`. See the **[Commands Reference](/reference/command.md)** for details.

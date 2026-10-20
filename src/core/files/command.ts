@@ -8,7 +8,7 @@ import { CordoMagic } from '../magic'
 import type { CordoInteraction } from '../interaction'
 import { LockfileInternals } from "./lockfile"
 import type { CordoRoute } from './route'
-import type { CordoAutocomplete } from "./command-autocomplete"
+import { AutocompleteInternals, type CordoAutocomplete } from "./command-autocomplete"
 
 
 type CommandChoices<T extends string | number> = Array<{
@@ -133,17 +133,19 @@ export namespace CommandInternals {
       description,
       description_localizations,
       required: opt.required,
-      autocomplete: opt.autocomplete,
       min_value: opt.minValue,
       max_value: opt.maxValue,
       min_length: opt.minLength,
       max_length: opt.maxLength,
       file_types: opt.fileTypes,
       channel_types: opt.channelTypes,
-      choices: opt.choices?.map((c: any) => {
-        const { value: name, localizations: name_localizations } = resolveLocalizedText(c.name)
-        return { name, name_localizations, value: c.value }
-      })
+      choices: opt.choices && Array.isArray(opt.choices)
+        ? opt.choices.map((c: any) => {
+          const { value: name, localizations: name_localizations } = resolveLocalizedText(c.name)
+          return { name, name_localizations, value: c.value }
+        })
+        : undefined,
+      autocomplete: opt.choices && AutocompleteInternals.isAutocomplete(opt.choices)
     }
 
     return res

@@ -59,3 +59,166 @@ The `defineCordoCommand` object accepts the following options:
 - `limitContexts`: Limits where the command can be used (`'guild'`, `'dm'`, or `'group'`).
 - `private`: If `true`, the resulting interaction will be automatically marked as ephemeral (private).
 - `route`: The `CordoRoute` handler to execute when the command is invoked.
+
+## Command Options
+
+Options in the `options` array configure the arguments users provide when running a chat command.
+
+Supported option types:
+- `'string'`: Text input. Supports `minLength`, `maxLength`, and `choices`.
+- `'integer'`: Whole numbers. Supports `minValue`, `maxValue`, and `choices`.
+- `'number'`: Floating-point numbers. Supports `minValue`, `maxValue`, and `choices`.
+- `'boolean'`: True or false toggle.
+- `'user'`: User mention.
+- `'channel'`: Channel mention. Supports filtering by `channelTypes`.
+- `'role'`: Role mention.
+- `'mentionable'`: Any mentionable entity (users, roles).
+- `'attachment'`: File attachment. Supports filtering by `fileTypes` (e.g. `['image', 'video']` or `['.json', '.png']`).
+
+### Static Choices
+
+For `'string'`, `'integer'`, or `'number'` options, you can provide a predefined list of static choices:
+
+```ts
+{
+  type: 'string',
+  name: 'difficulty',
+  description: 'Select difficulty level',
+  required: true,
+  choices: [
+    { name: 'Easy', value: 'easy' },
+    { name: 'Medium', value: 'medium' },
+    { name: 'Hard', value: 'hard' }
+  ]
+}
+```
+
+## Autocomplete (`defineCordoAutocomplete`)
+
+Instead of static choices, you can provide dynamic choices in real-time as the user types using `defineCordoAutocomplete`.
+
+### Defining an Autocomplete Handler
+
+Assign `defineCordoAutocomplete` to the option's `choices` property:
+
+```ts
+// src/routes/command/search.ts
+import { defineCordoCommand, defineCordoRoute, defineCordoAutocomplete } from 'cordo/core'
+import { text } from 'cordo/components'
+
+const route = defineCordoRoute((i) => {
+  const selectedTag = i.command.options.tag
+  i.render(text(`Selected tag: ${selectedTag}`))
+})
+
+export default defineCordoCommand({
+  type: 'chat',
+  name: 'search',
+  description: 'Search documentation tags',
+  options: [
+    {
+      type: 'string',
+      name: 'tag',
+      description: 'The tag to search for',
+      required: true,
+      choices: defineCordoAutocomplete(async (query, i) => {
+        // query is the string or number currently typed by the user
+        // i is the CordoInteraction context (i.guildId, i.locale, i.user, etc.)
+        const tags = ['routing', 'components', 'interactions', 'localization', 'error-handling']
+
+        const matching = tags.filter(tag => tag.toLowerCase().includes(query.toLowerCase()))
+
+        // Return up to 25 choices
+        return matching.slice(0, 25).map(tag => ({
+          name: tag,
+          value: tag
+        }))
+      })
+    }
+  ],
+  route
+})
+```
+
+### How it Works
+
+1. **Automatic Discord Configuration**: When syncing commands (`Cordo.syncCommands()`), Cordo detects that `choices` is an autocomplete handler, omits static choices, and registers the option with `autocomplete: true` on Discord.
+2. **Transparent Routing**: When a user types in Discord, Discord dispatches an `ApplicationCommandAutocomplete` interaction. Cordo identifies the target command route, locates the focused option, and invokes your autocomplete handler.
+3. **Response Formatting**: Cordo sends the returned array back to Discord as an autocomplete result. Discord allows a maximum of 25 choices.
+
+### Handler Signature
+
+```ts
+defineCordoAutocomplete<ReturnType extends string | number>(
+  handler: (
+    value: ReturnType,
+    i: CordoInteraction
+  ) => Array<{ name: string | LocalizedString, value: ReturnType }> | Promise<Array<{ name: string | LocalizedString, value: ReturnType }>>
+)
+```
+
+- **`value`**: The current value entered by the user for the focused option (`string` or `number`).
+- **`i`**: The `CordoInteraction` instance, providing access to `i.user`, `i.guildId`, `i.locale`, etc.
+- **Return Value**: An array (or Promise resolving to an array) of `{ name, value }` objects.
+
+### Localized Choice Names
+
+Choice names can be localized using a dictionary mapping locale codes to strings. Cordo will automatically pick the translation matching the user's `i.locale` (with fallback to `'en-US'` or the first available key):
+
+```ts
+choices: defineCordoAutocomplete((query, i) => [
+  {
+    name: {
+      'en-US': 'Apple',
+      'de': 'Apfel',
+      'fr': 'Pomme'
+    },
+    value: 'apple'
+  },
+  {
+    name: {
+      'en-US': 'Orange',
+      'de': 'Orange',
+      'fr': 'Orange'
+    },
+    value: 'orange'
+  }
+])
+```
+
+### Reusable Autocomplete Handlers
+
+Since `defineCordoAutocomplete` returns a reusable object, you can export it from a shared utility file and use it across multiple commands:
+
+```ts
+// src/utils/autocompletes.ts
+import { defineCordoAutocomplete } from 'cordo/core'
+import { searchDatabase } from '../lib/db'
+
+export const countryAutocomplete = defineCordoAutocomplete(async (query, i) => {
+  const countries = await searchDatabase('countries', query)
+  return countries.map(c => ({ name: c.name, value: c.code }))
+})
+```
+
+```ts
+// src/routes/command/shipping.ts
+import { defineCordoCommand, defineCordoRoute } from 'cordo/core'
+import { countryAutocomplete } from '../../utils/autocompletes'
+
+export default defineCordoCommand({
+  type: 'chat',
+  name: 'shipping',
+  description: 'Calculate shipping costs',
+  options: [
+    {
+      type: 'string',
+      name: 'country',
+      description: 'Destination country',
+      required: true,
+      choices: countryAutocomplete
+    }
+  ],
+  route: defineCordoRoute((i) => { /* ... */ })
+})
+```

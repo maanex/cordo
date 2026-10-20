@@ -11,6 +11,7 @@ import type { ParsedCordoConfig } from "./files/config"
 import { Hooks } from "./hooks"
 import { RoutingResolve } from "./routing/resolve"
 import { RoutingRespond } from "./routing/respond"
+import { AutocompleteInternals } from "./files/command-autocomplete"
 
 
 export namespace CordoGateway {
@@ -222,7 +223,7 @@ export namespace CordoGateway {
     }
   }
 
-  function handleAutocompleteInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommandAutocomplete }) {
+  async function handleAutocompleteInteraction(i: CordoInteraction & { type: InteractionType.ApplicationCommandAutocomplete }) {
     const res = RoutingResolve.getRouteForCommandObject(i.data)
     if (!res)
       return
@@ -239,10 +240,19 @@ export namespace CordoGateway {
     const focusedOption = i.data.options?.find(opt => opt.focused)
     if (!focusedOption)
       return
-
+    
     const handler = commandAutocompletes.get(focusedOption.name)
     // @ts-ignore for now
-    return handler?.(focusedOption.value, i)
+    const result = await AutocompleteInternals.callHandler(handler, focusedOption.value, i)
+    return respondTo(i, {
+      type: InteractionResponseType.ApplicationCommandAutocompleteResult,
+      data: {
+        choices: result?.map(r => ({
+          name: typeof r.name === 'string' ? r.name : r.name[i.locale] ?? r.name['en-US'] ?? Object.values(r.name)[0],
+          value: r.value
+        })) ?? []
+      }
+    })
   }
 
   //
