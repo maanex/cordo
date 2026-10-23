@@ -96,11 +96,11 @@ export default defineCordoErrorBoundary((error, req) => {
 
 ## Dynamic Command Autocomplete
 
-When creating slash commands that query databases, external APIs, or guild-specific data, use `defineCordoAutocomplete` to provide instant, filtered suggestions as the user types.
+When creating slash commands that query databases, external APIs, or guild-specific data, pass an autocomplete handler to `choices` to provide instant, filtered suggestions as the user types.
 
 ```ts
 // src/routes/command/profile.ts
-import { defineCordoCommand, defineCordoRoute, defineCordoAutocomplete } from 'cordo/core'
+import { defineCordoCommand, defineCordoRoute } from 'cordo/core'
 import { text } from 'cordo/components'
 import { searchGuildMembers } from '../../lib/guild'
 
@@ -119,7 +119,7 @@ export default defineCordoCommand({
       name: 'member',
       description: 'Search member by name',
       required: true,
-      choices: defineCordoAutocomplete(async (query, i) => {
+      choices: async (query, i) => {
         // Query database or cache using the interaction context
         const members = await searchGuildMembers(i.guildId, query)
 
@@ -127,7 +127,7 @@ export default defineCordoCommand({
           name: `${member.displayName} (@${member.username})`,
           value: member.id
         }))
-      })
+      }
     }
   ],
   route

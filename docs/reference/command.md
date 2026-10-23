@@ -93,17 +93,17 @@ For `'string'`, `'integer'`, or `'number'` options, you can provide a predefined
 }
 ```
 
-## Autocomplete (`defineCordoAutocomplete`)
+## Autocomplete
 
-Instead of static choices, you can provide dynamic choices in real-time as the user types using `defineCordoAutocomplete`.
+Instead of static choices, you can provide dynamic choices in real-time as the user types by providing a function to `choices`.
 
 ### Defining an Autocomplete Handler
 
-Assign `defineCordoAutocomplete` to the option's `choices` property:
+Assign an async or synchronous function to the option's `choices` property:
 
 ```ts
 // src/routes/command/search.ts
-import { defineCordoCommand, defineCordoRoute, defineCordoAutocomplete } from 'cordo/core'
+import { defineCordoCommand, defineCordoRoute } from 'cordo/core'
 import { text } from 'cordo/components'
 
 const route = defineCordoRoute((i) => {
@@ -121,7 +121,7 @@ export default defineCordoCommand({
       name: 'tag',
       description: 'The tag to search for',
       required: true,
-      choices: defineCordoAutocomplete(async (query, i) => {
+      choices: async (query, i) => {
         // query is the string or number currently typed by the user
         // i is the CordoInteraction context (i.guildId, i.locale, i.user, etc.)
         const tags = ['routing', 'components', 'interactions', 'localization', 'error-handling']
@@ -133,7 +133,7 @@ export default defineCordoCommand({
           name: tag,
           value: tag
         }))
-      })
+      }
     }
   ],
   route
@@ -142,19 +142,17 @@ export default defineCordoCommand({
 
 ### How it Works
 
-1. **Automatic Discord Configuration**: When syncing commands (`Cordo.syncCommands()`), Cordo detects that `choices` is an autocomplete handler, omits static choices, and registers the option with `autocomplete: true` on Discord.
-2. **Transparent Routing**: When a user types in Discord, Discord dispatches an `ApplicationCommandAutocomplete` interaction. Cordo identifies the target command route, locates the focused option, and invokes your autocomplete handler.
+1. **Automatic Discord Configuration**: When syncing commands (`Cordo.syncCommands()`), Cordo detects that `choices` is a function, omits static choices, and registers the option with `autocomplete: true` on Discord.
+2. **Transparent Routing**: When a user types in Discord, Discord dispatches an `ApplicationCommandAutocomplete` interaction. Cordo identifies the target command route, locates the focused option, and invokes your autocomplete function.
 3. **Response Formatting**: Cordo sends the returned array back to Discord as an autocomplete result. Discord allows a maximum of 25 choices.
 
 ### Handler Signature
 
 ```ts
-defineCordoAutocomplete<ReturnType extends string | number>(
-  handler: (
-    value: ReturnType,
-    i: CordoInteraction
-  ) => Array<{ name: string | LocalizedString, value: ReturnType }> | Promise<Array<{ name: string | LocalizedString, value: ReturnType }>>
-)
+(
+  value: string | number,
+  i: CordoInteraction
+) => Array<{ name: string | LocalizedString, value: string | number }> | Promise<Array<{ name: string | LocalizedString, value: string | number }>>
 ```
 
 - **`value`**: The current value entered by the user for the focused option (`string` or `number`).
@@ -166,7 +164,7 @@ defineCordoAutocomplete<ReturnType extends string | number>(
 Choice names can be localized using a dictionary mapping locale codes to strings. Cordo will automatically pick the translation matching the user's `i.locale` (with fallback to `'en-US'` or the first available key):
 
 ```ts
-choices: defineCordoAutocomplete((query, i) => [
+choices: (query, i) => [
   {
     name: {
       'en-US': 'Apple',
@@ -183,22 +181,21 @@ choices: defineCordoAutocomplete((query, i) => [
     },
     value: 'orange'
   }
-])
+]
 ```
 
 ### Reusable Autocomplete Handlers
 
-Since `defineCordoAutocomplete` returns a reusable object, you can export it from a shared utility file and use it across multiple commands:
+Autocomplete functions can be defined separately and reused across multiple commands:
 
 ```ts
 // src/utils/autocompletes.ts
-import { defineCordoAutocomplete } from 'cordo/core'
 import { searchDatabase } from '../lib/db'
 
-export const countryAutocomplete = defineCordoAutocomplete(async (query, i) => {
+export async function countryAutocomplete(query: string) {
   const countries = await searchDatabase('countries', query)
   return countries.map(c => ({ name: c.name, value: c.code }))
-})
+}
 ```
 
 ```ts
