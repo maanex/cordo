@@ -1,5 +1,5 @@
-import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
-import type { CordoModifier } from "../modifier"
+import { ComponentType, createComponent, renderComponentList, type CordoComponent } from '../component'
+import type { CordoModifier } from '../modifier'
 
 
 export type AllowedComponents = CordoComponent<'ActionRow' | 'Button' | 'TextDisplay' | 'Section' | 'MediaGallery' | 'Seperator' | 'File' | 'StringSelect'> | CordoModifier

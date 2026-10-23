@@ -1,5 +1,5 @@
-import { Hooks } from "../../core/hooks"
-import { ComponentType, createComponent } from "../component"
+import { Hooks } from '../../core/hooks'
+import { ComponentType, createComponent } from '../component'
 
 
 export function text(...content: Array<string | { toString: () => string }>) {
@@ -89,6 +89,6 @@ export function text(...content: Array<string | { toString: () => string }>) {
       return out
     }
   }
-  
+
   return out
 }

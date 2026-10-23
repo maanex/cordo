@@ -1,9 +1,9 @@
-import { ComponentType, createComponent } from "../component"
-import { Hooks } from "../../core/hooks"
-import { value, type CordoFunct, type CordoFunctRun } from "../../functions"
-import { FunctCompiler } from "../../functions/compiler"
-import { MaxLengthConstants } from "../../lib/constants"
-import { CordoMagic } from "../../core/magic"
+import { ComponentType, createComponent } from '../component'
+import { Hooks } from '../../core/hooks'
+import { value, type CordoFunct, type CordoFunctRun } from '../../functions'
+import { FunctCompiler } from '../../functions/compiler'
+import { MaxLengthConstants } from '../../lib/constants'
+import { CordoMagic } from '../../core/magic'
 
 
 type CheckboxGroupOption<Value extends string = string> = ({

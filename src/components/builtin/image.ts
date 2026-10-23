@@ -1,4 +1,4 @@
-import { ComponentType, createComponent } from "../component"
+import { ComponentType, createComponent } from '../component'
 
 
 export function image(url: string) {

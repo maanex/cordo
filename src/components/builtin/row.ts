@@ -1,4 +1,4 @@
-import { ComponentType, createComponent, renderComponentList, type CordoComponent } from "../component"
+import { ComponentType, createComponent, renderComponentList, type CordoComponent } from '../component'
 
 
 type AllowedComponents = CordoComponent<'Button' | 'StringSelect'>

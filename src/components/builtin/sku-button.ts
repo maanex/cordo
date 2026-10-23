@@ -1,5 +1,5 @@
-import { ButtonStyle } from "discord-api-types/v10"
-import { ComponentType, createComponent } from "../component"
+import { ButtonStyle } from 'discord-api-types/v10'
+import { ComponentType, createComponent } from '../component'
 
 
 export function skuButton(skuId: string) {

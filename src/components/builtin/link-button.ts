@@ -1,8 +1,8 @@
-import { URL } from "node:url"
-import { ButtonStyle } from "discord-api-types/v10"
-import { ComponentType, createComponent } from "../component"
-import { Hooks } from "../../core/hooks"
-import { MaxLengthConstants } from "../../lib/constants"
+import { URL } from 'node:url'
+import { ButtonStyle } from 'discord-api-types/v10'
+import { ComponentType, createComponent } from '../component'
+import { Hooks } from '../../core/hooks'
+import { MaxLengthConstants } from '../../lib/constants'
 
 
 export function linkButton(url: string) {

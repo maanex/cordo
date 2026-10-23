@@ -1,4 +1,4 @@
-import { ComponentType, createComponent, renderComponent, renderComponentList, type CordoComponent } from "../component"
+import { ComponentType, createComponent, renderComponent, renderComponentList, type CordoComponent } from '../component'
 
 
 type AllowedComponentsContent = CordoComponent<'TextDisplay'>

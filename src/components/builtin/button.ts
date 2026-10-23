@@ -1,11 +1,11 @@
-import { ButtonStyle, type APIEmoji } from "discord-api-types/v10"
-import { ComponentType, createComponent } from "../component"
-import { LibEmoji } from "../../lib/emoji"
-import { Hooks } from "../../core/hooks"
-import type { CordoFunct, CordoFunctRun } from "../../functions"
-import { FunctCompiler } from "../../functions/compiler"
-import { MaxLengthConstants } from "../../lib/constants"
-import { CordoMagic } from "../../core/magic"
+import { ButtonStyle, type APIEmoji } from 'discord-api-types/v10'
+import { ComponentType, createComponent } from '../component'
+import { LibEmoji } from '../../lib/emoji'
+import { Hooks } from '../../core/hooks'
+import type { CordoFunct, CordoFunctRun } from '../../functions'
+import { FunctCompiler } from '../../functions/compiler'
+import { MaxLengthConstants } from '../../lib/constants'
+import { CordoMagic } from '../../core/magic'
 
 
 export function button() {

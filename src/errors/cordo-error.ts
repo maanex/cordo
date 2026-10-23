@@ -1,4 +1,5 @@
-import * as Ui from "../components"
+import { container } from '../components/builtin/container'
+import { text } from '../components/builtin/text'
 
 
 export class CordoError extends Error {
@@ -11,9 +12,9 @@ export class CordoError extends Error {
   }
 
   public render() {
-    return Ui.container(
-      Ui.text('Error:', this.name).size('h2'),
-      Ui.text(this.message)
+    return container(
+      text('Error:', this.name).size('h2'),
+      text(this.message)
     )
   }
 

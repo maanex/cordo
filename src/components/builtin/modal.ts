@@ -1,9 +1,9 @@
-import { Hooks } from "../../core/hooks"
-import { CordoMagic } from "../../core/magic"
-import type { CordoFunct, CordoFunctRun } from "../../functions"
-import { FunctCompiler } from "../../functions/compiler"
-import { ComponentType, createComponent, renderComponent, renderComponentList, type CordoComponent, type CordoComponentPayload, type StringComponentType } from "../component"
-import type { CordoModifier } from "../modifier"
+import { Hooks } from '../../core/hooks'
+import { CordoMagic } from '../../core/magic'
+import type { CordoFunct, CordoFunctRun } from '../../functions'
+import { FunctCompiler } from '../../functions/compiler'
+import { ComponentType, createComponent, renderComponent, renderComponentList, type CordoComponent, type CordoComponentPayload, type StringComponentType } from '../component'
+import type { CordoModifier } from '../modifier'
 
 
 export type AllowedComponents = CordoComponent<'TextDisplay' | 'TextInput' | 'RoleSelect' | 'UserSelect' | 'StringSelect' | 'ChannelSelect' | 'MentionableSelect' | 'Label' | 'FileUpload' | 'RadioGroup' | 'CheckboxGroup' | 'Checkbox'> | CordoModifier

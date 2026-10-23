@@ -1,8 +1,8 @@
-import { ComponentType, createComponent } from "../component"
-import { Hooks } from "../../core/hooks"
-import { FunctCompiler } from "../../functions/compiler"
-import { value } from "../../functions"
-import { CordoMagic } from "../../core/magic"
+import { ComponentType, createComponent } from '../component'
+import { Hooks } from '../../core/hooks'
+import { FunctCompiler } from '../../functions/compiler'
+import { value } from '../../functions'
+import { CordoMagic } from '../../core/magic'
 
 
 export function textInput() {
