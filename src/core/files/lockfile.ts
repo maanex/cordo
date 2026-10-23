@@ -2,8 +2,7 @@ import { promises as fs } from 'node:fs'
 import { LibIds } from '../../lib/ids'
 import type { RouteInternals } from './route'
 import type { ErrorBoundaryInternals } from './error-boundary'
-import type { CordoCommand } from './command'
-import type { CordoAutocomplete } from './command-autocomplete'
+import type { AutocompleteHandler, CordoCommand } from './command'
 
 
 export namespace LockfileInternals {
@@ -21,7 +20,7 @@ export namespace LockfileInternals {
       routeImpls: Map<string, RouteInternals.ParsedRoute>
       errorBoundaries: Array<ErrorBoundaryInternals.ParsedBoundary>
       registeredCommands: Map<string, CordoCommand>
-      registeredCommandAutocompletes: WeakMap<CordoCommand, Map<string, CordoAutocomplete<any>>>
+      registeredCommandAutocompletes: WeakMap<CordoCommand, Map<string, AutocompleteHandler<string | number>>>
     }
   }
 
@@ -146,7 +145,7 @@ export namespace LockfileInternals {
 
       const types = [
         'declare module "cordo" {',
-        `  export type DynamicTypes = {`,
+        '  export type DynamicTypes = {',
         `    Route: ${routes.map(route => `\`${route}\``).join(' | ')}`,
         '  }',
         '}',

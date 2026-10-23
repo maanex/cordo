@@ -1,7 +1,7 @@
 import type { APIInteraction } from 'discord-api-types/v10'
 import defu from 'defu'
 import type { PartialDeep } from 'type-fest'
-import { HeadlessModeError, NotMountedError } from "../errors"
+import { HeadlessModeError, NotMountedError } from '../errors'
 import { ConfigInternals, type CordoConfig, type ParsedCordoConfig } from './files/config'
 import { LockfileInternals } from './files/lockfile'
 import { CordoGateway } from './gateway'
@@ -14,7 +14,6 @@ export { type DynamicTypes } from './dynamic-types'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, type RouteRequest, defineCordoRoute, assertCordoRequest } from './files/route'
 export { type CordoCommand, defineCordoCommand } from './files/command'
-export { type CordoAutocomplete, defineCordoAutocomplete } from './files/command-autocomplete'
 export { type CordoErrorBoundary, defineCordoErrorBoundary } from './files/error-boundary'
 export { type CordoInteraction } from './interaction'
 
@@ -29,7 +28,7 @@ async function mountCordo(configOverrides?: PartialDeep<CordoConfig>) {
   if (!CordoMagic.globalConfig.headless) {
     CordoMagic.globalLockfile = await LockfileInternals.readOrCreateLockfile(CordoMagic.globalConfig!.paths.lockfile)
     await RoutingFilesystem.readFsTreeAndSyncLockfile(CordoMagic.globalConfig.paths.routes, CordoMagic.globalLockfile, CordoMagic.globalConfig)
-  
+
     LockfileInternals.writeLockfile(CordoMagic.globalConfig.paths.lockfile, CordoMagic.globalLockfile, CordoMagic.globalConfig.paths.types)
   }
 }

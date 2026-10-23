@@ -1,14 +1,14 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from "discord-api-types/v10"
-import { disableAllComponents } from "../../components"
-import { ComponentType, renderComponent, renderComponentList, type CordoComponent } from "../../components/component"
-import type { RouteInternals, RouteRequest, RouteResponse } from "../files/route"
-import { InteractionInternals, type CordoInteraction } from "../interaction"
-import { CordoMagic } from "../magic"
-import { CordoGateway } from "../gateway"
-import { FunctInternals } from "../../functions/funct"
-import { goto, run } from "../../functions"
-import { isModifier, readModifier } from "../../components/modifier"
-import { RoutingResolve } from "./resolve"
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionContextType, InteractionResponseType, InteractionType, MessageFlags, type APIUser } from 'discord-api-types/v10'
+import { disableAllComponents } from '../../components'
+import { ComponentType, renderComponent, renderComponentList, type CordoComponent } from '../../components/component'
+import type { RouteInternals, RouteRequest, RouteResponse } from '../files/route'
+import { InteractionInternals, type CordoInteraction } from '../interaction'
+import { CordoMagic } from '../magic'
+import { CordoGateway } from '../gateway'
+import { FunctInternals } from '../../functions/funct'
+import { goto, run } from '../../functions'
+import { isModifier, readModifier } from '../../components/modifier'
+import { RoutingResolve } from './resolve'
 
 
 export namespace RoutingRespond {
@@ -87,7 +87,7 @@ export namespace RoutingRespond {
       if (options[0].type === ApplicationCommandOptionType.Subcommand || options[0].type === ApplicationCommandOptionType.SubcommandGroup)
         return parseCommandOptions(options[0].options)
     }
-    
+
     return (options as Record<string, any>[]).reduce((out, opt) => ({ [opt.name]: opt.value, ...out }), {})
   }
 
@@ -96,7 +96,7 @@ export namespace RoutingRespond {
     args: string[],
     interaction: CordoInteraction,
     opts: RouteOpts = {}
-): RouteRequest | null {
+  ): RouteRequest | null {
     const params = route.path
       .split('/')
       .filter(p => /^\[\w+\]$/.test(p))

@@ -1,9 +1,9 @@
-import type { APIEntitlement, APIInteractionGuildMember, APIMessage, APIPartialChannel, APIPartialGuild, APIUser } from "discord-api-types/v10"
-import type { CordoInteraction } from "../interaction"
-import type { goto, run } from "../../functions"
-import type { CordoComponent } from "../../components/component"
-import type { CordoModifier } from "../../components/modifier"
-import { RouteAssumptionFailedError } from "../../errors"
+import type { APIEntitlement, APIInteractionGuildMember, APIMessage, APIPartialChannel, APIPartialGuild, APIUser } from 'discord-api-types/v10'
+import type { CordoInteraction } from '../interaction'
+import type { goto, run } from '../../functions'
+import type { CordoComponent } from '../../components/component'
+import type { CordoModifier } from '../../components/modifier'
+import { RouteAssumptionFailedError } from '../../errors'
 
 
 const CordoRouteSymbol = Symbol.for('CordoRoute')

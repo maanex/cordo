@@ -1,4 +1,4 @@
-import crypto from "node:crypto"
+import crypto from 'node:crypto'
 import type { Permissions } from 'discord-api-types/globals'
 import { ChannelType, ApplicationCommandOptionType, ApplicationCommandType, type APIApplicationCommandOption } from 'discord-api-types/v10'
 import type { LocalizedString } from '../../lib/localization'
@@ -6,15 +6,24 @@ import { CordoGateway } from '../gateway'
 import { RoutingResolve } from '../routing/resolve'
 import { CordoMagic } from '../magic'
 import type { CordoInteraction } from '../interaction'
-import { LockfileInternals } from "./lockfile"
+import { LockfileInternals } from './lockfile'
 import type { CordoRoute } from './route'
-import { AutocompleteInternals, type CordoAutocomplete } from "./command-autocomplete"
 
+
+type MaybePromise<T> = T | Promise<T>
+
+export type AutocompleteHandler<ReturnType extends string | number> = (
+  value: ReturnType,
+  i: CordoInteraction,
+) => MaybePromise<Array<{
+  name: string | LocalizedString
+  value: ReturnType
+}>>
 
 type CommandChoices<T extends string | number> = Array<{
   name: string | LocalizedString
   value: T
-}> | CordoAutocomplete<T>
+}> | AutocompleteHandler<T>
 
 type CommandOption = {
   name: string | LocalizedString
@@ -145,7 +154,7 @@ export namespace CommandInternals {
           return { name, name_localizations, value: c.value }
         })
         : undefined,
-      autocomplete: opt.choices && AutocompleteInternals.isAutocomplete(opt.choices)
+      autocomplete: opt.choices && (typeof opt.choices === 'function')
     }
 
     return res
@@ -164,7 +173,7 @@ export namespace CommandInternals {
 
     const options: any[] = []
     if (isGroup) {
-      for (const [ subName, subTree ] of tree.subcommands.entries()) 
+      for (const [ subName, subTree ] of tree.subcommands.entries())
         options.push(buildApiOption(subName, subTree))
     } else if (tree.command?.options) {
       options.push(...tree.command.options.map(mapCommandOptionToApiOption))
@@ -204,11 +213,11 @@ export namespace CommandInternals {
 
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i]
-        if (!currentLevel.has(part)) 
+        if (!currentLevel.has(part))
           currentLevel.set(part, { subcommands: new Map() })
 
         const node = currentLevel.get(part)!
-        if (i === parts.length - 1) 
+        if (i === parts.length - 1)
           node.command = command
 
         currentLevel = node.subcommands
@@ -233,7 +242,7 @@ export namespace CommandInternals {
       }
 
       const { value: description, localizations: descriptionLocalizations } = resolveLocalizedText(
-        tree.command?.description, 
+        tree.command?.description,
         tree.subcommands.size > 0 ? 'Command group' : 'No description provided'
       )
 
@@ -241,9 +250,9 @@ export namespace CommandInternals {
 
       const apiOptions: any[] = []
       if (tree.subcommands.size > 0) {
-        for (const [ subName, subTree ] of tree.subcommands.entries()) 
+        for (const [ subName, subTree ] of tree.subcommands.entries())
           apiOptions.push(buildApiOption(subName, subTree))
-        
+
       } else if (tree.command?.options) {
         apiOptions.push(...tree.command.options.map(mapCommandOptionToApiOption))
       }
@@ -273,9 +282,9 @@ export namespace CommandInternals {
     const maxRetries = options?.maxRetries ?? 3
 
     const hash = crypto.createHash('sha256').update(JSON.stringify(apiCommands)).digest('hex')
-    if (CordoMagic.globalLockfile && CordoMagic.globalLockfile.reg.commandSyncHash === hash) 
+    if (CordoMagic.globalLockfile && CordoMagic.globalLockfile.reg.commandSyncHash === hash)
       return
-    
+
     console.log(`[Cordo.syncCommands] Syncing ${apiCommands.length} command(s) to Discord...`)
 
     let retries = 0
@@ -300,7 +309,7 @@ export namespace CommandInternals {
           await new Promise(resolve => setTimeout(resolve, backoffTime))
           continue
         } else {
-          console.error(`Max retries reached for bulk command sync. Skipping.`)
+          console.error('Max retries reached for bulk command sync. Skipping.')
           break
         }
       }

@@ -1,9 +1,9 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, InteractionType } from "discord.js"
-import { MissingContextError } from "../../errors/builtin/missing-context"
-import { FunctCompiler } from "../../functions/compiler"
-import { Hooks } from "../hooks"
-import type { CordoInteraction } from "../interaction"
-import { CordoMagic } from "../magic"
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionType } from 'discord.js'
+import { MissingContextError } from '../../errors/builtin/missing-context'
+import { FunctCompiler } from '../../functions/compiler'
+import { Hooks } from '../hooks'
+import type { CordoInteraction } from '../interaction'
+import { CordoMagic } from '../magic'
 
 const DefaultFileName = 'index'
 
@@ -18,7 +18,7 @@ export namespace RoutingResolve {
 
     const cwd = startingPath.split('/')
     if (cwd.at(-1) === DefaultFileName) cwd.pop()
-    while (inputPath.startsWith('.')) {        
+    while (inputPath.startsWith('.')) {
       if (inputPath.startsWith('..')) {
         if (cwd.length <= 0)
           return null

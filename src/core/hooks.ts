@@ -1,5 +1,5 @@
-import type { CordoConfig } from "./files/config"
-import { CordoMagic } from "./magic"
+import type { CordoConfig } from './files/config'
+import { CordoMagic } from './magic'
 
 
 export namespace Hooks {

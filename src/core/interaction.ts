@@ -1,5 +1,5 @@
-import type { APIInteraction } from "discord-api-types/v10"
-import type { CordoCommand } from "./files/command"
+import type { APIInteraction } from 'discord-api-types/v10'
+import type { CordoCommand } from './files/command'
 
 
 const CordoInteractionSymbol = Symbol.for('CordoInteraction')

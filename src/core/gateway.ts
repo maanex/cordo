@@ -1,17 +1,16 @@
-import { ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from "discord-api-types/v10"
-import type { Method } from "axios"
-import axios from "axios"
-import { FunctCompiler } from "../functions/compiler"
-import { FunctInternals } from "../functions/funct"
-import { MissingContextError } from "../errors/builtin/missing-context"
-import { InteractionInternals, type CordoInteraction } from "./interaction"
-import { CordoMagic } from "./magic"
-import type { LockfileInternals } from "./files/lockfile"
-import type { ParsedCordoConfig } from "./files/config"
-import { Hooks } from "./hooks"
-import { RoutingResolve } from "./routing/resolve"
-import { RoutingRespond } from "./routing/respond"
-import { AutocompleteInternals } from "./files/command-autocomplete"
+import { ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from 'discord-api-types/v10'
+import type { Method } from 'axios'
+import axios from 'axios'
+import { FunctCompiler } from '../functions/compiler'
+import { FunctInternals } from '../functions/funct'
+import { MissingContextError } from '../errors/builtin/missing-context'
+import { InteractionInternals, type CordoInteraction } from './interaction'
+import { CordoMagic } from './magic'
+import type { LockfileInternals } from './files/lockfile'
+import type { ParsedCordoConfig } from './files/config'
+import { Hooks } from './hooks'
+import { RoutingResolve } from './routing/resolve'
+import { RoutingRespond } from './routing/respond'
 
 
 export namespace CordoGateway {
@@ -123,7 +122,7 @@ export namespace CordoGateway {
     if (!config)
       throw new MissingContextError('Could not respond to interaction, no config found in context.')
     if (!config.client.id) {
-      console.warn(`No client id provided in config. Cannot respond to interactions.`)
+      console.warn('No client id provided in config. Cannot respond to interactions.')
       return null
     }
 
@@ -153,11 +152,11 @@ export namespace CordoGateway {
       }, deferAfter)
     }
 
-    if (i.type === InteractionType.ApplicationCommand) 
+    if (i.type === InteractionType.ApplicationCommand)
       return handleCommandInteraction(i)
-    else if (i.type === InteractionType.MessageComponent) 
+    else if (i.type === InteractionType.MessageComponent)
       return handleComponentInteraction(i)
-    else if (i.type === InteractionType.ModalSubmit) 
+    else if (i.type === InteractionType.ModalSubmit)
       return handleModalInteraction(i)
     else if (i.type === InteractionType.ApplicationCommandAutocomplete)
       return handleAutocompleteInteraction(i)
@@ -227,7 +226,7 @@ export namespace CordoGateway {
     const res = RoutingResolve.getRouteForCommandObject(i.data)
     if (!res)
       return
-    
+
     const command = CordoMagic.getLockfile()?.$runtime.registeredCommands.get(res.route.routeFilePath ?? res.path)
     if (!command)
       return
@@ -240,10 +239,10 @@ export namespace CordoGateway {
     const focusedOption = i.data.options?.find(opt => opt.focused)
     if (!focusedOption)
       return
-    
+
     const handler = commandAutocompletes.get(focusedOption.name)
     // @ts-ignore for now
-    const result = await AutocompleteInternals.callHandler(handler, focusedOption.value, i)
+    const result = await handler?.(focusedOption.value, i)
     return respondTo(i, {
       type: InteractionResponseType.ApplicationCommandAutocompleteResult,
       data: {
@@ -266,7 +265,7 @@ export namespace CordoGateway {
       }
       return true
     }
-    
+
     if (c.type === ComponentType.Label) {
       const success = await parseAndEvokeModalLeafComponents(c.component, i, collectedFormItems)
       return success
@@ -278,7 +277,7 @@ export namespace CordoGateway {
 
     const formRef = parsedCustomId.values[0]
 
-    // 
+    //
     if ('values' in c && c.values.length > 0 && typeof c.values[0] === 'string') {
       if (executeAllowedComponentTypes.includes(c.type)) {
         const success = await parseAndEvokeComponentWithValues(c, i)
@@ -331,7 +330,7 @@ export namespace CordoGateway {
   ): Promise<boolean> {
     if (!executeAllowedComponentTypes.includes('type' in data ? data.type : data.component_type)) // just to be sure
       return true
-    
+
     const option = FunctCompiler.parseCustomId(data.value)
     data.value = option.values[0]
 

@@ -1,12 +1,11 @@
-import { promises as fs } from "node:fs"
-import { join } from "node:path"
-import { ErrorBoundaryInternals, type CordoErrorBoundary } from "../files/error-boundary"
-import { RouteInternals, type CordoRoute } from "../files/route"
-import { LockfileInternals } from "../files/lockfile"
-import { LibIds } from "../../lib/ids"
-import { CommandInternals, type CordoCommand } from "../files/command"
-import type { ParsedCordoConfig } from "../files/config"
-import { AutocompleteInternals, type CordoAutocomplete } from "../files/command-autocomplete"
+import { promises as fs } from 'node:fs'
+import { join } from 'node:path'
+import { ErrorBoundaryInternals, type CordoErrorBoundary } from '../files/error-boundary'
+import { RouteInternals, type CordoRoute } from '../files/route'
+import { LockfileInternals } from '../files/lockfile'
+import { LibIds } from '../../lib/ids'
+import { CommandInternals, type AutocompleteHandler, type CordoCommand } from '../files/command'
+import type { ParsedCordoConfig } from '../files/config'
 
 
 export namespace RoutingFilesystem {
@@ -144,9 +143,9 @@ export namespace RoutingFilesystem {
       lockfile.$runtime.registeredCommands.set(filePath, file.command)
 
       const autocompleteOptions = file.command.options
-        ?.filter(opt => 'choices' in opt && AutocompleteInternals.isAutocomplete(opt.choices))
+        ?.filter(opt => 'choices' in opt && (typeof opt.choices === 'function'))
       if (autocompleteOptions?.length) {
-        const map = new Map<string, CordoAutocomplete<any>>()
+        const map = new Map<string, AutocompleteHandler<any>>()
         for (const option of autocompleteOptions) {
           // @ts-ignore we know choices are there and are autocomplete!
           map.set(option.name, option.choices)
