@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.20.0",
+  "version": "2.20.1",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maanex/cordo.git"
+    "url": "git+https://github.com/maanex/cordo.git"
   },
   "author": "Andreas May <andreas@maanex.me>",
   "license": "ISC",
