@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, InteractionType } from 'discord.js'
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionType } from 'discord-api-types/v10'
 import { MissingContextError } from '../../errors/builtin/missing-context'
 import { FunctCompiler } from '../../functions/compiler'
 import { Hooks } from '../hooks'
