@@ -9,7 +9,7 @@ You can define these in the `hooks` object when mounting Cordo:
 - **`onRawInteraction`**: Called the moment an interaction is received via HTTP, before Cordo does any parsing.
 - **`onBeforeHandle`**: Called after parsing, right before routing begins. Useful for kill-switches or global permissions.
 - **`onBeforeRespond`**: Called right before a JSON payload is returned to the HTTP framework or sent directly to Discord's API.
-- **`onAfterRespond`**: Called with the `AxiosResponse` of outgoing API calls.
+- **`onAfterRespond`**: Called with the response (`CordoApiResponse`) of outgoing API calls.
 - **`onNetworkError`**: Called when outgoing API calls fail.
 - **`transformCommandName`**: Intercepts the raw command name (from Discord) and transforms it into a route string.
 - **`transformUserFacingText`**: Intercepts all text rendered in UI components.

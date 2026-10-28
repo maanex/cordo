@@ -1,6 +1,4 @@
 import { ComponentType, InteractionResponseType, InteractionType, type APIApplicationCommand, type APIInteraction } from 'discord-api-types/v10'
-import type { Method } from 'axios'
-import axios from 'axios'
 import { FunctCompiler } from '../functions/compiler'
 import { FunctInternals } from '../functions/funct'
 import { MissingContextError } from '../errors/builtin/missing-context'
@@ -11,6 +9,18 @@ import type { ParsedCordoConfig } from './files/config'
 import { Hooks } from './hooks'
 import { RoutingResolve } from './routing/resolve'
 import { RoutingRespond } from './routing/respond'
+
+
+export type HttpMethod = 'get' | 'GET' | 'post' | 'POST' | 'put' | 'PUT' | 'patch' | 'PATCH' | 'delete' | 'DELETE'
+
+export type CordoApiResponse<T = any> = {
+  status: number
+  statusText: string
+  ok: boolean
+  headers: Headers
+  data: T
+  raw: Response
+}
 
 
 export namespace CordoGateway {
@@ -56,20 +66,52 @@ export namespace CordoGateway {
     httpCallback?.({ type: InteractionResponseType.Pong })
   }
 
-  function apiRequest(method: Method, url: string, body?: Record<string, any>) {
+  async function apiRequest<T = any>(method: HttpMethod | string, endpoint: string, body?: Record<string, any>): Promise<CordoApiResponse<T>> {
     const config = CordoMagic.getConfig()
     if (!config)
       throw new MissingContextError('Could not make API request, no config found in context.')
-    return axios({
-      method,
-      url,
-      baseURL: config.upstream.baseUrl,
-      headers: config.client.token ? { Authorization: `Bot ${config.client.token}` } : undefined,
-      data: body,
-      validateStatus: null
-    })
-      .then(res => Hooks.callHook('onAfterRespond', res))
-      .catch(res => Hooks.callHook('onNetworkError', res))
+
+    const url = /^https?:\/\//i.test(endpoint)
+      ? endpoint
+      : `${config.upstream.baseUrl.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`
+
+    const headers = new Headers()
+    if (config.client.token)
+      headers.set('Authorization', `Bot ${config.client.token}`)
+    if (body !== undefined)
+      headers.set('Content-Type', 'application/json')
+
+    try {
+      const rawRes = await fetch(url, {
+        method: method.toUpperCase(),
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : undefined
+      })
+
+      let data: any = null
+      const contentType = rawRes.headers.get('content-type')
+      if (contentType?.includes('application/json')) {
+        try {
+          data = await rawRes.json()
+        } catch {}
+      } else {
+        try {
+          data = await rawRes.text() || null
+        } catch {}
+      }
+
+      const res: CordoApiResponse<T> = {
+        status: rawRes.status,
+        statusText: rawRes.statusText,
+        ok: rawRes.ok,
+        headers: rawRes.headers,
+        data,
+        raw: rawRes
+      }
+      return Hooks.callHook('onAfterRespond', res)
+    } catch (err) {
+      return Hooks.callHook('onNetworkError', err)
+    }
   }
 
   /** if the payload is null the interaction will be defered if not done already */

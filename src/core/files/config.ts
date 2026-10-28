@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import defu from 'defu'
 import type { PartialDeep, Promisable } from 'type-fest'
 import type { APIInteraction } from 'discord-api-types/v10'
-import type { AxiosResponse } from 'axios'
+import type { CordoApiResponse } from '../gateway'
 import type { CordoInteraction } from '../interaction'
 import type { StringComponentType } from '../../components/component'
 import { parseFlags as runParseFlags, type FlagOpts as RunFlagOpts } from '../../functions/impl/run'
@@ -22,7 +22,7 @@ export type CordoConfig = {
    * - Cordo will not write to the lockfile or generate types.
    * - Cordo will not generate custom_ids for components.
    * - Cordo will not be able to route.
-   * 
+   *
    * Use headless mode if you want to use cordo exclusively to render components without using cordo as your framework.
    */
   headless: boolean
@@ -61,7 +61,7 @@ export type CordoConfig = {
     /** gets called before a response is returned or sent to discord */
     onBeforeRespond: HookFor<Record<string, any> | null, { interaction: CordoInteraction }>
     /** gets called with the response of outgoing api calls. DOES NOT get called on the first response as that's not an outgoing api call */
-    onAfterRespond: HookFor<AxiosResponse>,
+    onAfterRespond: HookFor<CordoApiResponse>,
     /** gets called when outgoing api calls fail */
     onNetworkError: HookFor<any>,
 
@@ -186,12 +186,12 @@ export namespace ConfigInternals {
 
     if (!config.headless) {
       config.paths.root = resolveRelativePath(config.paths.root)
-  
+
       config.paths.lockfile = resolveRelativePath(config.paths.lockfile, config.paths.root)
       config.paths.types = config.paths.types
         ? resolveRelativePath(config.paths.types, config.paths.root)
         : null
-  
+
       config.paths.routes = resolveRelativePath(config.paths.routes, config.paths.root)
     }
 

@@ -293,7 +293,7 @@ export namespace CommandInternals {
       const res = await CordoGateway.bulkUpsertCommands(apiCommands, guild)
 
       if (res.status === 429) {
-        const retryAfter = res.headers['retry-after'] || res.data?.retry_after
+        const retryAfter = res.headers.get('retry-after') || res.data?.retry_after
         const waitTime = retryAfter ? parseFloat(retryAfter) * 1000 : 5000
         console.warn(`Rate limited (429) when bulk syncing commands. Waiting ${waitTime}ms...`)
         await new Promise(resolve => setTimeout(resolve, waitTime))

@@ -1,6 +1,6 @@
 {
   "name": "cordo",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "description": "A framework for handling complex discord api interactions",
   "exports": {
     ".": "./src/index.ts",
@@ -38,11 +38,10 @@
   },
   "homepage": "https://github.com/maanex/cordo#readme",
   "dependencies": {
-    "axios": "^1.8.4",
     "defu": "^6.1.7",
     "discord-api-types": "^0.38.57",
-    "discord-interactions": "^2.4.1",
-    "type-fest": "^4.41.0"
+    "discord-interactions": "^4.4.0",
+    "type-fest": "^5.10.0"
   },
   "peerDependencies": {
     "discord.js": "^14.0.0",

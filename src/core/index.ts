@@ -11,6 +11,7 @@ import type { CordoInteraction } from './interaction'
 import { CommandInternals } from './files/command'
 
 export { type DynamicTypes } from './dynamic-types'
+export { type CordoApiResponse, type HttpMethod } from './gateway'
 export { type CordoConfig, defineCordoConfig } from './files/config'
 export { type CordoRoute, type RouteRequest, defineCordoRoute, assertCordoRequest } from './files/route'
 export { type CordoCommand, defineCordoCommand } from './files/command'

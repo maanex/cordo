@@ -66,7 +66,7 @@ A powerful set of lifecycle interceptors. You can return `null` from any hook to
 - `onRawInteraction`: Called the moment an interaction is received, before Cordo parses it.
 - `onBeforeHandle`: Called after parsing, right before routing begins.
 - `onBeforeRespond`: Called right before a JSON payload is returned or sent to Discord.
-- `onAfterRespond`: Called with the `AxiosResponse` of outgoing API calls.
+- `onAfterRespond`: Called with the response (`CordoApiResponse`) of outgoing API calls.
 - `onNetworkError`: Called when outgoing API calls fail.
 - `transformCommandName`: Intercepts the raw command name (from Discord) and transforms it into a route string.
 - `transformUserFacingText`: Intercepts all text rendered in UI components for centralized localization/translation.
