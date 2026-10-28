@@ -32,7 +32,11 @@
       "@core/*": [ "./src/core/*" ],
       "@plugin/*": [ "./src/plugin/*" ],
       "@lib/*": [ "./src/lib/*" ]
-    }
+    },
+
+    "types": [
+      "bun"
+    ]
   },
   "exclude": [
     "test"

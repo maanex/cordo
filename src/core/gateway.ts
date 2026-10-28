@@ -75,17 +75,20 @@ export namespace CordoGateway {
       ? endpoint
       : `${config.upstream.baseUrl.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`
 
+    const upperMethod = method.toUpperCase()
+    const hasBody = body != null && ![ 'GET', 'HEAD' ].includes(upperMethod)
+
     const headers = new Headers()
     if (config.client.token)
       headers.set('Authorization', `Bot ${config.client.token}`)
-    if (body !== undefined)
+    if (hasBody)
       headers.set('Content-Type', 'application/json')
 
     try {
       const rawRes = await fetch(url, {
-        method: method.toUpperCase(),
+        method: upperMethod,
         headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined
+        body: hasBody ? JSON.stringify(body) : undefined
       })
 
       let data: any = null

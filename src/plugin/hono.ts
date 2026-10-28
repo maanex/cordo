@@ -1,12 +1,12 @@
-import { verifyKey } from "discord-interactions"
-import { Hono } from "hono"
-import { Cordo } from "../core"
-import { PluginConfigurationError } from "../errors"
+import { verifyKey } from 'discord-interactions'
+import { Hono } from 'hono'
+import { Cordo } from '../core'
+import { PluginConfigurationError } from '../errors'
 
 
 export function useWithHono(clientPublicKey: string) {
   if (!clientPublicKey)
-    throw new PluginConfigurationError('You must specify a Discord client public key');
+    throw new PluginConfigurationError('You must specify a Discord client public key')
 
   const app = new Hono()
 
@@ -19,7 +19,7 @@ export function useWithHono(clientPublicKey: string) {
       return c.text('Bad Request', 400)
 
     const body = await Bun.readableStreamToArrayBuffer(bodyStream)
-    const isValid = verifyKey(body, signature, timestamp, clientPublicKey)
+    const isValid = await verifyKey(body, signature, timestamp, clientPublicKey)
     if (!isValid)
       return c.text('Bad Request', 401)
 
